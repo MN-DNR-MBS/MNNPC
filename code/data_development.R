@@ -1,9 +1,5 @@
 #### set-up ####
 
-# to do data processing
-# re-do these with BB scale instead of midpoint for scov_adj
-# is WMn83 real? If so, need to add names in
-
 # clear environment
 rm(list = ls())
 
@@ -14,51 +10,56 @@ library(RODBC)
 library(readxl)
 
 # import data
-crosswalk <- read_csv("../../intermediate-data/crosswalk_table_formatted_20250423a.csv",
+crosswalk <- read_csv("../../intermediate-data/crosswalk_table_formatted_20250911a.csv",
                       guess_max = Inf) 
-releve <- read_csv("../../intermediate-data/releve_table_formatted_20250423a.csv")
+releve <- read_csv("../../intermediate-data/releve_table_formatted_20250911a.csv")
 stcroix <- read_excel("../../data/duxbury_deer_releve_data_working.xlsx")
-
-# connect to MNTaxa for taxonomic backbone
-db_con <- odbcConnect("MNTaxa")
-# cvals <- sqlFetch(db_con, "plants.d_list_www") %>% as_tibble()
-close(db_con)
+mntaxa_dlist <- read_csv("../../intermediate-data/mntaxa_synonymies_20250911.csv")
 
 
 #### format data ####
 
-# select releves
+# add NPC info
 releve2 <- releve %>%
   mutate(npc_class = str_sub(npc_code, 1, 5),
          npc_type = if_else(nchar(npc_code) > 5, str_sub(npc_code, 1, 6),
                             NA_character_),
          npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
-                               NA_character_)) %>%
-  filter(used_in_fieldguide == "yes")
-
-# are all classified to class?
-sort(unique(releve2$npc_class)) # yes
+                               NA_character_))
 
 # add classification
 # format species names
 crosswalk2 <- crosswalk %>%
-  inner_join(releve2 %>%
+  left_join(releve2 %>%
                select(relnumb, npc_system, npc_system_id, npc_class_name,
                       npc_class, npc_type_name, npc_type, npc_subtype_name, 
                       npc_subtype)) %>%
   mutate(code_strata = paste0(analysis_group, strata_lower, strata_upper),
-         species_name =  str_remove(code_strata, "18") %>% 
-           str_replace_all("_", " ") %>%
-           str_replace("13", " understory") %>%
-           str_replace("45", " sub-canopy") %>%
-           str_replace("68", " canopy"))
+         taxon_name_strata =  case_when(strata_lower == 1 & strata_upper == 8 ~
+                                          taxon_name,
+                                        strata_lower == 1 & strata_upper == 3 ~
+                                          paste(taxon_name, "understory"),
+                                        strata_lower == 4 & strata_upper == 5 ~
+                                          paste(taxon_name, "sub-canopy"),
+                                        strata_lower == 6 & strata_upper == 8 ~
+                                          paste(taxon_name, "canopy")))
 
+# select releves
+releve3 <- releve2 %>%
+  filter(used_in_fieldguide == "yes")
+
+crosswalk3 <- crosswalk2 %>% 
+  filter(relnumb %in% releve3$relnumb)
+
+# are all classified to class?
+sort(unique(releve3$npc_class)) # yes
+         
 # check that there aren't duplicates
-get_dupes(releve2, relnumb)
-get_dupes(crosswalk2, relnumb, species_name)
+get_dupes(releve3, relnumb)
+get_dupes(crosswalk3, relnumb, code_strata)
 
 # are the releve numbers equal?
-nrow(releve2) == n_distinct(crosswalk2$relnumb)
+nrow(releve3) == n_distinct(crosswalk3$relnumb)
 
 
 #### floristic tables ####
@@ -67,25 +68,22 @@ nrow(releve2) == n_distinct(crosswalk2$relnumb)
 load("../RMAVIS/data/nvc_floristic_tables.rda")
 head(nvc_floristic_tables)
 
-# explore rank
-unique(nvc_floristic_tables$nvc_code)
-
 # samples per group
-samps_class <- releve2 %>% 
+samps_class <- releve3 %>% 
   count(npc_class)
 
-samps_type <- releve2 %>% 
+samps_type <- releve3 %>% 
   filter(!is.na(npc_type)) %>% 
   count(npc_type)
 
-samps_subtype <- releve2 %>% 
+samps_subtype <- releve3 %>% 
   filter(!is.na(npc_subtype)) %>% 
   count(npc_subtype)
 
 # percentage of data classified to type
-sum(samps_type$n) / nrow(releve2) # 97%
+sum(samps_type$n) / nrow(releve3) # 97%
 
-perc_rels_type <- releve2 %>%
+perc_rels_type <- releve3 %>%
   group_by(npc_class) %>%
   summarize(rels_tot = n_distinct(relnumb),
             rels_type = sum(!is.na(npc_type)),
@@ -95,9 +93,9 @@ perc_rels_type <- releve2 %>%
 # remainder have enough releves representing types
 
 # percentage of data classified to subtype
-sum(samps_subtype$n) / nrow(releve2) # only 15%
+sum(samps_subtype$n) / nrow(releve3) # only 15%
 
-perc_rels_subtype <- releve2 %>%
+perc_rels_subtype <- releve3 %>%
   group_by(npc_class) %>%
   summarize(rels_tot = n_distinct(relnumb),
             rels_subtype = sum(!is.na(npc_subtype)),
@@ -106,9 +104,9 @@ perc_rels_subtype <- releve2 %>%
 # don't use to inform species inclusions
 
 # floristic tables
-flor_type <- crosswalk2 %>%
+flor_type <- crosswalk3 %>%
   filter(!is.na(npc_type)) %>%
-  group_by(npc_class, npc_type, species_name) %>% 
+  group_by(npc_class, npc_type, taxon_name_strata) %>% 
   summarize(absolute_frequency = n_distinct(relnumb),
             minimum_cover = min(scov_adj),
             mean_cover = mean(scov_adj),
@@ -125,18 +123,18 @@ flor_type <- crosswalk2 %>%
 # species with at least 5% frequency in any type, keep for class
 flor_type_spp <- flor_type %>%
   filter(relative_frequency >= 0.05) %>%
-  distinct(npc_class, species_name)
+  distinct(npc_class, taxon_name_strata)
 
 # only keep more common species
 flor_type2 <- flor_type %>%
   inner_join(flor_type_spp) %>%
-  select(npc_type, species_name, constancy, absolute_frequency, 
+  select(npc_type, taxon_name_strata, constancy, absolute_frequency, 
          relative_frequency, minimum_cover, mean_cover, maximum_cover)
 
 # class tables
 # keep species in at least 5% of a type's samples or 5% of the class (if no types)
-flor_class <- crosswalk2 %>%
-  group_by(npc_class, species_name) %>% 
+flor_class <- crosswalk3 %>%
+  group_by(npc_class, taxon_name_strata) %>% 
   summarize(absolute_frequency = n_distinct(relnumb),
             minimum_cover = min(scov_adj),
             mean_cover = mean(scov_adj),
@@ -154,16 +152,16 @@ flor_class <- crosswalk2 %>%
   mutate(keep = if_else(!(npc_class %in% flor_type_spp$npc_class) & 
                           relative_frequency >= 0.05, 1, keep)) %>%
   filter(keep == 1) %>%
-  select(npc_class, species_name, constancy, absolute_frequency, 
+  select(npc_class, taxon_name_strata, constancy, absolute_frequency, 
          relative_frequency, minimum_cover, mean_cover, maximum_cover)
 
 # species kept
 flor_class_spp <- flor_class %>%
-  distinct(npc_class, species_name)
+  distinct(npc_class, taxon_name_strata)
 
-flor_subtype <- crosswalk2 %>%
+flor_subtype <- crosswalk3 %>%
   filter(!is.na(npc_subtype)) %>%
-  group_by(npc_class, npc_type, npc_subtype, species_name) %>% 
+  group_by(npc_class, npc_type, npc_subtype, taxon_name_strata) %>% 
   summarize(absolute_frequency = n_distinct(relnumb),
             minimum_cover = min(scov_adj),
             mean_cover = mean(scov_adj),
@@ -177,21 +175,24 @@ flor_subtype <- crosswalk2 %>%
                                relative_frequency >= 0.21 ~ 2,
                                TRUE ~ 1)) %>%
   inner_join(flor_class_spp) %>%
-  select(npc_subtype, species_name, constancy, absolute_frequency, 
+  select(npc_subtype, taxon_name_strata, constancy, absolute_frequency, 
          relative_frequency, minimum_cover, mean_cover, maximum_cover)
 
 # combine
-flor_npc <- flor_class %>%
+mnnpc_floristic_tables <- flor_class %>%
   rename(npc_code = npc_class) %>%
   rbind(flor_type2 %>%
           rename(npc_code = npc_type)) %>%
   rbind(flor_subtype %>%
           rename(npc_code = npc_subtype)) %>%
-  rename(npc_taxon_name = species_name)
+  rename(npc_taxon_name = taxon_name_strata)
 
 # check for NAs
-flor_npc %>%
+mnnpc_floristic_tables %>%
   filter(if_any(everything(), is.na))
+
+# save
+save(mnnpc_floristic_tables, file = "data/mnnpc_floristic_tables.rda")
 
 
 #### community attributes ####
@@ -215,19 +216,19 @@ nvc_community_attributes %>%
 # equivalent to classes
 
 # richness by system for species in floristic tables
-rich_sys <- releve2 %>% 
+rich_sys <- releve3 %>% 
   distinct(npc_system_id, npc_class) %>% 
   left_join(flor_class_spp) %>%
   group_by(npc_system_id) %>%
-  summarize(species_count = n_distinct(species_name),
+  summarize(species_count = n_distinct(taxon_name_strata),
             .groups = "drop")
 
 # attributes by system
 # species counts by releve
-att_sys <- crosswalk2 %>%
+att_sys <- crosswalk3 %>%
   inner_join(flor_class_spp) %>%
   group_by(relnumb, npc_system, npc_system_id) %>%
-  summarize(n_species = n_distinct(species_name),
+  summarize(n_species = n_distinct(taxon_name_strata),
             .groups = "drop") %>% 
   group_by(npc_system, npc_system_id) %>% 
   summarize(num_samples = n_distinct(relnumb),
@@ -248,10 +249,10 @@ att_sys <- crosswalk2 %>%
 # attributes by class
 # calculate richness by class
 # add system info
-att_class <- crosswalk2 %>%
+att_class <- crosswalk3 %>%
   inner_join(flor_class_spp) %>%
   group_by(relnumb, npc_class_name, npc_class) %>%
-  summarize(n_species = n_distinct(species_name),
+  summarize(n_species = n_distinct(taxon_name_strata),
             .groups = "drop") %>% 
   group_by(npc_class_name, npc_class) %>% 
   summarize(num_samples = n_distinct(relnumb),
@@ -262,7 +263,7 @@ att_class <- crosswalk2 %>%
   left_join(flor_class_spp %>%
               count(npc_class) %>%
               rename(species_count = n)) %>%
-  left_join(releve2 %>%
+  left_join(releve3 %>%
               distinct(npc_system_id, npc_class)) %>%
   mutate(fullname = npc_class_name,
          name = npc_class_name,
@@ -273,20 +274,12 @@ att_class <- crosswalk2 %>%
   select(fullname, name, npc_code, npc_code_parent, basal, rank, num_samples,
          min_species, max_species, mean_species, species_count)
 
-# richness by system for species in floristic tables
-rich_sys <- releve2 %>% 
-  distinct(npc_system_id, npc_class) %>% 
-  left_join(flor_class_spp) %>%
-  group_by(npc_system_id) %>%
-  summarize(species_count = n_distinct(species_name),
-            .groups = "drop")
-
 # attributes by type
-att_type <- crosswalk2 %>%
+att_type <- crosswalk3 %>%
   filter(!is.na(npc_type)) %>%
   inner_join(flor_type_spp) %>%
   group_by(relnumb, npc_type_name, npc_type) %>%
-  summarize(n_species = n_distinct(species_name),
+  summarize(n_species = n_distinct(taxon_name_strata),
             .groups = "drop") %>% 
   group_by(npc_type_name, npc_type) %>% 
   summarize(num_samples = n_distinct(relnumb),
@@ -297,7 +290,8 @@ att_type <- crosswalk2 %>%
   left_join(flor_type %>%
               count(npc_type) %>%
               rename(species_count = n)) %>%
-  left_join(releve2 %>%
+  left_join(releve3 %>%
+              filter(!is.na(npc_type)) %>% 
               distinct(npc_class_name, npc_class, npc_type)) %>%
   mutate(fullname = paste(npc_class_name, npc_type_name, sep = ", "),
          name = npc_type_name,
@@ -310,11 +304,11 @@ att_type <- crosswalk2 %>%
          min_species, max_species, mean_species, species_count)
 
 # attributes by sub-type
-att_subtype <- crosswalk2 %>%
+att_subtype <- crosswalk3 %>%
   filter(!is.na(npc_subtype)) %>%
-  inner_join(flor_type_spp) %>%
+  inner_join(flor_class_spp) %>%
   group_by(relnumb, npc_subtype_name, npc_subtype) %>%
-  summarize(n_species = n_distinct(species_name),
+  summarize(n_species = n_distinct(taxon_name_strata),
             .groups = "drop") %>% 
   group_by(npc_subtype_name, npc_subtype) %>% 
   summarize(num_samples = n_distinct(relnumb),
@@ -325,7 +319,7 @@ att_subtype <- crosswalk2 %>%
   left_join(flor_subtype %>%
               count(npc_subtype) %>%
               rename(species_count = n)) %>%
-  left_join(releve2 %>%
+  left_join(releve3 %>%
               distinct(npc_type_name, npc_type, npc_subtype)) %>%
   mutate(fullname = paste(npc_type_name, npc_subtype_name, sep = ", "),
          name = npc_subtype_name,
@@ -337,10 +331,20 @@ att_subtype <- crosswalk2 %>%
          min_species, max_species, mean_species, species_count)
 
 # combine
-att_npc <- att_sys %>%
+mnnpc_community_attributes <- att_sys %>%
   rbind(att_class) %>%
   rbind(att_type) %>% 
   rbind(att_subtype)
+
+# check for NAs
+mnnpc_community_attributes %>%
+  filter(if_any(-npc_code_parent, is.na))
+
+mnnpc_community_attributes %>% 
+  filter(rank != "system" & is.na(npc_code_parent))
+
+# save
+save(mnnpc_community_attributes, file = "data/mnnpc_community_attributes.rda")
 
 
 #### example data ####
@@ -350,7 +354,7 @@ load("../RMAVIS/data/example_data.rda")
 head(example_data$`Newborough Warren`)
 
 # get releves from database
-rel_ex <- releve %>%
+rel_ex <- releve2 %>%
   filter(relnumb %in% stcroix$RELNO) %>%
   transmute(Site = "St. Croix State Forest",
             Year = year(date_),
@@ -363,24 +367,47 @@ rel_ex <- releve %>%
             relnumb = relnumb)
 
 # add species
-example_npc <- rel_ex %>%
-  inner_join(crosswalk %>%
-               mutate(code_strata = paste0(analysis_group, strata_lower, strata_upper),
-                      species_name =  str_remove(code_strata, "18") %>% 
-                        str_replace_all("_", " ") %>%
-                        str_replace("13", " understory") %>%
-                        str_replace("45", " sub-canopy") %>%
-                        str_replace("68", " canopy")) %>%
-               select(relnumb, species_name, scov_adj) %>%
-               rename(Species = species_name,
-                      Cover = scov_adj)) %>%
-  select(-relnumb)
+mnnpc_example_data <- list("St. Croix State Forest" = rel_ex %>%
+                             inner_join(crosswalk2 %>%
+                                          select(relnumb, taxon_name_strata, scov_adj) %>%
+                                          rename(Species = taxon_name_strata,
+                                                 Cover = scov_adj)) %>%
+                             select(-relnumb))
 
 
+# check for NAs
+mnnpc_example_data$`St. Croix State Forest` %>%
+  filter(if_any(everything(), is.na))
+
+# save
+save(mnnpc_example_data, file = "data/mnnpc_example_data.rda")
+
+
+#### start here ####
 #### accepted taxa ####
+
+# look at example
+load("../RMAVIS/data/accepted_taxa.rda")
+head(accepted_taxa)
+
+# taxon name and MNTaxa ID(s)
+# can maybe get this from mntaxa script outputs
+mnnpc_accepted_taxa <- crosswalk2 %>% 
+  distinct(taxon_id, taxon_name_strata) %>% 
+  rename(accepted_taxon_id = taxon_id,
+         accepted_taxon_name = taxon_name_strata)
+
+# save
+save(mnnpc_accepted_taxa, file = "data/mnnpc_accepted_taxa.rda")
 
 
 #### taxonomic backbone ####
 
-# just use species included in floristic tables
+# look at example
+UKVegTB::taxonomic_backbone
 
+# same list as accepted taxa, but with more info
+# match taxon_id to dlist_ids, use 
+
+UKVegTB::taxa_lookup
+# all taxa, recommended taxon_name = dlist, recommended TVK = dlist_id
