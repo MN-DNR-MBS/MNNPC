@@ -10,11 +10,12 @@ library(RODBC)
 library(readxl)
 
 # import data
-crosswalk <- read_csv("../../intermediate-data/crosswalk_table_formatted_20250911a.csv",
+crosswalk <- read_csv("../../intermediate-data/crosswalk_table_formatted_20250916a.csv",
                       guess_max = Inf) 
-releve <- read_csv("../../intermediate-data/releve_table_formatted_20250911a.csv")
+releve <- read_csv("../../intermediate-data/releve_table_formatted_20250916a.csv")
 stcroix <- read_excel("../../data/duxbury_deer_releve_data_working.xlsx")
-mntaxa_dlist <- read_csv("../../intermediate-data/mntaxa_synonymies_20250911.csv")
+mntaxa_dlist <- read_csv("../../intermediate-data/mntaxa_synonymies_20250916.csv")
+mntaxa_lineage <- read_csv("../../intermediate-data/mntaxa_dlist_taxonomic_lineage_20250916.csv")
 
 
 #### format data ####
@@ -383,19 +384,15 @@ mnnpc_example_data$`St. Croix State Forest` %>%
 save(mnnpc_example_data, file = "data/mnnpc_example_data.rda")
 
 
-#### start here ####
 #### accepted taxa ####
 
 # look at example
 load("../RMAVIS/data/accepted_taxa.rda")
 head(accepted_taxa)
 
-# taxon name and MNTaxa ID(s)
-# can maybe get this from mntaxa script outputs
-mnnpc_accepted_taxa <- crosswalk2 %>% 
-  distinct(taxon_id, taxon_name_strata) %>% 
-  rename(accepted_taxon_id = taxon_id,
-         accepted_taxon_name = taxon_name_strata)
+# dlist ID and name
+mnnpc_accepted_taxa <- crosswalk3 %>% 
+  distinct(taxon_name, taxon_id)
 
 # save
 save(mnnpc_accepted_taxa, file = "data/mnnpc_accepted_taxa.rda")
@@ -404,10 +401,47 @@ save(mnnpc_accepted_taxa, file = "data/mnnpc_accepted_taxa.rda")
 #### taxonomic backbone ####
 
 # look at example
-UKVegTB::taxonomic_backbone
-
+UKVegTB::taxonomic_backbone %>% 
+  as_tibble()
 # same list as accepted taxa, but with more info
-# match taxon_id to dlist_ids, use 
 
-UKVegTB::taxa_lookup
+# dlist info
+mnnpc_taxonomic_backbone <- mntaxa_dlist %>% 
+  select(starts_with("dlist")) %>% 
+  distinct() %>% 
+  left_join(mntaxa_lineage %>% 
+              mutate(dlist_id = as.character(dlist_id)) %>% 
+              select(-c(dlist_taxon, dlist_rank))) %>% 
+  rename_with(.fn = ~str_remove(.x, "dlist_")) %>% 
+  rename(taxon_name = assignment,
+         taxon_id = id)
+  
+# check for missing information
+filter(mnnpc_taxonomic_backbone, is.na(publication))
+
+# check for duplicates
+get_dupes(mnnpc_taxonomic_backbone, taxon_id)
+
+# save
+save(mnnpc_taxonomic_backbone, file = "data/mnnpc_taxonomic_backbone.rda")
+
+
+#### look-up table ####
+
+# look at example
+UKVegTB::taxa_lookup %>% 
+  as_tibble()
 # all taxa, recommended taxon_name = dlist, recommended TVK = dlist_id
+
+# mntaxa crosswalk
+mnnpc_taxa_lookup <- mntaxa_dlist %>% 
+  select(taxon, taxon_id, rank, dlist_assignment, dlist_rank, dlist_full_name,
+         dlist_id) %>% 
+  rename_with(.fn = ~str_replace(.x, "dlist", "recommended") %>% 
+                str_replace("assignment", "taxon"))
+
+# check for duplicates
+get_dupes(mnnpc_taxa_lookup, taxon_id)
+
+# save
+save(mnnpc_taxa_lookup, file = "data/mnnpc_taxa_lookup.rda")
