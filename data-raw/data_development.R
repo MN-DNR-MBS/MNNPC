@@ -21,16 +21,22 @@ mntaxa <- read_csv("../../intermediate-data/mntaxa_taxa_20251015.csv")
 
 #### format data ####
 
+# system info
+npc_systems <- releve %>% 
+  distinct(npc_system_id, npc_system)
+
 # add NPC info
 releve2 <- releve %>%
+  select(-npc_system) %>% 
   mutate(npc_class = str_sub(npc_code, 1, 5),
          npc_type = if_else(nchar(npc_code) > 5, str_sub(npc_code, 1, 6),
                             NA_character_),
          npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
                                NA_character_),
-         npc_system_id = if_else(npc_system_id %in% c("WFn74", "FPn73"),
-                                 paste0(npc_system_id, "_sys"),
-                                 npc_system_id))
+         npc_system_id = if_else(str_detect(npc_system_id, "_|\\/"),
+                                 npc_system_id,
+                                 str_sub(npc_system_id, 1, 2))) %>% 
+  left_join(npc_systems)
 
 # add classification
 # format species names
