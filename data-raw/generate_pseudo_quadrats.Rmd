@@ -1,0 +1,143 @@
+---
+title: "Generate pseudo-quadrats"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_packages, message=FALSE, warning=FALSE}
+```
+
+```{r set_filepaths}
+data_path <- file.path(".", "data")
+```
+
+# Read Data
+
+```{r read_data}
+load(file = file.path(data_path, "mnnpc_floristic_tables.rda"))
+```
+
+# Generate pseudo-quadrat function
+
+```{r generate_psquads_function}
+generate_psquads <- function(psq_n, prefix, species, probabilities){
+  
+  trials <- 1:psq_n
+  
+  ps_quads <- data.frame("npc_code" = character(),
+                         "psq_id" = character(),
+                         "taxon_name" = character())
+  id <- 1
+  
+  for(i in trials){
+    
+    psquad_id <- paste0(prefix, "_", id)
+    
+    trial <- stats::rbinom(n = length(species), size = 1, prob = probabilities) |> as.logical()
+    trial_species <- species[trial]
+    
+    if(length(trial_species) > 0){
+      
+      ps_quad <- data.frame("npc_code" = prefix,
+                            "psq_id" = psquad_id,
+                            "taxon_name" = trial_species)
+      
+      ps_quads <- rbind(ps_quads, ps_quad)
+      
+      id <- id + 1
+      
+    }
+    
+  }
+  
+  return(ps_quads)
+  
+}
+```
+
+# Generate NVC pseudo-quadrats
+
+```{r generate_pseudo_quadrats}
+comm_codes <- mnnpc_floristic_tables |>
+  dplyr::pull(npc_code) |> 
+  unique() |> 
+  sort()
+
+pquads <- tibble::tibble()
+
+set.seed(7452819)
+
+for(comm in comm_codes){
+  
+  # comm <- comm_codes[1]
+  # comm <- "W2b"
+  
+  comm_ft <- subset(mnnpc_floristic_tables, npc_code == comm)
+  
+  probs <- comm_ft |>
+    dplyr::mutate(
+      "prob" = dplyr::case_when(
+        !is.na(constancy) & constancy == 1 ~ 0.1,
+        !is.na(constancy) & constancy == 2 ~ 0.3,
+        !is.na(constancy) & constancy == 3 ~ 0.5,
+        !is.na(constancy) & constancy == 4 ~ 0.7,
+        !is.na(constancy) & constancy == 5 ~ 0.9,
+        TRUE ~ NA
+      )
+    ) |>
+    dplyr::pull(prob)
+  
+  taxa <- comm_ft |>
+    dplyr::pull(npc_taxon_name)
+  
+  comm_psquads <- generate_psquads(psq_n = 25, 
+                                   prefix = comm, 
+                                   species = taxa, 
+                                   probabilities = probs)
+  
+  pquads <- pquads |>
+    dplyr::bind_rows(comm_psquads)
+  
+  
+}
+
+length(unique(pquads$psq_id))
+```
+
+Filter out duplicates
+
+```{r filter_duplicates}
+pquads_duplicate_rows <- pquads |>
+  janitor::get_dupes()
+
+pquads_nas <- pquads |>
+  dplyr::filter(is.na(taxon_name))
+
+pquads_no_duplicates <- pquads |>
+  dplyr::group_by(psq_id) |>
+  dplyr::summarise("key" = toString(sort(taxon_name))) |>
+  dplyr::distinct(key, .keep_all = TRUE) |>
+  dplyr::left_join(pquads, by = "psq_id") |>
+  dplyr::select(npc_code, psq_id, taxon_name)
+
+pquads_duplicates <- pquads |>
+  dplyr::filter(!(psq_id %in% pquads_no_duplicates$psq_id))
+```
+
+# Write Output Files
+
+```{r write_output_files}
+mnnpc_pquads <- pquads_no_duplicates
+usethis::use_data(mnnpc_pquads, internal = FALSE, overwrite = TRUE)
+```
+
+
+
+
+
+
+
