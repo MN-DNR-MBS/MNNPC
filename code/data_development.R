@@ -16,8 +16,7 @@ releve_taxa <- read_csv("../../intermediate-data/releve_taxa_formatted_20251015a
 stcroix <- read_excel("../../data/duxbury_deer_releve_data_working.xlsx")
 dlist_parents <- read_csv("../../intermediate-data/mntaxa_dlist_parents_20251015.csv",
                           guess_max = Inf)
-mntaxa <- read_csv(paste0("../../intermediate-data/mntaxa_taxa_",
-                          str_remove_all(Sys.Date(), "-"), ".csv"))
+mntaxa <- read_csv("../../intermediate-data/mntaxa_taxa_20251015.csv")
 
 
 #### format data ####
@@ -28,7 +27,10 @@ releve2 <- releve %>%
          npc_type = if_else(nchar(npc_code) > 5, str_sub(npc_code, 1, 6),
                             NA_character_),
          npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
-                               NA_character_))
+                               NA_character_),
+         npc_system_id = if_else(npc_system_id %in% c("WFn74", "FPn73"),
+                                 paste0(npc_system_id, "_sys"),
+                                 npc_system_id))
 
 # add classification
 # format species names
