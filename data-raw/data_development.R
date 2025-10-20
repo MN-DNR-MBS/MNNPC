@@ -17,6 +17,8 @@ stcroix <- read_excel("../../data/duxbury_deer_releve_data_working.xlsx")
 dlist_parents <- read_csv("../../intermediate-data/mntaxa_dlist_parents_20251015.csv",
                           guess_max = Inf)
 mntaxa <- read_csv("../../intermediate-data/mntaxa_taxa_20251015.csv")
+mntaxa_dlist <- read_csv("../../intermediate-data/mntaxa_synonymies_20251015.csv")
+analysis_codes <- read_csv("../../intermediate-data/analysis_codes_20251015.csv")
 
 
 #### format data ####
@@ -62,6 +64,40 @@ get_dupes(crosswalk3, relnumb, code_strata)
 
 # are the releve numbers equal?
 nrow(releve3) == n_distinct(crosswalk3$relnumb)
+
+# possible tree/strata combos
+tree_strata <- mntaxa_dlist %>% 
+  distinct(dlist_physiognomy) %>% 
+  full_join(analysis_codes %>% 
+              distinct(dlist_physiognomy)) %>% 
+  filter(str_detect(dlist_physiognomy, 
+                    "broadleaf deciduous|needleleaf evergreen")) %>% 
+  cross_join(crosswalk %>% 
+               distinct(strata)) %>% # includes NA
+  filter(!(dlist_physiognomy %in% c("broadleaf deciduous", 
+                                    "needleleaf evergreen",
+                                    "broadleaf deciduous/needleleaf evergreen") &
+             is.na(strata))) # only a tree -- must have strata
+
+# add analysis codes to MNTaxa if available
+# add strata to trees
+# add releve taxa (hard-coded groups and phys not in databases)
+mntaxa_dlist2 <- mntaxa_dlist %>%
+  distinct(taxon, taxon_id) %>% 
+  inner_join(analysis_codes %>% 
+               select(taxon_id, analysis_code, 
+                      starts_with("dlist"))) %>% 
+  full_join(mntaxa_dlist %>% 
+              anti_join(analysis_codes %>% 
+                          distinct(taxon_id))) %>%
+  mutate(analysis_group = if_else(!is.na(analysis_code), analysis_code,
+                                  dlist_assignment)) %>%
+  select(-analysis_code) %>% 
+  left_join(tree_strata, relationship = "many-to-many") %>% 
+  mutate(analysis_group_strata =  if_else(!is.na(strata), 
+                                          paste(analysis_group, strata),
+                                          analysis_group)) %>% 
+  full_join(releve_taxa)
 
 
 #### floristic tables ####
@@ -396,13 +432,16 @@ load("../RMAVIS/data/accepted_taxa.rda")
 head(accepted_taxa)
 
 # dlist ID and name
-mnnpc_accepted_taxa <- mnnpc_floristic_tables %>% 
-  rename(taxon_name = npc_taxon_name) %>% 
-  distinct(taxon_name) %>% 
-  left_join(releve_taxa %>% 
-              distinct(analysis_group_strata) %>% 
-              rename(taxon_name = analysis_group_strata)) %>% 
+mnnpc_accepted_taxa <- mntaxa_dlist2 %>% 
+  distinct(analysis_group_strata) %>% 
+  rename(taxon_name = analysis_group_strata) %>% 
   arrange(taxon_name)
+
+# make sure all floristic table taxa are included
+mnnpc_floristic_tables %>% 
+  distinct(npc_taxon_name) %>% 
+  rename(taxon_name = npc_taxon_name) %>% 
+  anti_join(mnnpc_accepted_taxa)
 
 # save
 save(mnnpc_accepted_taxa, file = "data/mnnpc_accepted_taxa.rda")
@@ -434,9 +473,8 @@ dlist_parents2 <- dlist_parents %>%
             lineage_source = paste(sort(unique(dlist_taxonomy_source)), collapse = "/"))
 
 # dlist info
-mnnpc_taxonomic_backbone <- releve_taxa %>% 
+mnnpc_taxonomic_backbone <- mntaxa_dlist2 %>% 
   rename(taxon_name = analysis_group_strata) %>% 
-  inner_join(mnnpc_accepted_taxa) %>% 
   select(taxon_name, starts_with("dlist")) %>% 
   distinct() %>% 
   left_join(dlist_parents2) %>% 
@@ -450,7 +488,8 @@ mnnpc_taxonomic_backbone <- releve_taxa %>%
   mutate(taxa_included = if_else(str_detect(taxon_name, "and genus"),
                                  paste(genus, taxa_included, sep = "/"),
                                  taxa_included)) %>% 
-  arrange(taxon_name)
+  arrange(taxon_name) %>% 
+  filter(taxa_ids != 69546) # remove duplicate species
   
 # check for missing information
 filter(mnnpc_taxonomic_backbone, is.na(publication))
@@ -460,7 +499,13 @@ mnnpc_accepted_taxa %>%
   anti_join(mnnpc_taxonomic_backbone)
 
 # check for duplicates
-get_dupes(mnnpc_taxonomic_backbone, taxon_name)
+get_dupes(mnnpc_taxonomic_backbone, taxon_name) %>%
+  data.frame()
+# one variety of Cardamine pratensis is native, one is not
+
+# check for releve inclusion
+# filter(releve_taxa, taxon_id %in% c(61423, 69546))
+# only native in releves, don't allow non-native to avoid confusion
 
 # save
 save(mnnpc_taxonomic_backbone, file = "data/mnnpc_taxonomic_backbone.rda")
@@ -475,7 +520,7 @@ UKVegTB::taxa_lookup %>%
 # all taxa, recommended taxon_name = dlist, recommended TVK = dlist_id
 
 # check for duplicates
-taxa_dups <- releve_taxa %>% 
+taxa_dups <- mntaxa_dlist2 %>% 
   left_join(mntaxa %>% 
               select(taxon_id, author, publication)) %>% 
   get_dupes(taxon, physiognomy, strata, author, publication) %>% 
@@ -487,32 +532,45 @@ taxa_dups <- releve_taxa %>%
 # these are hard-coded releve groups that aren't in MNTaxa
 
 # mntaxa crosswalk
-mnnpc_taxa_lookup <- releve_taxa %>% 
+mnnpc_taxa_lookup <- mntaxa_dlist2 %>% 
   rename(taxon_name = taxon,
          recommended_taxon_name = analysis_group_strata) %>% 
-  right_join(mnnpc_accepted_taxa %>% 
-               rename(recommended_taxon_name = taxon_name)) %>% 
+  select(taxon_name, taxon_id, strata, recommended_taxon_name, 
+         starts_with("dlist"))  %>% 
+  distinct() %>% 
   left_join(mntaxa %>% 
               select(taxon_id, ss_sl, rank, author, publication)) %>% 
   anti_join(taxa_dups %>% 
               filter(id_order > 1)) %>% 
   rename_with(.fn = ~str_replace(.x, "dlist", "recommended")) %>% 
-  rename(informal_group = physiognomy,
+  rename(informal_group = recommended_physiognomy,
          qualifier = ss_sl,
          authority = author,
          recommended_taxa_included = recommended_assignment,
          recommended_taxa_ids = recommended_id) %>% 
-  mutate(full_name = paste(taxon_name, na.omit(authority), 
-                           na.omit(qualifier), na.omit(strata))) %>% 
+  mutate(full_name = paste(taxon_name, authority, qualifier, strata) %>% 
+           str_remove_all("\\ NA"),
+         recommended_taxon_name = if_else(recommended_taxa_ids == 69546,
+                                          "exclude from data to avoid confusion with native variety",
+                                          recommended_taxon_name)) %>% 
   select(informal_group, taxon_name, rank, qualifier, authority, strata,
          full_name, publication, taxon_id, starts_with("recommended"))
 
 # all recommneded taxa matched to a taxon name?
 filter(mnnpc_taxa_lookup, is.na(taxon_name))
+
+# all accepted taxa included?
+mnnpc_accepted_taxa %>% 
+  rename(recommended_taxon_name = taxon_name) %>% 
+  anti_join(mnnpc_taxa_lookup)
   
 # check for duplicates
 get_dupes(mnnpc_taxa_lookup, full_name, informal_group, strata, publication) %>% 
   distinct(taxon_name, full_name, taxon_id)
+
+# number of accepted taxa
+n_distinct(mnnpc_taxa_lookup$recommended_taxon_name)
+# one more for the excluded taxon
 
 # save
 save(mnnpc_taxa_lookup, file = "data/mnnpc_taxa_lookup.rda")
