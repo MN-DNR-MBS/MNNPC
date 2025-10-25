@@ -14,7 +14,7 @@ library(indicspecies)
 
 ```{r set_filepaths}
 # data_path <- file.path("C:", "Users", "zekmar", "OneDrive - UKCEH", "Projects", "MNNPC")
-data_path <- file.path("/mnt", "mnnpc")
+data_path <- file.path("/mnt", "elements")
 ```
 
 # Read Data
@@ -114,31 +114,31 @@ species fidelity. Annals of Forest Science 78, 13.
 https://doi.org/10.1007/s13595-020-01017-0
 
 ```{r calc_r}
-calc_r_metric <- function(sys, dat){
-  
-  # sys <- "AP"
-  # dat <- prepped_data_list
-  
-  data <- dat[[sys]][["plot_species_mat"]]
-  clusters <- dat[[sys]][["plot_units_vec"]]
-  r <- indicspecies::multipatt(x = data, cluster = clusters, func = "r.g")
-  
-  r_dat <- r$sign |> 
-    tibble::rownames_to_column(var = "species") |>
-    tibble::as_tibble() |>
-    dplyr::filter(p.value < 0.01) |>
-    dplyr::rename_with(.fn = ~stringr::str_remove(., "^s."), .cols = tidyselect::starts_with("s.")) |>
-    dplyr::select(-index)
-  
-  return(r_dat)
-  
-}
-
-r_data_list <- lapply(mnnpc_systems$npc_code, 
-                      FUN = calc_r_metric, 
-                      dat = prepped_data_list)
-
-names(r_data_list) <- mnnpc_systems$npc_code
+# calc_r_metric <- function(sys, dat){
+#   
+#   # sys <- "AP"
+#   # dat <- prepped_data_list
+#   
+#   data <- dat[[sys]][["plot_species_mat"]]
+#   clusters <- dat[[sys]][["plot_units_vec"]]
+#   r <- indicspecies::multipatt(x = data, cluster = clusters, func = "r.g")
+#   
+#   r_dat <- r$sign |> 
+#     tibble::rownames_to_column(var = "species") |>
+#     tibble::as_tibble() |>
+#     dplyr::filter(p.value < 0.01) |>
+#     dplyr::rename_with(.fn = ~stringr::str_remove(., "^s."), .cols = tidyselect::starts_with("s.")) |>
+#     dplyr::select(-index)
+#   
+#   return(r_dat)
+#   
+# }
+# 
+# r_data_list <- lapply(mnnpc_systems$npc_code, 
+#                       FUN = calc_r_metric, 
+#                       dat = prepped_data_list)
+# 
+# names(r_data_list) <- mnnpc_systems$npc_code
 ```
 
 ```{r calc_indval}
@@ -159,13 +159,17 @@ calc_indval_metric <- function(sys, dat){
     dplyr::rename_with(.fn = ~stringr::str_remove(., "^s."), .cols = tidyselect::starts_with("s.")) |>
     dplyr::select(-index)
   
+  print(sys, " completed")
+  
   return(indval_dat)
   
 }
 
-indval_data_list <- lapply(mnnpc_systems$npc_code, 
-                          FUN = calc_indval_metric, 
-                          dat = prepped_data_list)
+indval_data_list <- parallel::mclapply(mnnpc_systems$npc_code, 
+                                       FUN = calc_indval_metric,
+                                       dat = prepped_data_list,
+                                       mc.preschedule = FALSE,
+                                       mc.cores = 30) 
 
 names(indval_data_list) <- mnnpc_systems$npc_code
 ```
