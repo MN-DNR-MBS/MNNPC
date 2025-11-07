@@ -1,24 +1,3 @@
-#' ...
-#'
-#' ...
-#'
-#' \code{...} 
-#'
-#' @format A data frame with `r nrow(MNNPC::...)` rows and `r ncol(MNNPC::...)` columns, the definitions of which are:
-#' \describe{
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#'   \item{}{}
-#' }
-""
-
 #' Accepted taxon names
 #'
 #' A data frame containing the accepted taxon names following MNTaxa: The State of Minnesota Vascular Plant Checklist
@@ -108,26 +87,65 @@
 
 #' A lookup between the accepted MNTaxa taxa and their synonyms
 #'
-#' A lookup between the accepted MNTaxa taxa and their synonyms
+#' A lookup between the accepted MNTaxa taxa and their synonyms, with additional information.
 #'
 #' \code{mnnpc_taxa_lookup} 
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxa_lookup)` rows and `r ncol(MNNPC::mnnpc_taxa_lookup)` columns, the definitions of which are:
 #' \describe{
 #'   \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
-#'   \item{taxon_name}{Taxon concept names, includes both accepted/recommended taxa and their synonyms.}
+#'   \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
 #'   \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-#'   \item{qualifier}{}
-#'   \item{authority}{}
-#'   \item{strata}{}
-#'   \item{full_name}{}
-#'   \item{publication}{}
-#'   \item{taxon_id}{}
+#'   \item{qualifier}{The qualifier associated with the taxon_name, e.g. s.s..}
+#'   \item{authority}{The authority who described the taxon concept associated with the taxon_name.}
+#'   \item{strata}{The strata of the taxon_name, required at present as RMAVIS bundles the floristic tables strata into taxon names.}
+#'   \item{full_name}{The full name of the taxon concept, which is equivalent to a concatentation of the taxon_name, qualifier, and authority.}
+#'   \item{publication}{The parent publication containing the taxon_name description.}
+#'   \item{taxon_id}{The ID of the taxon_name.}
 #'   \item{recommended_taxon_name}{The accepted/recommended taxon name, see `MNNPC::mnnpc_accepted_taxa` and `MNNPC::mnnpc_taxonomic_backbone`.}
-#'   \item{recommended_taxa_included}{}
-#'   \item{recommended_publication}{}
-#'   \item{recommended_common_name}{}
-#'   \item{recommended_c_value}{...}
-#'   \item{recommended_origin}{}
+#'   \item{recommended_taxa_included}{A taxa included in the recommended_taxon_name, which may consist of an aggregate, ecological group, or collection of taxa for the purposes of the MNNPC.}
+#'   \item{recommended_publication}{The parent publication containing the recommended_taxon_name description.}
+#'   \item{recommended_common_name}{The common name associated with the recommended_taxa_included.}
+#'   \item{recommended_c_value}{The coefficients of conservatism associated with the recommended_taxa_included.}
+#'   \item{recommended_origin}{The nativeness status of the recommended_taxon_name.}
 #' }
 "mnnpc_taxa_lookup"
+
+#' The taxonomic backbone for the MNNPC
+#'
+#' The taxonomic backbone for the MNNPC, containin the recommended/accepted taxon names and associated taxonomic information.
+#'
+#' \code{mnnpc_taxonomic_backbone} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_taxonomic_backbone)` rows and `r ncol(MNNPC::mnnpc_taxonomic_backbone)` columns, the definitions of which are:
+#' \describe{
+#'   \item{taxon_name}{The taxon concept name, includes accepted/recommended taxa only.}
+#'   \item{taxa_included}{The taxon names of the taxa included in taxon_name.}
+#'   \item{taxa_ids}{The ids of the taxa in taxa_included.}
+#'   \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
+#'   \item{hybrid}{The hybrid status of the taxon_name: 0 = non-hybrid, 1 = hyrbid. No hybrids at present.}
+#'   \item{full_name}{The full name of the taxon concept, which is equivalent to a concatentation of the taxon_name, qualifier, and authority.}
+#'   \item{publication}{The parent publication containing the taxon_name description.}
+#'   \item{physiognomy}{The lifeform associated with the taxa_included.}
+#'   \item{common_name}{The common name associated with the taxa_included.}
+#'   \item{c_value}{The coefficients of conservatism associated with the taxa_included.}
+#'   \item{origin}{The nativeness status of the taxon_name.}
+#'   \item{species}{The name of the species taxon associated with the taxon_name.}
+#'   \item{genus}{The name of the parent genus taxon associated with the taxon_name.}
+#'   \item{family}{The name of the parent family taxon associated with the taxon_name.}
+#'   \item{order}{The name of the parent order taxon associated with the taxon_name.}
+#'   \item{class}{The name of the parent class taxon associated with the taxon_name.}
+#'   \item{phylum}The name of the parent phylum taxon associated with the taxon_name.}
+#'   \item{kingdom}{The name of the parent kingdom taxon associated with the taxon_name.}
+#'   \item{lineage_source}{The source of the parent taxa }
+#' }
+"mnnpc_taxonomic_backbone"
+
+#' MNNPC system code types/prefixes
+#'
+#' Codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
+#'
+#' \code{mnnpc_vc_types} 
+#'
+#' @format A data frame with `r length(MNNPC::mnnpc_vc_types)` which contains ...
+"mnnpc_vc_types"

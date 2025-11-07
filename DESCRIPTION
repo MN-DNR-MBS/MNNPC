@@ -1,6 +1,6 @@
 Package: MNNPC
 Title: Minnesota Native Plant Community Classification System data.
-Version: 0.1
+Version: 0.1.0
 Authors@R: c(person(given = "Amy",
                     family = "Kendig",
                     role = c("aut", "cre"),
