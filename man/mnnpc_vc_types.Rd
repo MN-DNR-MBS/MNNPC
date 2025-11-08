@@ -11,7 +11,7 @@ A data frame with 12 which contains ...
 mnnpc_vc_types
 }
 \description{
-Codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
+A vector of codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
 }
 \details{
 \code{mnnpc_vc_types}

@@ -143,9 +143,18 @@
 
 #' MNNPC system code types/prefixes
 #'
-#' Codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
+#' A vector of codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
 #'
 #' \code{mnnpc_vc_types} 
 #'
 #' @format A data frame with `r length(MNNPC::mnnpc_vc_types)` which contains ...
 "mnnpc_vc_types"
+
+#' MNNPC system code types/prefixes with full names
+#'
+#' A vector of named codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
+#'
+#' \code{mnnpc_vc_types_named} 
+#'
+#' @format A data frame with `r length(MNNPC::mnnpc_vc_types_named)` which contains ...
+"mnnpc_vc_types_named"
