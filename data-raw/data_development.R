@@ -575,3 +575,18 @@ n_distinct(mnnpc_taxa_lookup$recommended_taxon_name)
 # save
 save(mnnpc_taxa_lookup, file = "data/mnnpc_taxa_lookup.rda")
 load("data/mnnpc_taxa_lookup.rda")
+
+
+#### data for testing ####
+
+# data used to build floristic tables
+test_dat <- crosswalk3 %>% 
+  select(relnumb, analysis_group_strata, scov_adj,
+         npc_class, npc_type, npc_subtype) %>% 
+  rename(Quadrat = relnumb,
+         Species = analysis_group_strata,
+         Cover = scov_adj)
+
+# save
+write_csv(test_dat,
+          "../../intermediate-data/floristic_table_development_data_20251023.csv")
