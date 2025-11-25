@@ -730,6 +730,7 @@ mnnpc_taxa_lookup <- taxa_crosswalk8 %>%
   rename(taxon_name = taxon,
          recommended_taxon_name = analysis_group) %>% 
   select(taxon_name, recommended_taxon_name, starts_with("dlist")) %>% 
+  select(-dlist_c_value) %>% 
   distinct() %>% 
   left_join(dlist_parents2) %>% 
   rename_with(.fn = ~str_replace(.x, "dlist_", "recommended_taxon_") %>% 
@@ -748,7 +749,8 @@ mnnpc_taxa_lookup <- taxa_crosswalk8 %>%
          #recommended_hybrid = if_else(!is.na(recommended_hybrid), 1, 0)) %>% 
   relocate(recommended_taxon_id, .after = "recommended_taxon_included") %>% 
   relocate(informal_group) %>% 
-  arrange(recommended_taxon_name, taxon_name)
+  arrange(recommended_taxon_name, taxon_name) %>% 
+  as.data.frame()
 
 # check for duplicates
 get_dupes(mnnpc_taxa_lookup, taxon_name)
