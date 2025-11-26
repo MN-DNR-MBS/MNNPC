@@ -31,11 +31,22 @@ usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE
 # Example data
 st_croix_raw <- mnnpc_example_data[["St. Croix State Forest"]]
 st_croix_processed <- st_croix_raw |>
-  rel_proc_fun()
+  rel_proc_fun() |>
+  dplyr::mutate("Year" = as.integer(Year)) |>
+  dplyr::select(Year, Group, Quadrat, Species, Cover)
 
 earthworm_forests_raw <- mnnpc_example_data[["Earthworm-Invaded Forests"]]
 earthworm_forests_processed <- earthworm_forests_raw |>
-  rel_proc_fun()
+  rel_proc_fun() |>
+  dplyr::mutate(
+    "Cover" = dplyr::case_when(
+      Cover > 100 ~ 100,
+      Cover < 0 ~ 0,
+      TRUE ~ Cover
+    )
+  ) |>
+  dplyr::mutate("Year" = as.integer(Year)) |>
+  dplyr::select(Year, Group, Quadrat, Species, Cover)
 
 mnnpc_example_data[["Earthworm-Invaded Forests"]] <- earthworm_forests_processed
 mnnpc_example_data[["St. Croix State Forest"]] <- st_croix_processed
