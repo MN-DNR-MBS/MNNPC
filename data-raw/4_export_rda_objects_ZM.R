@@ -35,6 +35,8 @@ st_croix_processed <- st_croix_raw |>
   dplyr::mutate("Year" = as.integer(Year)) |>
   dplyr::select(Year, Group, Quadrat, Species, Cover)
 
+isTRUE(all(all(st_croix_processed$Cover > 0), all(st_croix_processed$Cover <= 100)))
+
 earthworm_forests_raw <- mnnpc_example_data[["Earthworm-Invaded Forests"]]
 earthworm_forests_processed <- earthworm_forests_raw |>
   rel_proc_fun() |>
@@ -47,6 +49,8 @@ earthworm_forests_processed <- earthworm_forests_raw |>
   ) |>
   dplyr::mutate("Year" = as.integer(Year)) |>
   dplyr::select(Year, Group, Quadrat, Species, Cover)
+
+isTRUE(all(all(earthworm_forests_processed$Cover > 0), all(earthworm_forests_processed$Cover <= 100)))
 
 mnnpc_example_data[["Earthworm-Invaded Forests"]] <- earthworm_forests_processed
 mnnpc_example_data[["St. Croix State Forest"]] <- st_croix_processed
