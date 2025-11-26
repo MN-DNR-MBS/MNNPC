@@ -1,3 +1,3 @@
-# MNNPC 0.1.0 (XX-12-2025)
+# MNNPC 0.9.0 (26-12-2025)
 
-* Initial version.
+Initial prototype version.

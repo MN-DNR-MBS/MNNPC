@@ -5,34 +5,33 @@
 \alias{mnnpc_taxonomic_backbone}
 \title{The taxonomic backbone for the MNNPC}
 \format{
-A data frame with 2918 rows and 19 columns, the definitions of which are:
+A data frame with 24837 rows and 18 columns, the definitions of which are:
 \describe{
-\item{taxon_name}{The taxon concept name, includes accepted/recommended taxa only.}
+\item{informal_group}{The informal taxonomic group in which the taxa belongs.}
+\item{recommended_taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 \item{taxa_included}{The taxon names of the taxa included in taxon_name.}
-\item{taxa_ids}{The ids of the taxa in taxa_included.}
+\item{taxa_ids}{The ids of the taxa present in the taxa_included column.}
 \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-\item{hybrid}{The hybrid status of the taxon_name: 0 = non-hybrid, 1 = hyrbid. No hybrids at present.}
+\item{hybrid}{The hybrid status of the taxon_name: 0 = non-hybrid, 1 = hybrid.}
 \item{full_name}{The full name of the taxon concept, which is equivalent to a concatentation of the taxon_name, qualifier, and authority.}
 \item{publication}{The parent publication containing the taxon_name description.}
-\item{physiognomy}{The lifeform associated with the taxa_included.}
 \item{common_name}{The common name associated with the taxa_included.}
-\item{c_value}{The coefficients of conservatism associated with the taxa_included.}
 \item{origin}{The nativeness status of the taxon_name.}
 \item{species}{The name of the species taxon associated with the taxon_name.}
-\item{genus}{The name of the parent genus taxon associated with the taxon_name.}
-\item{family}{The name of the parent family taxon associated with the taxon_name.}
-\item{order}{The name of the parent order taxon associated with the taxon_name.}
-\item{class}{The name of the parent class taxon associated with the taxon_name.}
-\item{phylum}The name of the parent phylum taxon associated with the taxon_name.}
-\item{kingdom}{The name of the parent kingdom taxon associated with the taxon_name.}
-\item{lineage_source}{The source of the parent taxa }
+\item{genus}{The name of the genus taxon associated with the taxon_name.}
+\item{family}{The name of the family taxon associated with the taxon_name.}
+\item{order}{The name of the order taxon associated with the taxon_name.}
+\item{class}{The name of the class taxon associated with the taxon_name.}
+\item{phylum}{The name of the phylum taxon associated with the taxon_name.}
+\item{kingdom}{The name of the kingdom taxon associated with the taxon_name.}
+\item{lineage_source}{The source of the parent taxa.}
 }
 }
 \usage{
 mnnpc_taxonomic_backbone
 }
 \description{
-The taxonomic backbone for the MNNPC, containin the recommended/accepted taxon names and associated taxonomic information.
+The taxonomic backbone for the MNNPC, containing the recommended/accepted taxon names and associated taxonomic information.
 }
 \details{
 \code{mnnpc_taxonomic_backbone}

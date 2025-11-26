@@ -5,7 +5,7 @@
 \alias{mnnpc_example_data}
 \title{Example vegetation plot data}
 \format{
-A list of 1 data frames with  rows and  columns, the definitions of which are:
+A list of 2 data frames with  rows and  columns, the definitions of which are:
 \describe{
 \item{Site}{The name of the site.}
 \item{Year}{The year the quadrat was sampled in.}
@@ -24,6 +24,7 @@ A selection of example vegetation plot datasets, currently included are:
 \details{
 \itemize{
 \item St. Croix State Forest
+\item Earthworm-Invaded Forests
 }
 
 \code{mnnpc_example_data}

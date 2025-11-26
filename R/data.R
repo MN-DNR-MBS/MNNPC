@@ -38,6 +38,7 @@
 #' A selection of example vegetation plot datasets, currently included are:
 #' 
 #' - St. Croix State Forest
+#' - Earthworm-Invaded Forests
 #'
 #' \code{mnnpc_example_data} 
 #'
@@ -93,51 +94,56 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxa_lookup)` rows and `r ncol(MNNPC::mnnpc_taxa_lookup)` columns, the definitions of which are:
 #' \describe{
-#'   \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 #'   \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
-#'   \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-#'   \item{qualifier}{The qualifier associated with the taxon_name, e.g. s.s..}
-#'   \item{authority}{The authority who described the taxon concept associated with the taxon_name.}
-#'   \item{strata}{The strata of the taxon_name, required at present as RMAVIS bundles the floristic tables strata into taxon names.}
-#'   \item{full_name}{The full name of the taxon concept, which is equivalent to a concatentation of the taxon_name, qualifier, and authority.}
-#'   \item{publication}{The parent publication containing the taxon_name description.}
-#'   \item{taxon_id}{The ID of the taxon_name.}
 #'   \item{recommended_taxon_name}{The accepted/recommended taxon name, see `MNNPC::mnnpc_accepted_taxa` and `MNNPC::mnnpc_taxonomic_backbone`.}
-#'   \item{recommended_taxa_included}{A taxa included in the recommended_taxon_name, which may consist of an aggregate, ecological group, or collection of taxa for the purposes of the MNNPC.}
-#'   \item{recommended_publication}{The parent publication containing the recommended_taxon_name description.}
-#'   \item{recommended_common_name}{The common name associated with the recommended_taxa_included.}
-#'   \item{recommended_c_value}{The coefficients of conservatism associated with the recommended_taxa_included.}
-#'   \item{recommended_origin}{The nativeness status of the recommended_taxon_name.}
 #' }
 "mnnpc_taxa_lookup"
 
+#' Taxon name conversion
+#'
+#' A data frame containing all taxon names present in `MNNPC::taxa_lookup` and 
+#' the taxa and taxon groups that should be used for MNNPC analysis. For example,
+#' Oxalis stricta, Oxalis dillenii, Oxalis montana, and Oxalis acetosella are all
+#' lumped into the 'Oxalis ecological group' analysis group. 
+#' The `MNNPC::mnnpc_pquads`, `MNNPC::mnnpc_floristic_tables`, and `MNNPC::example_data`
+#' objects only include taxa and taxon froups from the 'analysis_group' column 
+#' in this object and `RMAVIS` will only match based on these groups.
+#'
+#' \code{mnnpc_taxa_conv} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_taxa_conv)` rows and `r ncol(MNNPC::mnnpc_taxa_conv)` columns, the definitions of which are:
+#' \describe{
+#'   \item{taxon}{The taxon name, see `MNNPC::taxa_lookup`}
+#'   \item{analysis_group}{The taxon or group of taxa used for analysis in the MNNPC and RMAVIS.}
+#' }
+"mnnpc_taxa_conv"
+
 #' The taxonomic backbone for the MNNPC
 #'
-#' The taxonomic backbone for the MNNPC, containin the recommended/accepted taxon names and associated taxonomic information.
+#' The taxonomic backbone for the MNNPC, containing the recommended/accepted taxon names and associated taxonomic information.
 #'
 #' \code{mnnpc_taxonomic_backbone} 
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxonomic_backbone)` rows and `r ncol(MNNPC::mnnpc_taxonomic_backbone)` columns, the definitions of which are:
 #' \describe{
-#'   \item{taxon_name}{The taxon concept name, includes accepted/recommended taxa only.}
+#'   \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
+#'   \item{recommended_taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 #'   \item{taxa_included}{The taxon names of the taxa included in taxon_name.}
-#'   \item{taxa_ids}{The ids of the taxa in taxa_included.}
+#'   \item{taxa_ids}{The ids of the taxa present in the taxa_included column.}
 #'   \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-#'   \item{hybrid}{The hybrid status of the taxon_name: 0 = non-hybrid, 1 = hyrbid. No hybrids at present.}
+#'   \item{hybrid}{The hybrid status of the taxon_name: 0 = non-hybrid, 1 = hybrid.}
 #'   \item{full_name}{The full name of the taxon concept, which is equivalent to a concatentation of the taxon_name, qualifier, and authority.}
 #'   \item{publication}{The parent publication containing the taxon_name description.}
-#'   \item{physiognomy}{The lifeform associated with the taxa_included.}
 #'   \item{common_name}{The common name associated with the taxa_included.}
-#'   \item{c_value}{The coefficients of conservatism associated with the taxa_included.}
 #'   \item{origin}{The nativeness status of the taxon_name.}
 #'   \item{species}{The name of the species taxon associated with the taxon_name.}
-#'   \item{genus}{The name of the parent genus taxon associated with the taxon_name.}
-#'   \item{family}{The name of the parent family taxon associated with the taxon_name.}
-#'   \item{order}{The name of the parent order taxon associated with the taxon_name.}
-#'   \item{class}{The name of the parent class taxon associated with the taxon_name.}
-#'   \item{phylum}The name of the parent phylum taxon associated with the taxon_name.}
-#'   \item{kingdom}{The name of the parent kingdom taxon associated with the taxon_name.}
-#'   \item{lineage_source}{The source of the parent taxa }
+#'   \item{genus}{The name of the genus taxon associated with the taxon_name.}
+#'   \item{family}{The name of the family taxon associated with the taxon_name.}
+#'   \item{order}{The name of the order taxon associated with the taxon_name.}
+#'   \item{class}{The name of the class taxon associated with the taxon_name.}
+#'   \item{phylum}{The name of the phylum taxon associated with the taxon_name.}
+#'   \item{kingdom}{The name of the kingdom taxon associated with the taxon_name.}
+#'   \item{lineage_source}{The source of the parent taxa.}
 #' }
 "mnnpc_taxonomic_backbone"
 

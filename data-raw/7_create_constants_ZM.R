@@ -2,7 +2,9 @@
 
 # mnnpc_taxa_aggregation <- mnnpc_taxonomic_backbone 
 
-example_data_options <- c("None" = "none", "St. Croix State Forest" = "St. Croix State Forest")
+example_data_options <- c("None" = "none", 
+                          "St. Croix State Forest" = "St. Croix State Forest",
+                          "Earthworm-Invaded Forests" = "Earthworm-Invaded Forests")
 usethis::use_data(example_data_options, internal = TRUE, overwrite = TRUE)
 
 mnnpc_vc_types <- list("AP", "FD", "FF", "FP", "MH", "MR", "OP", "RO", "UP", "WF", "WM", "WP")

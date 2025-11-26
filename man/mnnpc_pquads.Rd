@@ -5,7 +5,7 @@
 \alias{mnnpc_pquads}
 \title{Pseudo-quadrats}
 \format{
-A data frame with 254308 rows and 3 columns, the definitions of which are:
+A data frame with 254540 rows and 3 columns, the definitions of which are:
 \describe{
 \item{npc_code}{The code for the MNNPC unit.}
 \item{psq_id}{The pseudo-quadrat ID.}

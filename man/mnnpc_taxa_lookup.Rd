@@ -5,23 +5,10 @@
 \alias{mnnpc_taxa_lookup}
 \title{A lookup between the accepted MNTaxa taxa and their synonyms}
 \format{
-A data frame with 20514 rows and 19 columns, the definitions of which are:
+A data frame with 8483 rows and 2 columns, the definitions of which are:
 \describe{
-\item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
-\item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-\item{qualifier}{The qualifier associated with the taxon_name, e.g. s.s..}
-\item{authority}{The authority who described the taxon concept associated with the taxon_name.}
-\item{strata}{The strata of the taxon_name, required at present as RMAVIS bundles the floristic tables strata into taxon names.}
-\item{full_name}{The full name of the taxon concept, which is equivalent to a concatentation of the taxon_name, qualifier, and authority.}
-\item{publication}{The parent publication containing the taxon_name description.}
-\item{taxon_id}{The ID of the taxon_name.}
 \item{recommended_taxon_name}{The accepted/recommended taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}.}
-\item{recommended_taxa_included}{A taxa included in the recommended_taxon_name, which may consist of an aggregate, ecological group, or collection of taxa for the purposes of the MNNPC.}
-\item{recommended_publication}{The parent publication containing the recommended_taxon_name description.}
-\item{recommended_common_name}{The common name associated with the recommended_taxa_included.}
-\item{recommended_c_value}{The coefficients of conservatism associated with the recommended_taxa_included.}
-\item{recommended_origin}{The nativeness status of the recommended_taxon_name.}
 }
 }
 \usage{
