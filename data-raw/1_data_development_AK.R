@@ -75,20 +75,24 @@ taxa_crosswalk3 <- taxa_crosswalk2 %>%
   mutate(taxon = str_replace_all(taxon, " x ", " x"),
          taxon = if_else(str_sub(taxon, 1, 2) == "x ",
                          sub("^..", "x", taxon),
-                         taxon)) %>% 
+                         taxon),
+         hybrid_version = 2) %>% 
   full_join(taxa_crosswalk2 %>% 
               filter(!is.na(hybrid)) %>% 
               mutate(taxon = str_replace_all(taxon, " x ", " X "),
                      taxon = if_else(str_sub(taxon, 1, 2) == "x ",
                                      sub("^.", "X", taxon),
-                                     taxon))) %>% 
+                                     taxon),
+                     hybrid_version = 3)) %>% 
   full_join(taxa_crosswalk2 %>% 
               filter(!is.na(hybrid)) %>% 
               mutate(taxon = str_replace_all(taxon, " x ", " X"),
                      taxon = if_else(str_sub(taxon, 1, 2) == "x ",
                                      sub("^..", "X", taxon),
-                                     taxon))) %>% 
-  full_join(taxa_crosswalk2) %>% 
+                                     taxon),
+                     hybrid_version = 4)) %>% 
+  full_join(taxa_crosswalk2 %>% 
+              mutate(hybrid_version = 1)) %>% 
   mutate(hybrid = if_else(!is.na(hybrid), 1, 0),
          dlist_hybrid = if_else(!is.na(dlist_hybrid), 1, 0)) %>% 
   distinct()
@@ -170,7 +174,8 @@ releve_groups <- releve_taxa2 %>%
               select(taxon_id, rank, author, publication)) %>% 
   mutate(dlist_hybrid = if_else(!is.na(dlist_hybrid), 1, 0),
          hybrid = dlist_hybrid,
-         rank = replace_na(rank, "group")) %>% 
+         rank = replace_na(rank, "group"),
+         hybrid_version = 1) %>% # none are hybrids
   select(colnames(taxa_crosswalk6)) %>% 
   distinct()
 
@@ -640,6 +645,7 @@ head(accepted_taxa)
 
 # dlist ID and name
 mnnpc_accepted_taxa <- taxa_crosswalk8 %>% 
+  filter(hybrid_version == 1) %>% 
   rename(taxon_name = taxon) %>% 
   distinct(taxon_name) %>% 
   arrange(taxon_name) %>% 
@@ -671,21 +677,33 @@ taxa_crosswalk8 %>%
   distinct(taxon, rank) %>% 
   filter(is.na(rank)) # ~genus
 
+# incorrect hybrid?
+taxa_crosswalk8 %>% 
+  filter(hybrid == 1 & str_detect(taxon, "x|X") == F) %>% 
+  distinct(taxon)
+# I think they're possible hybrids -- leave in for now
+
 # add dlist info
 # remove species unless taxa is lower
 mnnpc_taxonomic_backbone <- taxa_crosswalk8 %>% 
-  distinct(taxon, hybrid, rank, publication, full_name) %>% 
-  mutate(rank = replace_na(rank, "genus")) %>% 
+  filter(hybrid_version == 1) %>% 
+  mutate(rank = replace_na(rank, "genus"),
+         recommended_taxon_name = if_else(str_detect(
+           taxon, "understory|sub-canopy|canopy"), analysis_group_strata,
+           analysis_group)) %>% 
+  distinct(taxon, hybrid, rank, publication, full_name, 
+           recommended_taxon_name) %>% 
   rename(taxon_name = taxon) %>% 
-  arrange(taxon_name, full_name) %>% 
+  arrange(taxon_name, full_name, recommended_taxon_name) %>% 
   as.data.frame()
 
 # check for duplicates
-get_dupes(mnnpc_taxonomic_backbone)
+get_dupes(mnnpc_taxonomic_backbone %>% select(-hybrid))
   
 # check for missing information
 filter(mnnpc_taxonomic_backbone, is.na(rank))
-filter(mnnpc_taxonomic_backbone, is.na(publication)) # hard coded releve groups
+filter(mnnpc_taxonomic_backbone, is.na(publication)) %>% 
+  distinct(taxon_name) # hard coded releve groups
 
 # check that all taxa are included
 mnnpc_accepted_taxa %>% 
@@ -727,8 +745,11 @@ dlist_parents2 <- dlist_parents %>%
               .fn = ~paste0("recommended_taxon_", .x))
 
 mnnpc_taxa_lookup <- taxa_crosswalk8 %>% 
-  rename(taxon_name = taxon,
-         recommended_taxon_name = analysis_group) %>% 
+  filter(hybrid_version == 1) %>% 
+  mutate(recommended_taxon_name = if_else(str_detect(
+    taxon, "understory|sub-canopy|canopy"), analysis_group_strata,
+    analysis_group)) %>% 
+  rename(taxon_name = taxon) %>% 
   select(taxon_name, recommended_taxon_name, starts_with("dlist")) %>% 
   select(-dlist_c_value) %>% 
   distinct() %>% 
@@ -758,6 +779,17 @@ get_dupes(mnnpc_taxa_lookup, taxon_name)
 # all accepted taxa included?
 mnnpc_accepted_taxa %>% 
   anti_join(mnnpc_taxa_lookup)
+
+# same taxa as backbone?
+mnnpc_taxonomic_backbone %>% 
+  distinct(taxon_name, recommended_taxon_name) %>% 
+  anti_join(mnnpc_taxa_lookup)
+
+mnnpc_taxa_lookup %>% 
+  distinct(taxon_name, recommended_taxon_name) %>% 
+  anti_join(mnnpc_taxonomic_backbone)
+
+n_distinct(mnnpc_taxonomic_backbone$taxon_name)
 
 # save
 save(mnnpc_taxa_lookup, file = "data-raw/data-out-ak/mnnpc_taxa_lookup.rds")

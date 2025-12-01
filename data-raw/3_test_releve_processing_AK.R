@@ -38,7 +38,7 @@ dat_raw <- crosswalk_raw |>
 
 #### process data ####
 
-source("data-raw/releve_processing.R")
+source("data-raw/2_releve_processing_AK.R")
 
 dat_proc <- rel_proc_fun(dat_raw)
 
