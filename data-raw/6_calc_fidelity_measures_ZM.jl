@@ -1,12 +1,15 @@
 using VegSci
 using CSV
+using XLSX
 using DataFrames
 using NamedArrays
 
 base_fp = joinpath("C:/Users/zekmar/OneDrive - UKCEH/Projects/MNNPC")
-mnnpc_dd_fp = joinpath(base_fp, "floristic_table_development_data_20251023.csv")
+mnnpc_dd_fp = joinpath(base_fp, "floristic_table_development_data_20251125.csv")
 
 mnnpc_dd = CSV.read(mnnpc_dd_fp, DataFrame)
+
+mnnpc_classes = sort(String.(unique(mnnpc_dd.npc_class)))
 
 mnnpc_dd = mnnpc_dd[:, [:npc_class, :Quadrat, :Species, :Cover]]
 
@@ -20,7 +23,7 @@ class_df = unique(mnnpc_dd[:, [:npc_class, :Quadrat]])
 
 classes_dict = Dict
 
-for i in unique(class_df.npc_class)
+for i in mnnpc_classes
 
     classes = class_df[class_df[:, :npc_class] .== i, :Quadrat]
     classes_i_dict = Dict(String.(i) => string.(classes))
@@ -30,18 +33,73 @@ end
 
 VegSci.check_cluster_releveID_duplicates(classes_dict)
 
-fidelity_values_u = VegSci.u_fidelity(releves_mat, classes_dict)
-fidelity_values_phi = VegSci.phi_fidelity(releves_mat, classes_dict)
-fidelity_values_chisq = VegSci.chisq_fidelity(releves_mat, classes_dict)
-fidelity_values_G = VegSci.G_fidelity(releves_mat, classes_dict)
-fidelity_values_indval = VegSci.indval_fidelity(releves_mat, classes_dict)
+# Define function to calculate and return all fidelity values
+calc_all_fidelity_values = function(rm, cd)
 
-fidelity_values_u_df = rename(stack(VegSci.nm_to_df(fidelity_values_u)), ["A" => "npc_class", "variable" => "species", "value" => "u"])
-fidelity_values_phi_df = rename(stack(VegSci.nm_to_df(fidelity_values_phi)), ["A" => "npc_class", "variable" => "species", "value" => "phi"])
-fidelity_values_chisq_df = rename(stack(VegSci.nm_to_df(fidelity_values_chisq)), ["A" => "npc_class", "variable" => "species", "value" => "chisq"])
-fidelity_values_G_df = rename(stack(VegSci.nm_to_df(fidelity_values_G)), ["A" => "npc_class", "variable" => "species", "value" => "g"])
-@time fidelity_values_indval_df = rename(stack(VegSci.nm_to_df(fidelity_values_indval)), ["A" => "npc_class", "variable" => "species", "value" => "indval"])
+    fidelity_values_u = VegSci.u_fidelity(rm, cd)
+    fidelity_values_phi = VegSci.phi_fidelity(rm, cd)
+    fidelity_values_chisq = VegSci.chisq_fidelity(rm, cd)
+    fidelity_values_G = VegSci.G_fidelity(rm, cd)
+    fidelity_values_indval = VegSci.indval_fidelity(rm, cd)
 
-fidelity_values_df = innerjoin(fidelity_values_u_df, fidelity_values_phi_df, fidelity_values_chisq_df, fidelity_values_G_df, fidelity_values_indval_df, on = [:npc_class, :species])
+    fidelity_values_u_df = rename(stack(VegSci.nm_to_df(fidelity_values_u)), ["A" => "npc_class", "variable" => "species", "value" => "u"])
+    fidelity_values_phi_df = rename(stack(VegSci.nm_to_df(fidelity_values_phi)), ["A" => "npc_class", "variable" => "species", "value" => "phi"])
+    fidelity_values_chisq_df = rename(stack(VegSci.nm_to_df(fidelity_values_chisq)), ["A" => "npc_class", "variable" => "species", "value" => "chisq"])
+    fidelity_values_G_df = rename(stack(VegSci.nm_to_df(fidelity_values_G)), ["A" => "npc_class", "variable" => "species", "value" => "g"])
+    fidelity_values_indval_df = rename(stack(VegSci.nm_to_df(fidelity_values_indval)), ["A" => "npc_class", "variable" => "species", "value" => "indval"])
 
-CSV.write(joinpath(base_fp, "mnnpc_fidelity_values.csv"), fidelity_values_df)
+    fidelity_values_df = innerjoin(fidelity_values_u_df, fidelity_values_phi_df, fidelity_values_chisq_df, fidelity_values_G_df, fidelity_values_indval_df, on = [:npc_class, :species])
+
+    return fidelity_values_df
+    
+end
+
+# Fidelity values across all classes
+all_classes_fidelity_values_df = calc_all_fidelity_values(releves_mat, classes_dict)
+sort!(all_classes_fidelity_values_df, [:npc_class])
+
+# Fidelity values within classes by system
+systems = ["AP", "FD", "FF", "FP", "MH", "MR", "OP", "RO", "UP", "WF", "WM", "WP"]
+
+fidelity_values_dict = Dict
+
+for system in systems
+
+    classes_sys = mnnpc_classes[startswith.(mnnpc_classes, system)]
+    cd_sys = filter(((k,v),) -> k in classes_sys, classes_dict)
+    rm_sys_names = reduce(vcat, collect(values(cd_sys)))
+    rm_sys = releves_mat[rm_sys_names, :]
+    
+    fidelity_values_df = calc_all_fidelity_values(rm_sys, cd_sys)
+
+    fidelity_values_dict_sys = Dict(system => fidelity_values_df)
+    fidelity_values_dict = merge(fidelity_values_dict, fidelity_values_dict_sys)
+
+end
+
+fidelity_values_dict["All"] = all_classes_fidelity_values_df
+
+XLSX.openxlsx(joinpath(base_fp, "mnnpc_fidelity_values.xlsx"), mode = "w") do xf
+
+    all_systems = append!(["All"], systems)
+
+    sheet = xf[1]
+
+    for sys in all_systems
+
+        df = fidelity_values_dict[sys]
+
+        sort!(df, [:npc_class, :species])
+
+        # mapcols(col -> replace!(col, NaN => missing), df)
+        # foreach(col -> replace!(col, NaN => missing), eachcol(df)) 
+
+        sheet = XLSX.addsheet!(xf, sys)
+
+        XLSX.writetable!(sheet, df)
+
+    end
+
+end
+
+# CSV.write(joinpath(base_fp, "mnnpc_fidelity_values.csv"), fidelity_values_df)
