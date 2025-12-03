@@ -14,7 +14,10 @@ load(file.path(input_path, "mnnpc_taxa_lookup.rds"))
 load(file.path(input_path, "mnnpc_taxonomic_backbone.rds"))
 
 # Taxon -> Analysis group aggregation lookup 
-mnnpc_taxa_conv <- taxa_conv
+# mnnpc_taxa_conv <- taxa_conv
+mnnpc_taxa_conv <- mnnpc_taxonomic_backbone |>
+  dplyr::select("taxon" = "taxon_name", "analysis_group" = "recommended_taxon_name") |>
+  dplyr::distinct()
 
 usethis::use_data(mnnpc_taxa_conv, internal = FALSE, overwrite = TRUE)
 
@@ -64,6 +67,7 @@ usethis::use_data(mnnpc_floristic_tables, internal = FALSE, overwrite = TRUE)
 
 # Taxonomic backbone
 mnnpc_taxonomic_backbone <- mnnpc_taxonomic_backbone |>
+  dplyr::distinct(taxon_name) |>
   dplyr::left_join(mnnpc_taxa_lookup, by = "taxon_name") |>
   dplyr::select(informal_group, 
                 recommended_taxon_name, 

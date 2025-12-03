@@ -5,7 +5,7 @@
 \alias{mnnpc_taxa_lookup}
 \title{A lookup between the accepted MNTaxa taxa and their synonyms}
 \format{
-A data frame with 8483 rows and 2 columns, the definitions of which are:
+A data frame with 7781 rows and 2 columns, the definitions of which are:
 \describe{
 \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
 \item{recommended_taxon_name}{The accepted/recommended taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}.}

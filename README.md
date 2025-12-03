@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Generic
-badge](https://img.shields.io/badge/Version-0.9.2-green.svg)]()
+badge](https://img.shields.io/badge/Version-0.9.3-green.svg)]()
 <!-- badges: end -->
 
 Minnesota Native Plant Community Classification System objects for

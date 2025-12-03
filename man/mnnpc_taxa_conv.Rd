@@ -5,7 +5,7 @@
 \alias{mnnpc_taxa_conv}
 \title{Taxon name conversion}
 \format{
-A data frame with 8483 rows and 2 columns, the definitions of which are:
+A data frame with 7781 rows and 2 columns, the definitions of which are:
 \describe{
 \item{taxon}{The taxon name, see \code{MNNPC::taxa_lookup}}
 \item{analysis_group}{The taxon or group of taxa used for analysis in the MNNPC and RMAVIS.}

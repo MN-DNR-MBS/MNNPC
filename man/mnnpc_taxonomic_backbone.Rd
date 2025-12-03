@@ -5,7 +5,7 @@
 \alias{mnnpc_taxonomic_backbone}
 \title{The taxonomic backbone for the MNNPC}
 \format{
-A data frame with 24837 rows and 18 columns, the definitions of which are:
+A data frame with 7781 rows and 18 columns, the definitions of which are:
 \describe{
 \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 \item{recommended_taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
