@@ -164,3 +164,44 @@
 #'
 #' @format A data frame with `r length(MNNPC::mnnpc_vc_types_named)` which contains ...
 "mnnpc_vc_types_named"
+
+#' 
+#'
+#' 
+#'
+#' \code{mnnpc_scov_conv} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_scov_conv)` rows and `r ncol(MNNPC::mnnpc_scov_conv)` columns, the definitions of which are:
+#' \describe{
+#'   \item{scov}{}
+#'   \item{scov_mid}{}
+#' }
+"mnnpc_scov_conv"
+
+#' 
+#'
+#' 
+#'
+#' \code{mnnpc_strata} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_strata)` rows and `r ncol(MNNPC::mnnpc_strata)` columns, the definitions of which are:
+#' \describe{
+#'   \item{physcode}{}
+#'   \item{strata_lower}{}
+#'   \item{strata_upper}{}
+#' }
+"mnnpc_strata"
+
+#' 
+#'
+#' 
+#' 
+#' \code{mnnpc_ht_conv} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_ht_conv)` rows and `r ncol(MNNPC::mnnpc_ht_conv)` columns, the definitions of which are:
+#' \describe{
+#'   \item{ht}{The height category to assign for strata between ht_min_m and ht_max_m.}
+#'   \item{ht_min_m}{}
+#'   \item{ht_max_m}{}
+#' }
+"mnnpc_ht_conv"
