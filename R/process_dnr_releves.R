@@ -16,27 +16,6 @@ process_dnr_releves <- function(releve_data){
     
   } else {
     
-    #### conversion tables ####
-    
-    # taxa crosswalk
-    # load("data-raw/data-out-ak/taxa_conv.rds")
-    
-    # scov midpoint conversion
-    scov_conv <- data.frame(scov = c(as.character(5:1), "+", "r"),
-                            scov_mid = c(87.5, 62.5, 37.5, 15, 2.5, 0.5, 0.1))
-    
-    # strata for physcodes
-    strata <- data.frame(physcode = c(rep(c("D", "E"), each = 3), "B", "C", "F", 
-                                      "G", "H", "K", "S", "X"),
-                         strata_lower = c(rep(c(1, 4, 6), 2), rep(1, 8)),
-                         strata_upper = c(rep(c(3, 5, 8), 2), rep(8, 8)))
-    
-    # height conversion table
-    ht_conv <- data.frame(ht = 1:8,
-                          ht_min_m = c(0, 0.1, 0.5, 2, 5, 10, 20, 35),
-                          ht_max_m = c(0.1, 0.5, 2, 5, 10, 20, 35, 50))
-    
-    
     #### checks and replies ####
     
     # check for required fields
@@ -98,7 +77,7 @@ process_dnr_releves <- function(releve_data){
     if(is.numeric(dat2$scov) == F){
       
       dat2 <- dat2 |>
-        dplyr::left_join(scov_conv) |>
+        dplyr::left_join(MNNPC::mnnpc_scov_conv) |>
         dplyr::select(-scov) |>
         dplyr::rename(scov = scov_mid)
       
@@ -167,7 +146,7 @@ process_dnr_releves <- function(releve_data){
     # add strata to tree names
     # rename columns
     dat5 <- dat4 |>
-      dplyr::inner_join(strata, relationship = "many-to-many") |>
+      dplyr::inner_join(MNNPC::mnnpc_strata, relationship = "many-to-many") |>
       dplyr::filter((strata_lower == 1 & strata_upper == 8) |
                       (!is.na(minht) & !is.na(maxht))) |> 
       dplyr::mutate(minht = ifelse(is.na(minht) & strata_lower == 1 &
@@ -177,10 +156,10 @@ process_dnr_releves <- function(releve_data){
       dplyr::filter((minht >= strata_lower & minht <= strata_upper) | 
                       (strata_lower >= minht & strata_lower <= maxht) |
                       (strata_lower == 1 & strata_upper == 8)) |>
-      dplyr::left_join(ht_conv |>
+      dplyr::left_join(MNNPC::mnnpc_ht_conv |>
                          dplyr::rename(minht = ht) |>
                          dplyr::select(minht, ht_min_m)) |>
-      dplyr::left_join(ht_conv |>
+      dplyr::left_join(MNNPC::mnnpc_ht_conv |>
                          dplyr::rename(maxht = ht) |>
                          dplyr::select(maxht, ht_max_m)) |>
       dplyr::mutate(max_min_range = ht_max_m - ht_min_m,
@@ -190,7 +169,7 @@ process_dnr_releves <- function(releve_data){
       dplyr::reframe(ht = seq(minht, maxht)) |> 
       dplyr::ungroup() |>
       dplyr::filter(ht >= strata_lower & ht <= strata_upper) |> 
-      dplyr::left_join(ht_conv |>
+      dplyr::left_join(MNNPC::mnnpc_ht_conv |>
                          dplyr::mutate(ht_range = ht_max_m - ht_min_m) |>
                          dplyr::select(ht, ht_range)) |>
       dplyr::mutate(scov_ht = scov_per_m * ht_range) |>  
