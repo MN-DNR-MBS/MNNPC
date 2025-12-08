@@ -205,3 +205,28 @@
 #'   \item{ht_max_m}{}
 #' }
 "mnnpc_ht_conv"
+
+#' A lookup between accepted taxon names and the taxon names present in the phylogenetic tree
+#'
+#' A lookup between accepted taxon names as present in `MNNPC::mnnpc_accepted_taxa` and the taxon names present in the `MNNPC::mnnpc_phlyo_tree` phylogenetic tree object.
+#' At present `r t(as.matrix(table(MNNPC::mnnpc_accepted_phylo_taxa_lookup$phylo)))[[1, "TRUE"]]` taxa out of `r nrow(MNNPC::mnnpc_accepted_taxa)` are present in the tree.
+#' The phylo_taxon_name are produced by reducing varieties and subspecies to the species rank, and removing strata and ecological group suffixes.
+#' 
+#' \code{mnnpc_accepted_phylo_taxa_lookup} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_accepted_phylo_taxa_lookup)` rows and `r ncol(MNNPC::mnnpc_accepted_phylo_taxa_lookup)` columns, the definitions of which are:
+#' \describe{
+#'   \item{taxon_name}{Accepted taxon names as present in `MNNPC::mnnpc_accepted_taxa`.}
+#'   \item{phylo_taxon_name}{The taxon name present in the `MNNPC::mnnpc_phlyo_tree` object.}
+#'   \item{phylo}{A boolean representing whether each taxon is present in the `MNNPC::mnnpc_phlyo_tree` object.}
+#' }
+"mnnpc_accepted_phylo_taxa_lookup"
+
+#' A phylogenetic tree for the MNNPC taxa
+#'
+#' A phylogenetic tree in the Newick format, formed from taxa present in the phylo_taxon_name column in `MNNPC::mnnpc_accepted_phylo_taxa_lookup`, where available.
+#' 
+#' \code{mnnpc_phlyo_tree} 
+#'
+#' @format A string containing the phylogentic tree in the Newick format.
+"mnnpc_phlyo_tree"
