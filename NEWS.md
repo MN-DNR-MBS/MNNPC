@@ -1,3 +1,8 @@
+# MNNPC 0.9.4 (08-12-2025)
+
+* Adding function `MNNPC::process_dnr_releves`.
+* Adding objects: `MNNPC::mnnpc_phlyo_tree`, `MNNPC::mnnpc_accepted_phylo_taxa_lookup`, `MNNPC::mnnpc_ht_conv`, `MNNPC::mnnpc_strata`, `MNNPC::mnnpc_scov_conv`, and `MNNPC::example_releve`.
+
 # MNNPC 0.9.3 (03-12-2025)
 
 * Adding temporary `MNNPC::mnnpc_taxa_conv` object.
