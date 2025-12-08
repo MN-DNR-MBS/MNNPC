@@ -15,10 +15,10 @@ resample <- readxl::read_excel("../../../releve-resample/data/releve_list_southe
 #### test parameters ####
 
 # number of releves to test
-n_test <- 5
+n_test <- 1
 
 # randomly select releves
-rels <- sample(crosswalk_pre$relnumb, n_test)
+rels <- sample(releve$relnumb, n_test)
 
 # relnumb will match to crosswalk tables
 # make up year and group
@@ -32,8 +32,13 @@ parms <- data.frame(relnumb = rels,
 # select releve to test
 # add columns
 dat_raw <- crosswalk_raw |>
+  dplyr::select(relnumb, physcode, minht, maxht, pcov, taxon, relid, scov_mid,
+                outside_of_plot) |>
   dplyr::inner_join(parms) |>
   dplyr::rename(scov = scov_mid)
+
+# save example
+# save(dat_raw, file = "data-raw/data-out-ak/raw_releve_example.rds")
 
 
 #### process data ####
