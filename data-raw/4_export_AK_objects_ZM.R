@@ -5,12 +5,14 @@ input_path <- file.path("data-raw", "data-out-ak")
 source("./data-raw/2_releve_processing_AK.R")
 
 # Load objects created by A.K.
-load(file.path(input_path, "taxa_conv.rds"))
+load(file.path(input_path, "mnnpc_taxa_conv.rds")) 
+# load(file.path(input_path, "mnnpc_taxa_conv_raw.rds"))
 load(file.path(input_path, "mnnpc_accepted_taxa.rds"))
 load(file.path(input_path, "mnnpc_community_attributes.rds"))
 load(file.path(input_path, "mnnpc_example_data.rds"))
 load(file.path(input_path, "mnnpc_floristic_tables.rds"))
 load(file.path(input_path, "mnnpc_taxa_lookup.rds"))
+# load(file.path(input_path, "mnnpc_taxonomic_backbone_full.rds"))
 load(file.path(input_path, "mnnpc_taxonomic_backbone.rds"))
 load(file.path(input_path, "raw_releve_example.rds"))
 
