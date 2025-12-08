@@ -12,6 +12,13 @@ load(file.path(input_path, "mnnpc_example_data.rds"))
 load(file.path(input_path, "mnnpc_floristic_tables.rds"))
 load(file.path(input_path, "mnnpc_taxa_lookup.rds"))
 load(file.path(input_path, "mnnpc_taxonomic_backbone.rds"))
+load(file.path(input_path, "raw_releve_example.rds"))
+
+# Example releve
+example_releve <- dat_raw |>
+  dplyr::select(year, group, relnumb, physcode, minht, maxht, taxon, scov)
+
+usethis::use_data(example_releve, internal = FALSE, overwrite = TRUE)
 
 # Taxon -> Analysis group aggregation lookup 
 # mnnpc_taxa_conv <- taxa_conv

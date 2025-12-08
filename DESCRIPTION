@@ -22,3 +22,5 @@ Depends:
     R (>= 4.4)
 LazyData: true
 Config/testthat/edition: 3
+Suggests: 
+    testthat (>= 3.0.0)

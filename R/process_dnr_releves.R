@@ -1,3 +1,15 @@
+#' Process releve data into the format required by RMAVIS
+#' 
+#' Process releve data into the format required by RMAVIS, specifically a data frame
+#' in long format containing "Year", "Group", "Quadrat", "Species", and "Cover" columns.
+#'
+#' @param releve_data See `MNNPC::example_releve`.
+#'
+#' @returns A data frame containing the releve data with five columns: "Year", "Group", "Quadrat", "Species", "Cover"
+#' @export
+#'
+#' @examples
+#' MNNPC::process_dnr_releves(releve_data = MNNPC::example_releve)
 process_dnr_releves <- function(releve_data){
   
   #### check for processed releve ####
