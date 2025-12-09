@@ -1,3 +1,9 @@
+# MNNPC 0.9.5 (09-12-2025)
+
+* Adding branch lengths to `MNNPC::mnnpc_phlyo_tree`.
+* Changing the name of `MNNPC::mnnpc_accepted_phylo_taxa_lookup` to `MNNPC::mnnpc_phylo_taxa_lookup` 
+  and ensuring that the matched OTL name and OTL OTT codes are included in this lookup.
+
 # MNNPC 0.9.4 (08-12-2025)
 
 * Adding function `MNNPC::process_dnr_releves`.

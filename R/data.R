@@ -228,22 +228,25 @@
 #' A lookup between accepted taxon names and the taxon names present in the phylogenetic tree
 #'
 #' A lookup between accepted taxon names as present in `MNNPC::mnnpc_accepted_taxa` and the taxon names present in the `MNNPC::mnnpc_phlyo_tree` phylogenetic tree object.
-#' At present `r t(as.matrix(table(MNNPC::mnnpc_accepted_phylo_taxa_lookup$phylo)))[[1, "TRUE"]]` taxa out of `r nrow(MNNPC::mnnpc_accepted_taxa)` are present in the tree.
+#' At present `r t(as.matrix(table(MNNPC::mnnpc_phylo_taxa_lookup$phylo)))[[1, "TRUE"]]` taxa out of `r nrow(MNNPC::mnnpc_accepted_taxa)` are present in the tree.
 #' The phylo_taxon_name are produced by reducing varieties and subspecies to the species rank, and removing strata and ecological group suffixes.
 #' 
-#' \code{mnnpc_accepted_phylo_taxa_lookup} 
+#' \code{mnnpc_phylo_taxa_lookup} 
 #'
-#' @format A data frame with `r nrow(MNNPC::mnnpc_accepted_phylo_taxa_lookup)` rows and `r ncol(MNNPC::mnnpc_accepted_phylo_taxa_lookup)` columns, the definitions of which are:
+#' @format A data frame with `r nrow(MNNPC::mnnpc_phylo_taxa_lookup)` rows and `r ncol(MNNPC::mnnpc_phylo_taxa_lookup)` columns, the definitions of which are:
 #' \describe{
 #'   \item{taxon_name}{Accepted taxon names as present in `MNNPC::mnnpc_accepted_taxa`.}
-#'   \item{phylo_taxon_name}{The taxon name present in the `MNNPC::mnnpc_phlyo_tree` object.}
+#'   \item{search_name}{The taxon name used to search for OTL data, and as present in the `MNNPC::mnnpc_phlyo_tree` object.}
+#'   \item{matched_name}{The OTL name matched to the search_name.}
 #'   \item{phylo}{A boolean representing whether each taxon is present in the `MNNPC::mnnpc_phlyo_tree` object.}
+#'   \item{ottid}{The OTL id associated with the matched name.}
 #' }
-"mnnpc_accepted_phylo_taxa_lookup"
+"mnnpc_phylo_taxa_lookup"
 
 #' A phylogenetic tree for the MNNPC taxa
 #'
-#' A phylogenetic tree in the Newick format, formed from taxa present in the phylo_taxon_name column in `MNNPC::mnnpc_accepted_phylo_taxa_lookup`, where available.
+#' A phylogenetic tree in the Newick format, formed from taxa present in the search_name column in `MNNPC::mnnpc_phylo_taxa_lookup`, where available.
+#' Branch lengths were calculated using the 'Grafen' method implemented in the `ape::compute.brlen` function.
 #' 
 #' \code{mnnpc_phlyo_tree} 
 #'

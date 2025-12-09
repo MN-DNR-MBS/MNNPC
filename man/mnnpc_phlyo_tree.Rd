@@ -11,7 +11,8 @@ A string containing the phylogentic tree in the Newick format.
 mnnpc_phlyo_tree
 }
 \description{
-A phylogenetic tree in the Newick format, formed from taxa present in the phylo_taxon_name column in \code{MNNPC::mnnpc_accepted_phylo_taxa_lookup}, where available.
+A phylogenetic tree in the Newick format, formed from taxa present in the search_name column in \code{MNNPC::mnnpc_phylo_taxa_lookup}, where available.
+Branch lengths were calculated using the 'Grafen' method implemented in the \code{ape::compute.brlen} function.
 }
 \details{
 \code{mnnpc_phlyo_tree}
