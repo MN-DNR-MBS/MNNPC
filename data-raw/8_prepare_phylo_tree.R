@@ -38,7 +38,7 @@ mnnpc_accepted_phylo_taxa_lookup <- mnnpc_accepted_taxa |>
                                                         pattern = "\\ssubsp.*$"))
 
 # Extract names to submit to rotl
-taxa_phylo <- mnnpc_accepted_phylo_taxa_lookup |>
+taxa_phylo <- mnnpc_phylo_taxa_lookup |>
   dplyr::distinct(search_name) |>
   dplyr::pull(search_name)
 
@@ -65,7 +65,7 @@ matched_taxa <- rotl_results |>
   dplyr::mutate("ottid" = ifelse(!is.na(ott_id), paste0("ott", as.numeric(ott_id)), NA), .keep = "unused")
 
 # Join OTT codes onto lookup
-mnnpc_accepted_phylo_taxa_lookup <- mnnpc_accepted_phylo_taxa_lookup |>
+mnnpc_phylo_taxa_lookup <- mnnpc_phylo_taxa_lookup |>
   dplyr::left_join(matched_taxa, by = "search_name", relationship = "many-to-many")
 
 # Retrieve OTT codes for taxa present in OTL
