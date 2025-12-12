@@ -8,9 +8,9 @@
 A data frame with 7781 rows and 5 columns, the definitions of which are:
 \describe{
 \item{taxon_name}{Accepted taxon names as present in \code{MNNPC::mnnpc_accepted_taxa}.}
-\item{search_name}{The taxon name used to search for OTL data, and as present in the \code{MNNPC::mnnpc_phlyo_tree} object.}
+\item{search_name}{The taxon name used to search for OTL data, and as present in the \code{MNNPC::mnnpc_phylo_tree} object.}
 \item{matched_name}{The OTL name matched to the search_name.}
-\item{phylo}{A boolean representing whether each taxon is present in the \code{MNNPC::mnnpc_phlyo_tree} object.}
+\item{phylo}{A boolean representing whether each taxon is present in the \code{MNNPC::mnnpc_phylo_tree} object.}
 \item{ottid}{The OTL id associated with the matched name.}
 }
 }
@@ -18,7 +18,7 @@ A data frame with 7781 rows and 5 columns, the definitions of which are:
 mnnpc_phylo_taxa_lookup
 }
 \description{
-A lookup between accepted taxon names as present in \code{MNNPC::mnnpc_accepted_taxa} and the taxon names present in the \code{MNNPC::mnnpc_phlyo_tree} phylogenetic tree object.
+A lookup between accepted taxon names as present in \code{MNNPC::mnnpc_accepted_taxa} and the taxon names present in the \code{MNNPC::mnnpc_phylo_tree} phylogenetic tree object.
 At present 7642 taxa out of 7781 are present in the tree.
 The phylo_taxon_name are produced by reducing varieties and subspecies to the species rank, and removing strata and ecological group suffixes.
 }

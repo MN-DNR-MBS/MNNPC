@@ -54,7 +54,7 @@ plot_data_class_results <- plot_data_class |>
   dplyr::rowwise() |>
   dplyr::mutate("rdiv_objects" = list(RMAVIS::calc_rdiversity_objects(plot_data = data, 
                                                                       higher_taxa = higher_taxa, 
-                                                                      phylo_tree = MNNPC::mnnpc_phlyo_tree, # phlyo -> phylo
+                                                                      phylo_tree = MNNPC::mnnpc_phylo_tree, # phylo -> phylo
                                                                       phylo_taxa_lookup = MNNPC::mnnpc_phylo_taxa_lookup,
                                                                       groups = c("npc_class", "npc_type", "npc_subtype", "Quadrat"))),
                 .keep = "unused") |>
@@ -70,7 +70,7 @@ plot_data_type_results <- plot_data_type |>
   dplyr::rowwise() |>
   dplyr::mutate("rdiv_objects" = list(RMAVIS::calc_rdiversity_objects(plot_data = data, 
                                                                       higher_taxa = higher_taxa, 
-                                                                      phylo_tree = MNNPC::mnnpc_phlyo_tree, # phlyo -> phylo
+                                                                      phylo_tree = MNNPC::mnnpc_phylo_tree, # phylo -> phylo
                                                                       phylo_taxa_lookup = MNNPC::mnnpc_phylo_taxa_lookup,
                                                                       groups = c("npc_class", "npc_type", "npc_subtype", "Quadrat"))),
                 .keep = "unused") |>
@@ -86,7 +86,7 @@ plot_data_subtype_results <- plot_data_subtype |>
   dplyr::rowwise() |>
   dplyr::mutate("rdiv_objects" = list(RMAVIS::calc_rdiversity_objects(plot_data = data, 
                                                                       higher_taxa = higher_taxa, 
-                                                                      phylo_tree = MNNPC::mnnpc_phlyo_tree, # phlyo -> phylo
+                                                                      phylo_tree = MNNPC::mnnpc_phylo_tree, # phylo -> phylo
                                                                       phylo_taxa_lookup = MNNPC::mnnpc_phylo_taxa_lookup,
                                                                       groups = c("npc_class", "npc_type", "npc_subtype", "Quadrat"))),
                 .keep = "unused") |>
@@ -102,7 +102,7 @@ plot_data_quadrat_results <- plot_data_quadrat |>
   dplyr::rowwise() |>
   dplyr::mutate("rdiv_objects" = list(RMAVIS::calc_rdiversity_objects(plot_data = data, 
                                                                       higher_taxa = higher_taxa, 
-                                                                      phylo_tree = MNNPC::mnnpc_phlyo_tree, # phlyo -> phylo
+                                                                      phylo_tree = MNNPC::mnnpc_phylo_tree, # phylo -> phylo
                                                                       phylo_taxa_lookup = MNNPC::mnnpc_phylo_taxa_lookup,
                                                                       groups = c("npc_class", "npc_type", "npc_subtype", "Quadrat"))),
                 .keep = "unused") |>

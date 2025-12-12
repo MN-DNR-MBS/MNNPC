@@ -1,13 +1,18 @@
+# MNNPC 0.9.6 (12-12-2025)
+
+* Fixing instances where "phylo" was incorrectly spelt as phlyo.
+* Adding code to calculate diversity measures for the MNNPC in ./data-raw/9_calc_diversity.R
+
 # MNNPC 0.9.5 (09-12-2025)
 
-* Adding branch lengths to `MNNPC::mnnpc_phlyo_tree`.
+* Adding branch lengths to `MNNPC::mnnpc_phylo_tree`.
 * Changing the name of `MNNPC::mnnpc_accepted_phylo_taxa_lookup` to `MNNPC::mnnpc_phylo_taxa_lookup` 
   and ensuring that the matched OTL name and OTL OTT codes are included in this lookup.
 
 # MNNPC 0.9.4 (08-12-2025)
 
 * Adding function `MNNPC::process_dnr_releves`.
-* Adding objects: `MNNPC::mnnpc_phlyo_tree`, `MNNPC::mnnpc_accepted_phylo_taxa_lookup`, `MNNPC::mnnpc_ht_conv`, `MNNPC::mnnpc_strata`, `MNNPC::mnnpc_scov_conv`, and `MNNPC::example_releve`.
+* Adding objects: `MNNPC::mnnpc_phylo_tree`, `MNNPC::mnnpc_accepted_phylo_taxa_lookup`, `MNNPC::mnnpc_ht_conv`, `MNNPC::mnnpc_strata`, `MNNPC::mnnpc_scov_conv`, and `MNNPC::example_releve`.
 
 # MNNPC 0.9.3 (03-12-2025)
 

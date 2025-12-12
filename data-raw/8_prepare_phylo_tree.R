@@ -77,20 +77,20 @@ ott_in_tree_tbl <- tibble::enframe(ott_in_tree) |>
 all(ott_in_tree_tbl$name %in% mnnpc_accepted_phylo_taxa_lookup$matched_name)
 
 # Retrieve and save tree in Newick format
-mnnpc_phlyo_tree_raw <- rotl::tol_induced_subtree(ott_ids = ott_in_tree, label_format = "id")
+mnnpc_phylo_tree_raw <- rotl::tol_induced_subtree(ott_ids = ott_in_tree, label_format = "id")
 
-rotl::tol_induced_subtree(ott_ids = ott_in_tree, label_format = "id", file = file.path(".", "data-raw", "data-out-zm", "mnnpc_phlyo_tree.txt"))
+rotl::tol_induced_subtree(ott_ids = ott_in_tree, label_format = "id", file = file.path(".", "data-raw", "data-out-zm", "mnnpc_phylo_tree.txt"))
 
 # Read tree back into R
-mnnpc_phlyo_tree_string <- readLines(file.path(".", "data-raw", "data-out-zm", "mnnpc_phlyo_tree.txt"))
+mnnpc_phylo_tree_string <- readLines(file.path(".", "data-raw", "data-out-zm", "mnnpc_phylo_tree.txt"))
 
-mnnpc_phlyo_tree_phylo <- ape::read.tree(text = mnnpc_phlyo_tree_string)
+mnnpc_phylo_tree_phylo <- ape::read.tree(text = mnnpc_phylo_tree_string)
 
 # Calculate branch lengths
-mnnpc_phlyo_tree_phylo <- ape::compute.brlen(mnnpc_phlyo_tree_phylo, method = "Grafen")
+mnnpc_phylo_tree_phylo <- ape::compute.brlen(mnnpc_phylo_tree_phylo, method = "Grafen")
 
 # Replace tip labels, we need to do this as there are some incorrectly formatted names returned, and inexact, but acceptable, matches
-tip_labels <- mnnpc_phlyo_tree_phylo$tip.label
+tip_labels <- mnnpc_phylo_tree_phylo$tip.label
 
 new_tip_labels_all <- setNames(mnnpc_accepted_phylo_taxa_lookup$search_name, mnnpc_accepted_phylo_taxa_lookup$ottid)
 
@@ -98,12 +98,12 @@ new_tip_labels <- new_tip_labels_all[tip_labels]
 
 all(tip_labels == names(new_tip_labels))
 
-mnnpc_phlyo_tree_phylo$tip.label <- new_tip_labels
+mnnpc_phylo_tree_phylo$tip.label <- new_tip_labels
 
-mnnpc_phlyo_tree <- ape::write.tree(mnnpc_phlyo_tree_phylo)
+mnnpc_phylo_tree <- ape::write.tree(mnnpc_phylo_tree_phylo)
 
 # Save tree
-usethis::use_data(mnnpc_phlyo_tree, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_phylo_tree, internal = FALSE, overwrite = TRUE)
 
 # Save lookup between MNNPC names and names use to retrieve tree data
 mnnpc_phylo_taxa_lookup <- mnnpc_accepted_phylo_taxa_lookup
