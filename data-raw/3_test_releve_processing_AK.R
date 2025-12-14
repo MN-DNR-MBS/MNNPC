@@ -1,21 +1,23 @@
 #### import data ####
 
 # import data
-crosswalk_pre <- read.csv("../../intermediate-data/crosswalk_table_formatted_20251119a.csv")
-crosswalk_raw <- read.csv("../../intermediate-data/crosswalk_raw_no_dups_20251119a.csv")
-releve <- read.csv("../../intermediate-data/releve_table_formatted_20251119a.csv")
-
-# remove everything except above
-rm(list = ls()[!ls() %in% c("crosswalk_raw", "crosswalk_pre", "releve")])
+crosswalk_pre <- read.csv("../../intermediate-data/crosswalk_table_formatted_20251214a.csv")
+crosswalk_raw <- read.csv("../../intermediate-data/crosswalk_raw_no_dups_20251214a.csv")
+releve <- read.csv("../../intermediate-data/releve_table_formatted_20251214a.csv")
 
 # example data
 load("data-raw/data-out-ak/mnnpc_example_data.rds")
 resample <- readxl::read_excel("../../../releve-resample/data/releve_list_southern_20251120.xlsx")
 
+# remove everything except above
+rm(list = ls()[!ls() %in% c("crosswalk_raw", "crosswalk_pre", "releve",
+                            "resample")])
+
+
 #### test parameters ####
 
 # number of releves to test
-n_test <- 1
+n_test <- 5
 
 # randomly select releves
 rels <- sample(releve$relnumb, n_test)
@@ -36,9 +38,6 @@ dat_raw <- crosswalk_raw |>
                 outside_of_plot) |>
   dplyr::inner_join(parms) |>
   dplyr::rename(scov = scov_mid)
-
-# save example
-# save(dat_raw, file = "data-raw/data-out-ak/raw_releve_example.rds")
 
 
 #### process data ####
