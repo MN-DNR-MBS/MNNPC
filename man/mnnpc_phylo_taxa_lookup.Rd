@@ -19,7 +19,7 @@ mnnpc_phylo_taxa_lookup
 }
 \description{
 A lookup between accepted taxon names as present in \code{MNNPC::mnnpc_accepted_taxa} and the taxon names present in the \code{MNNPC::mnnpc_phylo_tree} phylogenetic tree object.
-At present 3415 taxa out of 3476 are present in the tree.
+At present 3415 taxa out of 3761 are present in the tree.
 The phylo_taxon_name are produced by reducing varieties and subspecies to the species rank, and removing strata and ecological group suffixes.
 }
 \details{

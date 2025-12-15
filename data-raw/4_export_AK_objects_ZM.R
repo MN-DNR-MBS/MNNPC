@@ -27,7 +27,8 @@ mnnpc_taxa_conv <- mnnpc_taxa_lookup |>
 usethis::use_data(mnnpc_taxa_conv, internal = FALSE, overwrite = TRUE)
 
 # Accepted taxa
-mnnpc_accepted_taxa <- mnnpc_accepted_taxa
+mnnpc_accepted_taxa <- tibble::tibble("taxon_name" = unique(c(mnnpc_taxa_lookup$recommended_taxon_name, mnnpc_taxa_lookup$analysis_group))) |>
+  dplyr::arrange(taxon_name)
 
 usethis::use_data(mnnpc_accepted_taxa, internal = FALSE, overwrite = TRUE)
 

@@ -1,3 +1,7 @@
+# MNNPC 0.9.8 (15-12-2025)
+
+* Ensuring all analysis_group aggregates (see `MNNPC::mnnpc_taxa_lookup`) are included in `MNNPC::mnnpc_accepted_taxa`.
+
 # MNNPC 0.9.7 (15-12-2025)
 
 * Ensuring all data documentation is complete.

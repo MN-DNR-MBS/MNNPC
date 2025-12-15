@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 # MNNPC
 
 <!-- badges: start -->
-[![Generic badge](https://img.shields.io/badge/Version-0.9.7-green.svg)]()
+[![Generic badge](https://img.shields.io/badge/Version-0.9.8-green.svg)]()
 <!-- badges: end -->
 
 Minnesota Native Plant Community Classification System objects for RMAVIS  
