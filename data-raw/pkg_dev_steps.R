@@ -38,14 +38,14 @@ devtools::build_readme()
 # devtools::build_vignettes()
 
 # 13) Build package manual
-devtools::build_manual(pkg = ".", path = ".")
+# devtools::build_manual(pkg = ".", path = ".")
 
 # 14) Build pkgdown website, this builds the site locally, 
 #     which is important if building your site takes a long time or reads data outside of the repository.
 # devtools::build_site()
 
 # 15) Manually deploy website
-pkgdown::deploy_to_branch()
+# pkgdown::deploy_to_branch()
 
 # 16) Release!
 

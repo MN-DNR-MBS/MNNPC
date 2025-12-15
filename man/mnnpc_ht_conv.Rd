@@ -7,16 +7,16 @@
 \format{
 A data frame with 8 rows and 3 columns, the definitions of which are:
 \describe{
-\item{ht}{The height category to assign for strata between ht_min_m and ht_max_m.}
-\item{ht_min_m}{...}
-\item{ht_max_m}{...}
+\item{ht}{The height level to assign for strata between ht_min_m and ht_max_m.}
+\item{ht_min_m}{The minimum height of the level, in meters.}
+\item{ht_max_m}{The maximum height of the level, in meters.}
 }
 }
 \usage{
 mnnpc_ht_conv
 }
 \description{
-...
+A dataframe to convert height levels to meters based on A handbook for collecting vegetation plot data in Minnesota: The relevé method.
 }
 \details{
 \code{mnnpc_ht_conv}

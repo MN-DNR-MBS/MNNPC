@@ -123,7 +123,7 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxa_conv)` rows and `r ncol(MNNPC::mnnpc_taxa_conv)` columns, the definitions of which are:
 #' \describe{
-#'   \item{taxon}{The taxon name, see `MNNPC::taxa_lookup`}
+#'   \item{taxon_name}{The taxon name, see `MNNPC::taxa_lookup`}
 #'   \item{analysis_group}{The group in which the accepted/recommended taxon was placed for MN NPC classification analyses, with height strata omitted.}
 #' }
 "mnnpc_taxa_conv"
@@ -136,6 +136,7 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxonomic_backbone)` rows and `r ncol(MNNPC::mnnpc_taxonomic_backbone)` columns, the definitions of which are:
 #' \describe{
+#'   \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 #'   \item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
 #'   \item{taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 #'   \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}

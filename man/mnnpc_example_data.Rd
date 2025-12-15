@@ -7,12 +7,14 @@
 \format{
 A list of 2 data frames with  rows and  columns, the definitions of which are:
 \describe{
-\item{Site}{The name of the site.}
-\item{Year}{The year the quadrat was sampled in.}
-\item{Group}{The group containing the quadrat.}
-\item{Quadrat}{The quadrat name.}
-\item{Species}{The taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}.}
-\item{Cover}{The cover of the taxon in the quadrat.}
+\item{year}{The year the plot was sampled.}
+\item{group}{The group containing the plot.}
+\item{relnumb}{The ID/releve number of the plot.}
+\item{physcode}{The physiognomy code of the taxon.}
+\item{minht}{The minimum height class in which the taxon was recorded.}
+\item{maxht}{The maximum height class in which the taxon was recorded.}
+\item{taxon}{The taxon name, see \code{MNNPC::mnnpc_taxa_lookup}.}
+\item{scov}{The percent cover of the taxon in the plot within the strata.}
 }
 }
 \usage{

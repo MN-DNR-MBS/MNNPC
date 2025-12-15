@@ -5,10 +5,10 @@
 \alias{mnnpc_taxa_conv}
 \title{Taxon name conversion}
 \format{
-A data frame with 7781 rows and 2 columns, the definitions of which are:
+A data frame with 7157 rows and 2 columns, the definitions of which are:
 \describe{
-\item{taxon}{The taxon name, see \code{MNNPC::taxa_lookup}}
-\item{analysis_group}{The taxon or group of taxa used for analysis in the MNNPC and RMAVIS.}
+\item{taxon_name}{The taxon name, see \code{MNNPC::taxa_lookup}}
+\item{analysis_group}{The group in which the accepted/recommended taxon was placed for MN NPC classification analyses, with height strata omitted.}
 }
 }
 \usage{
@@ -20,7 +20,7 @@ the taxa and taxon groups that should be used for MNNPC analysis. For example,
 Oxalis stricta, Oxalis dillenii, Oxalis montana, and Oxalis acetosella are all
 lumped into the 'Oxalis ecological group' analysis group.
 The \code{MNNPC::mnnpc_pquads}, \code{MNNPC::mnnpc_floristic_tables}, and \code{MNNPC::example_data}
-objects only include taxa and taxon froups from the 'analysis_group' column
+objects only include taxa and taxon groups from the 'analysis_group' column
 in this object and \code{RMAVIS} will only match based on these groups.
 }
 \details{

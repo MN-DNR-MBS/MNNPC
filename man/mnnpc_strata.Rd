@@ -7,16 +7,16 @@
 \format{
 A data frame with 14 rows and 3 columns, the definitions of which are:
 \describe{
-\item{physcode}{...}
-\item{strata_lower}{...}
-\item{strata_upper}{...}
+\item{physcode}{Physiognomy code. For more information, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.}
+\item{strata_lower}{The lower height level of the stratum.}
+\item{strata_upper}{The upper height level of the stratum.}
 }
 }
 \usage{
 mnnpc_strata
 }
 \description{
-...
+A dataframe to specify height strata based on physiognomy. Trees are stratified into levels 1-3, 4-5, and 6-8. Other physiognomy types are not stratified.
 }
 \details{
 \code{mnnpc_strata}

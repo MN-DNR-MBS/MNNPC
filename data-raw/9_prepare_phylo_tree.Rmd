@@ -1,16 +1,29 @@
-# Load packages
-library(dplyr)
-library(stringr)
-library(rotl)
-library(ape)
+---
+title: "Prepare phylogenetic tree data"
+output: html_document
+date: "`r Sys.Date()`"
+---
 
-# Establish filepaths
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_packages, message=FALSE, warning=FALSE}
+```
+
+```{r set_filepaths}
 input_path <- file.path("data-raw", "data-out-ak")
+```
 
 # Read data
-load(file.path(input_path, "mnnpc_accepted_taxa.rds"))
 
-# Prepare taxa for which to retrieve phylogenetic tree data
+```{r read_data}
+load(file.path(input_path, "mnnpc_accepted_taxa.rds"))
+```
+
+# Prepare taxon names
+
+```{r prepare_taxon_names}
 strings_to_remove <- paste(x = c(" ecological group",
                                  " 1",
                                  " 2",
@@ -28,8 +41,7 @@ strings_to_remove <- paste(x = c(" ecological group",
                                  " understory"), 
                            collapse = "|", sep = "")
 
-# Create initial lookup between MNNPC taxon names and names to submit via rotl
-mnnpc_accepted_phylo_taxa_lookup <- mnnpc_accepted_taxa |>
+mnnpc_phylo_taxa_lookup <- mnnpc_accepted_taxa |>
   dplyr::mutate("search_name" = stringr::str_remove_all(string = taxon_name,
                                                         pattern = strings_to_remove)) |>
   dplyr::mutate("search_name" = stringr::str_remove_all(string = search_name,
@@ -37,14 +49,21 @@ mnnpc_accepted_phylo_taxa_lookup <- mnnpc_accepted_taxa |>
   dplyr::mutate("search_name" = stringr::str_remove_all(string = search_name,
                                                         pattern = "\\ssubsp.*$"))
 
-# Extract names to submit to rotl
+
 taxa_phylo <- mnnpc_phylo_taxa_lookup |>
   dplyr::distinct(search_name) |>
   dplyr::pull(search_name)
+```
 
-# Search for taxa available in OTL via rotl
+# Retrieve codes from OTL
+
+```{r retrieve_otl_codes}
 rotl_results <- rotl::tnrs_match_names(names = taxa_phylo, context_name = "Land plants")
+```
 
+# Create matched taxa lookup
+
+```{r create_matched_taxa_lookup}
 matched_taxa <- rotl_results |>
   dplyr::mutate(
     "phylo" = dplyr::case_when(
@@ -64,35 +83,62 @@ matched_taxa <- rotl_results |>
   dplyr::distinct() |>
   dplyr::mutate("ottid" = ifelse(!is.na(ott_id), paste0("ott", as.numeric(ott_id)), NA), .keep = "unused")
 
-# Join OTT codes onto lookup
+table(matched_taxa$phylo)
+
+# matched_taxa_lookup <- matched_taxa |>
+#   dplyr::mutate(
+#     "search_name" = dplyr::case_when(
+#       TRUE ~ stringr::str_to_sentence(string = search_name)
+#     )
+#   ) |>
+#   dplyr::select(search_name, phylo) |>
+#   dplyr::distinct()
+
 mnnpc_phylo_taxa_lookup <- mnnpc_phylo_taxa_lookup |>
-  dplyr::left_join(matched_taxa, by = "search_name", relationship = "many-to-many")
+  dplyr::left_join(matched_taxa, by = "search_name", relationship = "many-to-many") |>
+  dplyr::mutate("search_name" = stringr::str_remove_all(string = search_name, pattern = stringr::fixed("'")))
+```
 
 # Retrieve OTT codes for taxa present in OTL
+
+```{r retrieve_ott_codes}
 ott_in_tree <- rotl::ott_id(rotl_results)[rotl::is_in_tree(rotl::ott_id(rotl_results))]
 
 ott_in_tree_tbl <- tibble::enframe(ott_in_tree) |>
   dplyr::mutate("ottid" = paste0("ott", as.numeric(value)))
 
-all(ott_in_tree_tbl$name %in% mnnpc_accepted_phylo_taxa_lookup$matched_name)
+all(ott_in_tree_tbl$name %in% mnnpc_phylo_taxa_lookup$matched_name)
+setdiff(ott_in_tree_tbl$name, mnnpc_phylo_taxa_lookup$matched_name)
+```
 
-# Retrieve and save tree in Newick format
+# Retrieve tree
+
+```{r retrieve_tree}
 mnnpc_phylo_tree_raw <- rotl::tol_induced_subtree(ott_ids = ott_in_tree, label_format = "id")
 
 rotl::tol_induced_subtree(ott_ids = ott_in_tree, label_format = "id", file = file.path(".", "data-raw", "data-out-zm", "mnnpc_phylo_tree.txt"))
+```
 
 # Read tree back into R
+
+```{r read_tree_back}
 mnnpc_phylo_tree_string <- readLines(file.path(".", "data-raw", "data-out-zm", "mnnpc_phylo_tree.txt"))
 
 mnnpc_phylo_tree_phylo <- ape::read.tree(text = mnnpc_phylo_tree_string)
+```
 
 # Calculate branch lengths
-mnnpc_phylo_tree_phylo <- ape::compute.brlen(mnnpc_phylo_tree_phylo, method = "Grafen")
 
-# Replace tip labels, we need to do this as there are some incorrectly formatted names returned, and inexact, but acceptable, matches
+```{r calc_branch_lengths}
+mnnpc_phylo_tree_phylo <- ape::compute.brlen(mnnpc_phylo_tree_phylo, method = "Grafen")
+```
+
+# Replace tip labels
+
+```{r replace_tip_labels}
 tip_labels <- mnnpc_phylo_tree_phylo$tip.label
 
-new_tip_labels_all <- setNames(mnnpc_accepted_phylo_taxa_lookup$search_name, mnnpc_accepted_phylo_taxa_lookup$ottid)
+new_tip_labels_all <- setNames(mnnpc_phylo_taxa_lookup$search_name, mnnpc_phylo_taxa_lookup$ottid)
 
 new_tip_labels <- new_tip_labels_all[tip_labels]
 
@@ -101,10 +147,37 @@ all(tip_labels == names(new_tip_labels))
 mnnpc_phylo_tree_phylo$tip.label <- new_tip_labels
 
 mnnpc_phylo_tree <- ape::write.tree(mnnpc_phylo_tree_phylo)
+```
 
-# Save tree
+# Check tree can be read back in
+
+```{r check_read_tree}
+check_read_tree <- ape::read.tree(text = mnnpc_phylo_tree)
+```
+
+# Check structure of objects
+
+```{r check_structure}
+str(mnnpc_phylo_tree)
+str(mnnpc_phylo_taxa_lookup)
+```
+
+# Check coverage of taxa in tree
+
+```{r check_coverage_taxa}
+table(mnnpc_phylo_taxa_lookup$phylo)
+```
+
+# Export .rda files to RMAVIS
+
+```{r export_rda_files_to_rmavis}
 usethis::use_data(mnnpc_phylo_tree, internal = FALSE, overwrite = TRUE)
-
-# Save lookup between MNNPC names and names use to retrieve tree data
-mnnpc_phylo_taxa_lookup <- mnnpc_accepted_phylo_taxa_lookup
 usethis::use_data(mnnpc_phylo_taxa_lookup, internal = FALSE, overwrite = TRUE)
+```
+
+
+
+
+
+
+

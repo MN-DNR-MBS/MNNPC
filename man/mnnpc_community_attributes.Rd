@@ -7,17 +7,17 @@
 \format{
 A data frame with 275 rows and 11 columns, the definitions of which are:
 \describe{
-\item{fullname}{The full name of the MNNPC unit.}
-\item{name}{The name of the MNNPC unit.}
-\item{npc_code}{The code for the MNNPC unit.}
-\item{npc_code_parent}{The parent unit for the MNNPC unit.}
-\item{basal}{A boolean (TRUE/FALSE) indicating whether the MNNPC unit. is at the lowest rank and has no }
-\item{rank}{The rank of the community, one of: system, class, type, subtype.}
-\item{num_samples}{The number of plots/samples which constitute the MNNPC unit.}
-\item{min_species}{The minimum number of species recorded in the plots which constitute the MNNPC unit.}
-\item{max_species}{The maximum number of species recorded in the plots which constitute the MNNPC unit.}
-\item{mean_species}{The mean number of species in the plots which constitute the MNNPC unit.}
-\item{species_count}{The total number of species recorded in the plots which constitute the MNNPC unit.}
+\item{fullname}{The full name of the MN NPC unit.}
+\item{name}{The name of the MN NPC unit.}
+\item{npc_code}{The code for the MN NPC unit.}
+\item{npc_code_parent}{The parent unit for the MN NPC unit.}
+\item{basal}{A boolean (TRUE/FALSE) indicating whether the MN NPC unit is at the lowest rank and has no sub-units.}
+\item{rank}{The rank of the unit, one of: system, class, type, subtype.}
+\item{num_samples}{The number of plots/samples which constitute the MN NPC unit.}
+\item{min_species}{The minimum number of species recorded in the plots which constitute the MN NPC unit.}
+\item{max_species}{The maximum number of species recorded in the plots which constitute the MN NPC unit.}
+\item{mean_species}{The mean number of species in the plots which constitute the MN NPC unit.}
+\item{species_count}{The total number of species recorded in the plots which constitute the MN NPC unit.}
 }
 }
 \usage{

@@ -5,23 +5,23 @@
 \alias{example_releve}
 \title{example_releve}
 \format{
-A data frame with 86 rows and 8 columns, the definitions of which are:
+A data frame with 54 rows and 8 columns, the definitions of which are:
 \describe{
-\item{year}{...}
-\item{group}{...}
-\item{relnumb}{...}
-\item{physcode}{...}
-\item{minht}{...}
-\item{maxht}{...}
-\item{taxon}{...}
-\item{scov}{...}
+\item{year}{The year the plot was sampled.}
+\item{group}{The group containing the plot.}
+\item{relnumb}{The ID/releve number of the plot.}
+\item{physcode}{The physiognomy code of the taxon.}
+\item{minht}{The minimum height class in which the taxon was recorded.}
+\item{maxht}{The maximum height class in which the taxon was recorded.}
+\item{taxon}{The taxon name, see \code{MNNPC::mnnpc_taxa_lookup}.}
+\item{scov}{The percent cover of the taxon in the plot within the strata.}
 }
 }
 \usage{
 example_releve
 }
 \description{
-...
+A releve plot from the St. Croix State Forest study to serve as an example for formatting. For more information on height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
 }
 \details{
 \code{example_releve}

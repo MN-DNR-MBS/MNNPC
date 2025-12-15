@@ -119,7 +119,7 @@ process_dnr_releves <- function(releve_data){
     dat3 <- dat2 |>
       dplyr::mutate(taxon = gsub(" s\\.s\\.", "", taxon),
                     taxon = gsub(" s\\.l\\.", "", taxon))|>
-      dplyr::left_join(MNNPC::mnnpc_taxa_conv)
+      dplyr::left_join(MNNPC:::mnnpc_taxa_conv_raw)
     
     # taxa that will be removed
     taxa_removed <- dat3 |>

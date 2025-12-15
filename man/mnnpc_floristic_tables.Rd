@@ -5,16 +5,16 @@
 \alias{mnnpc_floristic_tables}
 \title{Floristic Tables}
 \format{
-A data frame with 40398 rows and 8 columns, the definitions of which are:
+A data frame with 40384 rows and 8 columns, the definitions of which are:
 \describe{
-\item{npc_code}{The code for the MNNPC unit.}
+\item{npc_code}{The code for the MN NPC unit.}
 \item{npc_taxon_name}{The taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}.}
-\item{constancy}{The constancy of occurrence across the plots constituting the MNNPC unit.}
-\item{absolute_frequency}{The number of occurrences in the plots constituting the MNNPC unit.}
-\item{relative_frequency}{The proportion of plots constituting the MNNPC unit that the taxon is present in.}
-\item{minimum_cover}{The minimum cover of the taxon in the plots constituting the MNNPC unit.}
-\item{mean_cover}{The mean cover of the taxon in the plots constituting the MNNPC unit.}
-\item{maximum_cover}{The maximum cover of the taxon in the plots constituting the MNNPC unit.}
+\item{constancy}{The constancy of occurrence across the plots constituting the MN NPC unit.}
+\item{absolute_frequency}{The number of occurrences in the plots constituting the MN NPC unit.}
+\item{relative_frequency}{The proportion of plots constituting the MN NPC unit that the taxon is present in.}
+\item{minimum_cover}{The minimum cover of the taxon in the plots constituting the MN NPC unit.}
+\item{mean_cover}{The mean cover of the taxon in the plots constituting the MN NPC unit.}
+\item{maximum_cover}{The maximum cover of the taxon in the plots constituting the MN NPC unit.}
 }
 }
 \usage{

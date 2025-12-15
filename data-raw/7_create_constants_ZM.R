@@ -1,8 +1,20 @@
+# Load objects ------------------------------------------------------------
+input_path <- file.path("data-raw", "data-out-ak")
+load(file.path(input_path, "taxa_conv.rds")) 
+
+
+# Internal Objects --------------------------------------------------------
 example_data_options <- c("None" = "none", 
                           "St. Croix State Forest" = "St. Croix State Forest",
                           "Earthworm-Invaded Forests" = "Earthworm-Invaded Forests")
-usethis::use_data(example_data_options, internal = TRUE, overwrite = TRUE)
 
+mnnpc_taxa_conv_raw <- taxa_conv
+
+
+usethis::use_data(example_data_options, mnnpc_taxa_conv_raw,
+                  internal = TRUE, overwrite = TRUE)
+
+# External Objects --------------------------------------------------------
 mnnpc_vc_types <- list("AP", "FD", "FF", "FP", "MH", "MR", "OP", "RO", "UP", "WF", "WM", "WP")
 usethis::use_data(mnnpc_vc_types, internal = FALSE, overwrite = TRUE)
 

@@ -5,10 +5,18 @@
 \alias{mnnpc_taxa_lookup}
 \title{A lookup between the accepted MNTaxa taxa and their synonyms}
 \format{
-A data frame with 7781 rows and 2 columns, the definitions of which are:
+A data frame with 7157 rows and 10 columns, the definitions of which are:
 \describe{
+\item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
 \item{recommended_taxon_name}{The accepted/recommended taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}.}
+\item{recommended_rank}{The taxonomic rank of the accepted/recommended taxon.}
+\item{recommended_scientific_name}{The scientific name of the accepted/recommended taxon concept, which is equivalent to a concatentation of the taxon_name and authority.}
+\item{recommended_full_name}{The scientific name of the accepted/recommended taxon concept, plus the height strata, if applicable.}
+\item{recommended_id}{The ID of the accepted/recommended taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
+\item{recommended_publication}{The parent publication containing the accepted/recommended taxon description.}
+\item{analysis_group}{The group in which the accepted/recommended taxon was placed for MN NPC classification analyses.}
+\item{analysis_group_includes}{The list of taxa in the group (separated by slashes) in which the accepted/recommended taxon was placed for MN NPC classification analyses.}
 }
 }
 \usage{

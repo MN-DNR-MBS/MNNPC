@@ -7,15 +7,15 @@
 \format{
 A data frame with 7 rows and 2 columns, the definitions of which are:
 \describe{
-\item{scov}{...}
-\item{scov_mid}{...}
+\item{scov}{Braun-Blanquet cover/abundance scale values.}
+\item{scov_mid}{Percent cover values.}
 }
 }
 \usage{
 mnnpc_scov_conv
 }
 \description{
-...
+A dataframe used to convert cover values from the Braun-Blanquet cover/abundance scale to percent cover based on approximate mid-points (Tüxen and Ellenberg 1937).
 }
 \details{
 \code{mnnpc_scov_conv}

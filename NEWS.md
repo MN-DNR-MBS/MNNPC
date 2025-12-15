@@ -1,3 +1,8 @@
+# MNNPC 0.9.7 (15-12-2025)
+
+* Ensuring all data documentation is complete.
+* Finalising `MNNPC::mnnpc_taxa_conv` and adding an internal object `MNNPC::mnnpc_taxa_conv_raw` for use by `MNNPC::process_dnr_releves`.
+
 # MNNPC 0.9.6 (12-12-2025)
 
 * Fixing instances where "phylo" was incorrectly spelt as phlyo.

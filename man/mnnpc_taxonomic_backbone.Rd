@@ -5,26 +5,24 @@
 \alias{mnnpc_taxonomic_backbone}
 \title{The taxonomic backbone for the MNNPC}
 \format{
-A data frame with 7781 rows and 18 columns, the definitions of which are:
+A data frame with 3476 rows and 16 columns, the definitions of which are:
 \describe{
 \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
-\item{recommended_taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
-\item{taxa_included}{The taxon names of the taxa included in taxon_name.}
-\item{taxa_ids}{The ids of the taxa present in the taxa_included column.}
+\item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
+\item{taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-\item{hybrid}{The hybrid status of the taxon_name: 0 = non-hybrid, 1 = hybrid.}
-\item{full_name}{The full name of the taxon concept, which is equivalent to a concatentation of the taxon_name, qualifier, and authority.}
+\item{scientific_name}{The scientific name of the taxon concept, which is equivalent to a concatentation of the taxon_name and authority.}
+\item{full_name}{The scientific name of the taxon concept, plus the height strata, if applicable.}
 \item{publication}{The parent publication containing the taxon_name description.}
-\item{common_name}{The common name associated with the taxa_included.}
-\item{origin}{The nativeness status of the taxon_name.}
-\item{species}{The name of the species taxon associated with the taxon_name.}
+\item{common_name}{The common name associated with the taxon_name.}
+\item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown) of the taxon_name.}
+\item{species}{The name of the species taxon associated with the taxon_name, if applicable.}
 \item{genus}{The name of the genus taxon associated with the taxon_name.}
 \item{family}{The name of the family taxon associated with the taxon_name.}
 \item{order}{The name of the order taxon associated with the taxon_name.}
 \item{class}{The name of the class taxon associated with the taxon_name.}
 \item{phylum}{The name of the phylum taxon associated with the taxon_name.}
 \item{kingdom}{The name of the kingdom taxon associated with the taxon_name.}
-\item{lineage_source}{The source of the parent taxa.}
 }
 }
 \usage{
