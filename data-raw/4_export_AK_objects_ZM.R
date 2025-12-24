@@ -11,13 +11,14 @@ load(file.path(input_path, "mnnpc_example_data.rds"))
 load(file.path(input_path, "mnnpc_floristic_tables.rds"))
 load(file.path(input_path, "mnnpc_taxa_lookup.rds"))
 load(file.path(input_path, "mnnpc_taxonomic_backbone.rds"))
-load(file.path(input_path, "raw_releve_example.rds"))
+load(file.path(input_path, "mnnpc_example_releve.rds"))
+load(file.path(input_path, "mnnpc_hybrid_crosswalk.rds"))
 
 # Example releve
-example_releve <- example_releve |>
+mnnpc_example_releve <- mnnpc_example_releve |>
   dplyr::select(year, group, relnumb, physcode, minht, maxht, taxon, scov)
 
-usethis::use_data(example_releve, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_example_releve, internal = FALSE, overwrite = TRUE)
 
 # Taxon -> Analysis group aggregation lookup 
 mnnpc_taxa_conv <- mnnpc_taxa_lookup |>
@@ -79,7 +80,6 @@ mnnpc_taxonomic_backbone <- mnnpc_taxonomic_backbone |>
                 taxon_name, 
                 rank, 
                 scientific_name,
-                full_name,
                 common_name,
                 species, genus, family, order, class, phylum, kingdom,
                 origin, 
@@ -92,3 +92,8 @@ usethis::use_data(mnnpc_taxonomic_backbone, internal = FALSE, overwrite = TRUE)
 mnnpc_taxa_lookup <- mnnpc_taxa_lookup
 
 usethis::use_data(mnnpc_taxa_lookup, internal = FALSE, overwrite = TRUE)
+
+# Hybrid crosswalk
+mnnpc_hybrid_crosswalk <- mnnpc_hybrid_crosswalk
+
+usethis::use_data(mnnpc_hybrid_crosswalk, internal = FALSE, overwrite = TRUE)

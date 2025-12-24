@@ -1,9 +1,9 @@
 #### import data ####
 
 # import data
-crosswalk_pre <- read.csv("../../intermediate-data/crosswalk_table_formatted_20251214a.csv")
-crosswalk_raw <- read.csv("../../intermediate-data/crosswalk_raw_no_dups_20251214a.csv")
-releve <- read.csv("../../intermediate-data/releve_table_formatted_20251214a.csv")
+crosswalk_pre <- read.csv("../../intermediate-data/crosswalk_table_formatted_20251224a.csv")
+crosswalk_raw <- read.csv("../../intermediate-data/crosswalk_raw_no_dups_20251224a.csv")
+releve <- read.csv("../../intermediate-data/releve_table_formatted_20251224a.csv")
 
 # example data
 load("data-raw/data-out-ak/mnnpc_example_data.rds")
@@ -12,6 +12,9 @@ resample <- readxl::read_excel("../../../releve-resample/data/releve_list_southe
 # remove everything except above
 rm(list = ls()[!ls() %in% c("crosswalk_raw", "crosswalk_pre", "releve",
                             "resample")])
+
+# load objects from package
+devtools::load_all()
 
 
 #### test parameters ####
@@ -42,9 +45,7 @@ dat_raw <- crosswalk_raw |>
 
 #### process data ####
 
-source("data-raw/2_releve_processing_AK.R")
-
-dat_proc <- rel_proc_fun(dat_raw)
+dat_proc <- process_dnr_releves(dat_raw)
 
 
 #### pre-processed data ####
@@ -63,28 +64,18 @@ dat_val <- crosswalk_pre |>
 #### compare ####
 
 # rows with mismatches
-rows_mis <- which(rowSums(dat_proc != dat_val) > 0)
+rows_mis <- which(rowSums(dat_proc[1:nrow(dat_val),] != dat_val) > 0)
 
 # compare data
 dat_proc[rows_mis, ]
 dat_val[rows_mis, ]
 
-# taxa crosswalk
-load("data-raw/data-out-ak/taxa_conv.rds")
-
-# explore issues
-# dplyr::filter(taxa_conv, analysis_group == "Chamaenerion angustifolium")
-# dplyr::filter(crosswalk_raw, relnumb == "4475" & 
-#                 stringr::str_detect(taxon, "angustifolium"))
-# dplyr::filter(crosswalk_raw, relnumb == "B950" & taxon == "Viola")
-# mismatches left seem to be due to duplicates
-
 
 #### example data ####
 
 # process datasets
-dat_ex_proc1 <- rel_proc_fun(mnnpc_example_data[[1]])
-dat_ex_proc2 <- rel_proc_fun(mnnpc_example_data[[2]])
+dat_ex_proc1 <- process_dnr_releves(mnnpc_example_data[[1]])
+dat_ex_proc2 <- process_dnr_releves(mnnpc_example_data[[2]])
 
 # format resample data
 # format resample data
@@ -94,7 +85,9 @@ resample2 <- resample |>
   dplyr::rename(relnumb = orig_relnumb) |> 
   dplyr::full_join(resample |>
                      dplyr::filter(stringr::str_detect(npc, "MHs38|MHs39"))) |> 
-  dplyr::mutate(group = ifelse(stringr::str_detect(npc, "MHs38"), "A", "B"))
+  dplyr::mutate(group = ifelse(stringr::str_detect(npc, "MHs38"), 
+                               "Oak-Basswood Group", 
+                               "Maple-Basswood Group"))
 
 # get releve numbers in the database
 dat_ex_relnumb1 <- releve |>
@@ -117,11 +110,12 @@ dat_ex_relnumb2 <- releve |>
   dplyr::left_join(resample2 |>
                      dplyr::select(relnumb, group)) |>
   dplyr::mutate(year = lubridate::year(date_),
+                year = ifelse(year < 2018, 1990, year),
                 orig_relnumb = ifelse(relnumb %in% dat_ex_proc2$Quadrat,
                                       relnumb, original_releve_nbr)) |>
   dplyr::select(year, group, orig_relnumb, relnumb)
   
-# pre-processed example data
+# previously processed example data
 dat_ex_val1 <- crosswalk_pre |>
   dplyr::inner_join(dat_ex_relnumb1) |>
   dplyr::select(year, group, orig_relnumb, analysis_group_strata, scov_adj) |>
@@ -142,3 +136,5 @@ dat_ex_proc1[rows_mis1, ]
 dat_ex_val1[rows_mis1, ]
 
 rows_mis2 <- which(rowSums(dat_ex_proc2 != dat_ex_val2) > 0)
+dat_ex_proc2[rows_mis2, ]
+dat_ex_val2[rows_mis2, ]

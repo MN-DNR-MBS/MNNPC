@@ -10,7 +10,11 @@
 #'
 #' @examples
 #' MNNPC::process_dnr_releves(releve_data = MNNPC::example_releve)
-process_dnr_releves <- function(releve_data){
+process_dnr_releves <- function(releve_data,
+                                process_malformed_data = TRUE,
+                                strip_suffixes = TRUE,
+                                match_to_accepted = TRUE,
+                                aggregate_into_analysis_groups = TRUE){
   
   #### check for processed releve ####
   
@@ -55,12 +59,21 @@ process_dnr_releves <- function(releve_data){
                       (physcode %in% c("D", "E") & is.na(maxht))) |>
       nrow()
     
-    # warn and remove rows with missing required data
-    if(n_missing_data > 0){
-      warning(paste("There are", n_missing_data, "rows with missing required data (physcode, taxon, scov, or trees missing minht or maxht). These rows will be excluded from analysis."))
+    # warn and remove rows with missing data
+    if(n_missing_data > 0 & process_malformed_data == T){
+      
+      warning(paste("There are", n_missing_data, "rows with missing data (physcode, taxon, scov, or trees missing minht or maxht). These rows will be excluded from analysis."))
       
       dat2 <- dat2 |>
         dplyr::filter(!is.na(physcode) & !is.na(taxon) & !is.na(scov)) # minht and maxht fixed below
+      
+    }
+
+    # stop if data can't be processed if missing
+    if(n_missing_data > 0 & process_malformed_data == F){
+      
+      stop(paste("There are", n_missing_data, "rows with missing required data (physcode, taxon, scov, or trees missing minht or maxht)."))
+      
     }
     
     # check that min and max heights are in order
@@ -70,6 +83,7 @@ process_dnr_releves <- function(releve_data){
     
     # warn and flip min and max heights if out of order
     if(n_misordered_heights > 0){
+      
       warning(paste("There are", n_misordered_heights, "rows with maxht < minht. These rows will be corrected by swapping minht and maxht values."))
       
       dat2 <- dat2 |>
@@ -80,6 +94,7 @@ process_dnr_releves <- function(releve_data){
                       maxht = ifelse(maxht_orig < minht_orig, minht_orig, 
                                      maxht_orig)) |>
         dplyr::select(-c(minht_orig, maxht_orig))
+      
     }
     
     
@@ -114,24 +129,132 @@ process_dnr_releves <- function(releve_data){
       
     }
     
-    # remove s.s. and s.l.
-    # add analysis group by taxon name
-    dat3 <- dat2 |>
-      dplyr::mutate(taxon = gsub(" s\\.s\\.", "", taxon),
-                    taxon = gsub(" s\\.l\\.", "", taxon))|>
-      dplyr::left_join(MNNPC:::mnnpc_taxa_conv_raw)
+    # check for suffixes
+    suffixes_present <- sum(grepl("(s\\.s\\.|s\\.l\\.|s\\.a\\.)", dat2$taxon))
     
-    # taxa that will be removed
+    # remove suffixes
+    if(suffixes_present > 0 & strip_suffixes == T){
+      
+      dat2 <- dat2 |>
+        dplyr::mutate(taxon = gsub(" s\\.s\\.", "", taxon),
+                      taxon = gsub(" s\\.l\\.", "", taxon),
+                      taxon = gsub(" s\\.a\\.", "", taxon))
+      
+    }
+    
+    # stop if suffixes present and removing not selected
+    if(suffixes_present > 0 & strip_suffixes == F){
+      
+      # sum cover for each taxon (over strata, outside of plot, etc.)
+      dat_out_suff <- dat2 |>
+        dplyr::group_by(year, group, relnumb, taxon) |>
+        dplyr::summarize(Cover = sum(scov, na.rm = T),
+                         .groups = "drop") |>
+        dplyr::rename(Year = year, 
+                     Group = group,
+                     Quadrat = relnumb,
+                     Species = taxon)
+      
+      # warning
+      warning("Taxa were not matched to accepted names or aggregated into analysis groups. Cover was summed for each taxon. Please remove suffixes (s.s., s.l.) from taxa names or set strip_suffixes = TRUE to continue processing data.")
+      
+      # return
+      return(dat_out_suff)
+      
+      # exit
+      stop()
+      
+    }
+    
+    # stop if taxa aren't matched to accepted names
+    if(match_to_accepted == F){
+      
+      # sum cover for each taxon (over strata, outside of plot, etc.)
+      dat_out_no_match <- dat2 |>
+        dplyr::group_by(year, group, relnumb, taxon) |>
+        dplyr::summarize(Cover = sum(scov, na.rm = T),
+                         .groups = "drop") |>
+        dplyr::rename(Year = year, 
+                     Group = group,
+                     Quadrat = relnumb,
+                     Species = taxon)
+      
+      # message
+      warning("Taxa were not matched to accepted names. Cover was summed for each taxon. Please set match_to_accepted = TRUE to continue processing data.")
+      
+      # return
+      return(dat_out_no_match)
+      
+      # stop
+      stop()
+      
+    }
+    
+    # crosswalk hybrids
+    # add match names and analysis group by taxon name
+    dat3 <- dat2 |>
+      dplyr::left_join(MNNPC::mnnpc_hybrid_crosswalk) |>
+      dplyr::mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) |>
+      dplyr::select(-taxon_rep) |>
+      dplyr::rename(taxon_name = taxon) |>
+      dplyr::left_join(MNNPC::mnnpc_taxa_lookup |>
+                         dplyr::select(taxon_name, recommended_taxon_name,
+                                       analysis_group))
+    
+    # stop if not aggregating into analysis groups
+    if(aggregate_into_analysis_groups == F){
+      
+      # taxa that don't have analysis groups
+      taxa_removed <- dat3 |>
+        dplyr::filter(is.na(recommended_taxon_name)) |>
+        dplyr::pull(taxon_name) |>
+        unique() |>
+        sort()
+      
+      # warn user about taxa being removed and no aggregation
+      if(length(taxa_removed) > 0){
+        
+        warning(paste("Taxa were not aggregated and cover was summed for each accepted name. Please set aggregate_into_analysis_groups = TRUE to continue processing data. The following taxa were be removed because they do not have accepted names in the taxa lookup table:", 
+                      paste(taxa_removed, collapse = ", ")))
+        
+      } else {
+        
+        warning("Taxa were not aggregated and cover was summed for each accepted name. Please set aggregate_into_analysis_groups = TRUE to continue processing data.")
+        
+      }
+      
+      # sum cover for each taxon (over strata, outside of plot, etc.)
+      dat_out_match <- dat3 |>
+        dplyr::filter(!is.na(recommended_taxon_name))|>
+        dplyr::group_by(year, group, relnumb, recommended_taxon_name) |>
+        dplyr::summarize(Cover = sum(scov, na.rm = T),
+                         .groups = "drop") |>
+        dplyr::rename(Year = year, 
+                     Group = group,
+                     Quadrat = relnumb,
+                     Species = recommended_taxon_name)
+      
+      # return
+      return(dat_out_match)
+      
+      # exit
+      stop()
+      
+    }
+    
+    # taxa that don't have analysis groups
     taxa_removed <- dat3 |>
       dplyr::filter(is.na(analysis_group)) |>
-      dplyr::pull(taxon) |>
+      dplyr::pull(taxon_name) |>
       unique() |>
       sort()
     
     # warn user about taxa being removed
     if(length(taxa_removed) > 0){
       
-      warning(paste("The following taxa will be removed from the analysis. Please see the taxonomic backbone and taxa lookup for taxa that can be included in the analysis:", paste(taxa_removed, collapse = ", ")))
+      warning(paste0("The following taxa were removed because they don't belong to analysis groups: ", 
+                     paste(taxa_removed, collapse = ", "), 
+                     ". See taxa lookup table for details."))
       
     }
     
