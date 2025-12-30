@@ -4,10 +4,24 @@
 \alias{process_dnr_releves}
 \title{Process releve data into the format required by RMAVIS}
 \usage{
-process_dnr_releves(releve_data)
+process_dnr_releves(
+  releve_data,
+  process_malformed_data = TRUE,
+  strip_suffixes = TRUE,
+  match_to_accepted = TRUE,
+  aggregate_into_analysis_groups = TRUE
+)
 }
 \arguments{
-\item{releve_data}{See \code{MNNPC::example_releve}.}
+\item{releve_data}{See \code{MNNPC::mnnpc_example_releve}.}
+
+\item{process_malformed_data}{Specify whether to process data with missing values, a boolean (TRUE/FALSE).}
+
+\item{strip_suffixes}{Specify whether to strip suffixes (e.g. s.l., s.s., and s.a.) from taxon names, a boolean (TRUE/FALSE).}
+
+\item{match_to_accepted}{Specify whether to convert raw taxon names to accepted/recommended taxon names, a boolean (TRUE/FALSE).}
+
+\item{aggregate_into_analysis_groups}{Specify whether to aggregate taxa into analysis groups, a boolean (TRUE/FALSE).}
 }
 \value{
 A data frame containing the releve data with five columns: "Year", "Group", "Quadrat", "Species", "Cover"
@@ -17,5 +31,5 @@ Process releve data into the format required by RMAVIS, specifically a data fram
 in long format containing "Year", "Group", "Quadrat", "Species", and "Cover" columns.
 }
 \examples{
-MNNPC::process_dnr_releves(releve_data = MNNPC::example_releve)
+MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve)
 }

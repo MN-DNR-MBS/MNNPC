@@ -1,7 +1,7 @@
 renv::install(file.path("..", "RMAVIS_1.2.0.tar.gz"), repos = NULL, type = "source")
 
 base_fp <- file.path("C:", "Users", "zekmar", "OneDrive - UKCEH", "Projects", "MNNPC")
-mnnpc_dd_fp <- file.path(base_fp, "floristic_table_development_data_20251125.csv")
+mnnpc_dd_fp <- file.path(base_fp, "floristic_table_development_data_20251214.csv")
 
 mnnpc_dd <- read.csv(file = mnnpc_dd_fp) |>
   tibble::as_tibble() |>
@@ -10,7 +10,7 @@ mnnpc_dd <- read.csv(file = mnnpc_dd_fp) |>
 
 higher_taxa <- MNNPC::mnnpc_taxonomic_backbone |>
   tibble::as_tibble() |>
-  dplyr::select("taxon_name" = "recommended_taxon_name",
+  dplyr::select(taxon_name,
                 "Kingdom" = "kingdom",
                 "Phylum" = "phylum",
                 "Class" = "class",

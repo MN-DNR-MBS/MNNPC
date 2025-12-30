@@ -5,7 +5,7 @@
 \alias{mnnpc_accepted_taxa}
 \title{Accepted taxon names}
 \format{
-A data frame with 3761 rows and 1 columns, the definitions of which are:
+A data frame with 3113 rows and 1 columns, the definitions of which are:
 \describe{
 \item{taxon_name}{Taxon names.}
 }

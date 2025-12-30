@@ -5,7 +5,7 @@
 \alias{mnnpc_taxa_lookup}
 \title{A lookup between the accepted MNTaxa taxa and their synonyms}
 \format{
-A data frame with 7157 rows and 10 columns, the definitions of which are:
+A data frame with 5769 rows and 9 columns, the definitions of which are:
 \describe{
 \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}

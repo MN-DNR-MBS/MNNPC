@@ -3,13 +3,17 @@
 #' Process releve data into the format required by RMAVIS, specifically a data frame
 #' in long format containing "Year", "Group", "Quadrat", "Species", and "Cover" columns.
 #'
-#' @param releve_data See `MNNPC::example_releve`.
+#' @param releve_data See `MNNPC::mnnpc_example_releve`.
+#' @param process_malformed_data Specify whether to process data with missing values, a boolean (TRUE/FALSE).
+#' @param strip_suffixes Specify whether to strip suffixes (e.g. s.l., s.s., and s.a.) from taxon names, a boolean (TRUE/FALSE).
+#' @param match_to_accepted Specify whether to convert raw taxon names to accepted/recommended taxon names, a boolean (TRUE/FALSE).
+#' @param aggregate_into_analysis_groups Specify whether to aggregate taxa into analysis groups, a boolean (TRUE/FALSE).
 #'
 #' @returns A data frame containing the releve data with five columns: "Year", "Group", "Quadrat", "Species", "Cover"
 #' @export
 #'
 #' @examples
-#' MNNPC::process_dnr_releves(releve_data = MNNPC::example_releve)
+#' MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve)
 process_dnr_releves <- function(releve_data,
                                 process_malformed_data = TRUE,
                                 strip_suffixes = TRUE,
@@ -18,17 +22,15 @@ process_dnr_releves <- function(releve_data,
   
   #### check for processed releve ####
   
-  dat <- releve_data
-  
   # final fields
   final_fields <- c("Year", "Group", "Quadrat", "Species", "Cover")
   
   # check for processed releve
-  if(all(final_fields %in% names(dat)) == T){
+  if(all(final_fields %in% names(releve_data)) == T){
     
     message("It looks like you've uploaded processed data. No further processing will be applied before analysis.")
     
-    return(dat)
+    return(releve_data)
     
   } else {
     
@@ -38,9 +40,9 @@ process_dnr_releves <- function(releve_data,
     fields_required <- c("year", "group", "relnumb", "physcode", "minht", "maxht", 
                          "taxon", "scov")
     
-    if(all(fields_required %in% names(dat)) == F){
+    if(all(fields_required %in% names(releve_data)) == F){
       
-      missing_fields <- fields_required[!(fields_required %in% names(dat))]
+      missing_fields <- fields_required[!(fields_required %in% names(releve_data))]
       stop(paste("Missing required fields:", 
                  paste(missing_fields, collapse = ", ")))
       
@@ -48,7 +50,7 @@ process_dnr_releves <- function(releve_data,
     
     # convert heights to numbers if they aren't already
     # this will cause a warning if there's "X" in these columns
-    dat2 <- dat |>
+    dat2 <- releve_data |>
       dplyr::mutate(minht = as.numeric(minht),
                     maxht = as.numeric(maxht))
     
@@ -230,9 +232,9 @@ process_dnr_releves <- function(releve_data,
         dplyr::summarize(Cover = sum(scov, na.rm = T),
                          .groups = "drop") |>
         dplyr::rename(Year = year, 
-                     Group = group,
-                     Quadrat = relnumb,
-                     Species = recommended_taxon_name)
+                      Group = group,
+                      Quadrat = relnumb,
+                      Species = recommended_taxon_name)
       
       # return
       return(dat_out_match)

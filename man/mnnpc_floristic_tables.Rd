@@ -5,7 +5,7 @@
 \alias{mnnpc_floristic_tables}
 \title{Floristic Tables}
 \format{
-A data frame with 40384 rows and 8 columns, the definitions of which are:
+A data frame with 126831 rows and 10 columns, the definitions of which are:
 \describe{
 \item{npc_code}{The code for the MN NPC unit.}
 \item{npc_taxon_name}{The taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}.}

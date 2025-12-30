@@ -20,13 +20,6 @@ mnnpc_example_releve <- mnnpc_example_releve |>
 
 usethis::use_data(mnnpc_example_releve, internal = FALSE, overwrite = TRUE)
 
-# Taxon -> Analysis group aggregation lookup 
-mnnpc_taxa_conv <- mnnpc_taxa_lookup |>
-  dplyr::select(taxon_name, "analysis_group" = "recommended_taxon_name") |>
-  dplyr::distinct()
-
-usethis::use_data(mnnpc_taxa_conv, internal = FALSE, overwrite = TRUE)
-
 # Accepted taxa
 mnnpc_accepted_taxa <- tibble::tibble("taxon_name" = unique(c(mnnpc_taxa_lookup$recommended_taxon_name, mnnpc_taxa_lookup$analysis_group))) |>
   dplyr::arrange(taxon_name)
@@ -41,26 +34,22 @@ usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE
 # Example data
 st_croix_raw <- mnnpc_example_data[["St. Croix State Forest"]]
 st_croix_processed <- st_croix_raw |>
-  rel_proc_fun() |>
-  dplyr::mutate("Year" = as.integer(Year)) |>
-  dplyr::select(Year, Group, Quadrat, Species, Cover)
+  dplyr::mutate("year" = as.integer(year))
 
-isTRUE(all(all(st_croix_processed$Cover > 0), all(st_croix_processed$Cover <= 100)))
+isTRUE(all(all(st_croix_processed$scov > 0), all(st_croix_processed$scov <= 100)))
 
 earthworm_forests_raw <- mnnpc_example_data[["Earthworm-Invaded Forests"]]
 earthworm_forests_processed <- earthworm_forests_raw |>
-  rel_proc_fun() |>
   dplyr::mutate(
-    "Cover" = dplyr::case_when(
-      Cover > 100 ~ 100,
-      Cover < 0 ~ 0,
-      TRUE ~ Cover
+    "scov" = dplyr::case_when(
+      scov > 100 ~ 100,
+      scov < 0 ~ 0,
+      TRUE ~ scov
     )
   ) |>
-  dplyr::mutate("Year" = as.integer(Year)) |>
-  dplyr::select(Year, Group, Quadrat, Species, Cover)
+  dplyr::mutate("year" = as.integer(year))
 
-isTRUE(all(all(earthworm_forests_processed$Cover > 0), all(earthworm_forests_processed$Cover <= 100)))
+isTRUE(all(all(earthworm_forests_processed$scov > 0), all(earthworm_forests_processed$scov <= 100)))
 
 mnnpc_example_data[["Earthworm-Invaded Forests"]] <- earthworm_forests_processed
 mnnpc_example_data[["St. Croix State Forest"]] <- st_croix_processed

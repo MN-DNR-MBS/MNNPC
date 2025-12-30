@@ -109,25 +109,6 @@
 #' }
 "mnnpc_taxa_lookup"
 
-#' Taxon name conversion
-#'
-#' A data frame containing all taxon names present in `MNNPC::taxa_lookup` and 
-#' the taxa and taxon groups that should be used for MNNPC analysis. For example,
-#' Oxalis stricta, Oxalis dillenii, Oxalis montana, and Oxalis acetosella are all
-#' lumped into the 'Oxalis ecological group' analysis group. 
-#' The `MNNPC::mnnpc_pquads`, `MNNPC::mnnpc_floristic_tables`, and `MNNPC::example_data`
-#' objects only include taxa and taxon groups from the 'analysis_group' column 
-#' in this object and `RMAVIS` will only match based on these groups.
-#'
-#' \code{mnnpc_taxa_conv} 
-#'
-#' @format A data frame with `r nrow(MNNPC::mnnpc_taxa_conv)` rows and `r ncol(MNNPC::mnnpc_taxa_conv)` columns, the definitions of which are:
-#' \describe{
-#'   \item{taxon_name}{The taxon name, see `MNNPC::taxa_lookup`}
-#'   \item{analysis_group}{The group in which the accepted/recommended taxon was placed for MN NPC classification analyses, with height strata omitted.}
-#' }
-"mnnpc_taxa_conv"
-
 #' The taxonomic backbone for the MNNPC
 #'
 #' The taxonomic backbone for the MNNPC, containing the recommended/accepted taxon names and associated taxonomic information.
@@ -173,13 +154,13 @@
 #' @format A data frame with `r length(MNNPC::mnnpc_vc_types_named)` which contains ...
 "mnnpc_vc_types_named"
 
-#' example_releve
+#' mnnpc_example_releve
 #'
 #' A releve plot from the St. Croix State Forest study to serve as an example for formatting. For more information on height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
 #'
-#' \code{example_releve} 
+#' \code{mnnpc_example_releve} 
 #'
-#' @format A data frame with `r nrow(MNNPC::example_releve)` rows and `r ncol(MNNPC::example_releve)` columns, the definitions of which are:
+#' @format A data frame with `r nrow(MNNPC::mnnpc_example_releve)` rows and `r ncol(MNNPC::mnnpc_example_releve)` columns, the definitions of which are:
 #' \describe{
 #'   \item{year}{The year the plot was sampled.}
 #'   \item{group}{The group containing the plot.}
@@ -190,7 +171,7 @@
 #'   \item{taxon}{The taxon name, see `MNNPC::mnnpc_taxa_lookup`.}
 #'   \item{scov}{The percent cover of the taxon in the plot within the strata.}
 #' }
-"example_releve"
+"mnnpc_example_releve"
 
 #' mnnpc_scov_conv
 #'

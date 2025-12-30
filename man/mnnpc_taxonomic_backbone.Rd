@@ -5,7 +5,7 @@
 \alias{mnnpc_taxonomic_backbone}
 \title{The taxonomic backbone for the MNNPC}
 \format{
-A data frame with 3476 rows and 16 columns, the definitions of which are:
+A data frame with 2904 rows and 15 columns, the definitions of which are:
 \describe{
 \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 \item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}

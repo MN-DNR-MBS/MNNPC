@@ -5,7 +5,7 @@
 \alias{mnnpc_community_attributes}
 \title{Attributes for each MNNPC community.}
 \format{
-A data frame with 275 rows and 11 columns, the definitions of which are:
+A data frame with 1378 rows and 11 columns, the definitions of which are:
 \describe{
 \item{fullname}{The full name of the MN NPC unit.}
 \item{name}{The name of the MN NPC unit.}

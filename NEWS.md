@@ -1,3 +1,11 @@
+# MNNPC 0.9.9 (XX-12-2025)
+
+* Removing `MNNPC::mnnpc_taxa_conv`, all lookup information now contained in `MNNPC::mnnpc_taxa_lookup` and a new object `MNNPC::mnnpc_hybrid_crosswalk`.
+* Adding four arguments to `MNNPC::process_dnr_releves` which 
+* Adding section-specific floristic tables, pseudo-quadrats, and community attributes.
+* Adding constant objects `MNNPC::mnnpc_vc_types_flreg_named` and `MNNPC::mnnpc_ecs_sections`.
+* Re-naming `MNNPC::example_releve` to `MNNPC::mnnpc_example_releve`.
+
 # MNNPC 0.9.8 (15-12-2025)
 
 * Ensuring all analysis_group aggregates (see `MNNPC::mnnpc_taxa_lookup`) are included in `MNNPC::mnnpc_accepted_taxa`.
@@ -21,7 +29,7 @@
 # MNNPC 0.9.4 (08-12-2025)
 
 * Adding function `MNNPC::process_dnr_releves`.
-* Adding objects: `MNNPC::mnnpc_phylo_tree`, `MNNPC::mnnpc_accepted_phylo_taxa_lookup`, `MNNPC::mnnpc_ht_conv`, `MNNPC::mnnpc_strata`, `MNNPC::mnnpc_scov_conv`, and `MNNPC::example_releve`.
+* Adding objects: `MNNPC::mnnpc_phylo_tree`, `MNNPC::mnnpc_accepted_phylo_taxa_lookup`, `MNNPC::mnnpc_ht_conv`, `MNNPC::mnnpc_strata`, `MNNPC::mnnpc_scov_conv`, and `MNNPC::mnnpc_example_releve`.
 
 # MNNPC 0.9.3 (03-12-2025)
 
