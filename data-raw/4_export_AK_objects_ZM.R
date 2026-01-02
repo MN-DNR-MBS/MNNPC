@@ -34,7 +34,13 @@ usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE
 # Example data
 st_croix_raw <- mnnpc_example_data[["St. Croix State Forest"]]
 st_croix_processed <- st_croix_raw |>
-  dplyr::mutate("year" = as.integer(year))
+  dplyr::mutate("year" = as.integer(year)) |>
+  dplyr::filter(!(taxon %in% c("Polytrichum", 
+                               "Unknown moss",
+                               "Unknown")))
+
+st_croix_processed |>
+  dplyr::filter(!(taxon %in% mnnpc_accepted_taxa$taxon_name))
 
 isTRUE(all(all(st_croix_processed$scov > 0), all(st_croix_processed$scov <= 100)))
 
@@ -47,7 +53,17 @@ earthworm_forests_processed <- earthworm_forests_raw |>
       TRUE ~ scov
     )
   ) |>
-  dplyr::mutate("year" = as.integer(year))
+  dplyr::mutate("year" = as.integer(year)) |>
+  dplyr::filter(!(taxon %in% c("Unknown", 
+                               "Non-sphagnum moss",
+                               "Unknown moss",
+                               "Unknown bryophytes"))) |>
+  dplyr::mutate(
+    "taxon" = dplyr::case_when(
+      taxon == "Lonicera xbella" ~ "Lonicera x bella",
+      TRUE ~ taxon
+    )
+  )
 
 isTRUE(all(all(earthworm_forests_processed$scov > 0), all(earthworm_forests_processed$scov <= 100)))
 
