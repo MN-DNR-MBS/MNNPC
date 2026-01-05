@@ -240,16 +240,12 @@ flor_fun <- function(ecs_sec = all_sections){
     # add ecs section
     if(length(ecs_sec) > 1){
 
-     flor_comb2 <- flor_comb %>%
-       mutate(npc = npc_code,
-              ecs_section = "statewide")
+     flor_comb2 <- flor_comb
 
     } else {
 
       flor_comb2 <- flor_comb %>%
-        mutate(npc = npc_code,
-               npc_code = paste(npc_code, ecs_sec, sep = "_"),
-               ecs_section = ecs_sec)
+        mutate(npc_code = paste(npc_code, ecs_sec, sep = "_"))
 
     }
 
@@ -291,96 +287,6 @@ mnnpc_floristic_tables %>%
 # save
 save(mnnpc_floristic_tables, file = "data-raw/data-out-ak/mnnpc_floristic_tables.rds")
 load("data-raw/data-out-ak/mnnpc_floristic_tables.rds")
-
-
-#### example data and releve ####
-
-# look at example
-load("../RMAVIS/data/example_data.rda")
-head(example_data$`Newborough Warren`)
-
-# get releves from database
-rel_ex1 <- releve2 %>%
-  filter(relnumb %in% stcroix$RELNO) %>%
-  transmute(group = case_when(is.na(place_name) ~ "Control",
-                              str_detect(place_name, "Outside Exclosure") ~ 
-                                "Outside Exclosure",
-                              str_detect(place_name, "Exclosure") ~ 
-                                "Inside Exclosure"),
-            year = if_else(group == "Control", 2004, year(date_)), # artificially set same initial year for all
-            quadrat = if_else(!is.na(original_releve_nbr), original_releve_nbr,
-                              relnumb),
-            relnumb = relnumb)
-
-# format resample data
-resample2 <- resample %>%
-  filter(str_detect(npc, "MHs38|MHs39")) %>% 
-  rename(quadrat = orig_relnumb) %>% 
-  full_join(resample %>%
-              filter(str_detect(npc, "MHs38|MHs39")) %>% 
-              select(-relnumb) %>% 
-              rename(relnumb = orig_relnumb) %>% 
-              mutate(quadrat = relnumb)) %>% 
-  mutate(group = if_else(str_detect(npc, "MHs38"), "Oak-Basswood Group", 
-                         "Maple-Basswood Group"))
-
-rel_ex2 <- releve2 %>% 
-  inner_join(resample2 %>% 
-               select(relnumb, group, quadrat)) %>% 
-  transmute(year = year(date_),
-            year = if_else(year < 2018, 1990, year), # artificially set same initial year for all
-            group = group,
-            quadrat = quadrat,
-            relnumb = relnumb)
-
-# get taxa from database
-rel_tax1 <- rel_ex1 %>% 
-  inner_join(crosswalk_raw %>%
-               distinct(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
-  select(-relnumb) %>% 
-  rename(relnumb = quadrat,
-         scov = scov_mid) %>% 
-  filter(!is.na(scov))
-
-rel_tax2 <- rel_ex2 %>% 
-  inner_join(crosswalk_raw %>%
-               select(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
-  select(-relnumb) %>% 
-  rename(relnumb = quadrat,
-         scov = scov_mid) %>% 
-  filter(!is.na(scov))
-
-# check
-count(rel_tax1, year, group, relnumb)
-count(rel_tax2, year, group, relnumb) %>% 
-  arrange(relnumb, year, group) %>% 
-  data.frame()
-
-# add species
-mnnpc_example_data <- list("St. Croix State Forest" = rel_tax1 %>%
-                             as.data.frame(),
-                           "Earthworm-Invaded Forests" = rel_tax2 %>% 
-                             as.data.frame())
-
-
-# check for NAs
-mnnpc_example_data$`St. Croix State Forest` %>%
-  filter(if_any(everything(), is.na))
-
-mnnpc_example_data$`Earthworm-Invaded Forests` %>%
-  filter(if_any(everything(), is.na))
-
-# save
-save(mnnpc_example_data, file = "data-raw/data-out-ak/mnnpc_example_data.rds")
-load("data-raw/data-out-ak/mnnpc_example_data.rds")
-
-# select one releve for formatting example
-mnnpc_example_releve <- mnnpc_example_data$`St. Croix State Forest` %>% 
-  filter(relnumb == "4710")
-
-# save
-save(mnnpc_example_releve, file = "data-raw/data-out-ak/mnnpc_example_releve.rds")
-load("data-raw/data-out-ak/mnnpc_example_releve.rds")
 
 
 #### look-up table and hybrid crosswalk ####
@@ -1007,7 +913,8 @@ att_fun <- function(ecs_sec = all_sections){
              npc_code = paste(npc_code, ecs_sec, sep = "_"),
              npc_code_parent = if_else(!is.na(npc_code_parent),
                                        paste(npc_code_parent, ecs_sec, sep = "_"),
-                                       npc_code_parent))
+                                       npc_code_parent),
+             ecs_section = ecs_name)
     
   }
   
@@ -1017,7 +924,8 @@ att_fun <- function(ecs_sec = all_sections){
 }
 
 # floristic tables statewide and by region
-att_tab_state <- att_fun()
+att_tab_state <- att_fun() %>% 
+  mutate(ecs_section = NA_character_)
 att_tab_LAP <- att_fun("LAP")
 att_tab_MIM <- att_fun("MIM")
 att_tab_MOP <- att_fun("MOP")
@@ -1053,6 +961,96 @@ mnnpc_community_attributes %>%
 save(mnnpc_community_attributes, 
      file = "data-raw/data-out-ak/mnnpc_community_attributes.rds")
 load("data-raw/data-out-ak/mnnpc_community_attributes.rds")
+
+
+#### example data and releve ####
+
+# look at example
+load("../RMAVIS/data/example_data.rda")
+head(example_data$`Newborough Warren`)
+
+# get releves from database
+rel_ex1 <- releve2 %>%
+  filter(relnumb %in% stcroix$RELNO) %>%
+  transmute(group = case_when(is.na(place_name) ~ "Control",
+                              str_detect(place_name, "Outside Exclosure") ~ 
+                                "Outside Exclosure",
+                              str_detect(place_name, "Exclosure") ~ 
+                                "Inside Exclosure"),
+            year = if_else(group == "Control", 2004, year(date_)), # artificially set same initial year for all
+            quadrat = if_else(!is.na(original_releve_nbr), original_releve_nbr,
+                              relnumb),
+            relnumb = relnumb)
+
+# format resample data
+resample2 <- resample %>%
+  filter(str_detect(npc, "MHs38|MHs39")) %>% 
+  rename(quadrat = orig_relnumb) %>% 
+  full_join(resample %>%
+              filter(str_detect(npc, "MHs38|MHs39")) %>% 
+              select(-relnumb) %>% 
+              rename(relnumb = orig_relnumb) %>% 
+              mutate(quadrat = relnumb)) %>% 
+  mutate(group = if_else(str_detect(npc, "MHs38"), "Oak-Basswood Group", 
+                         "Maple-Basswood Group"))
+
+rel_ex2 <- releve2 %>% 
+  inner_join(resample2 %>% 
+               select(relnumb, group, quadrat)) %>% 
+  transmute(year = year(date_),
+            year = if_else(year < 2018, 1990, year), # artificially set same initial year for all
+            group = group,
+            quadrat = quadrat,
+            relnumb = relnumb)
+
+# get taxa from database
+rel_tax1 <- rel_ex1 %>% 
+  inner_join(crosswalk_raw %>%
+               distinct(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
+  select(-relnumb) %>% 
+  rename(relnumb = quadrat,
+         scov = scov_mid) %>% 
+  filter(!is.na(scov))
+
+rel_tax2 <- rel_ex2 %>% 
+  inner_join(crosswalk_raw %>%
+               select(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
+  select(-relnumb) %>% 
+  rename(relnumb = quadrat,
+         scov = scov_mid) %>% 
+  filter(!is.na(scov))
+
+# check
+count(rel_tax1, year, group, relnumb)
+count(rel_tax2, year, group, relnumb) %>% 
+  arrange(relnumb, year, group) %>% 
+  data.frame()
+
+# add species
+mnnpc_example_data <- list("St. Croix State Forest" = rel_tax1 %>%
+                             as.data.frame(),
+                           "Earthworm-Invaded Forests" = rel_tax2 %>% 
+                             as.data.frame())
+
+
+# check for NAs
+mnnpc_example_data$`St. Croix State Forest` %>%
+  filter(if_any(everything(), is.na))
+
+mnnpc_example_data$`Earthworm-Invaded Forests` %>%
+  filter(if_any(everything(), is.na))
+
+# save
+save(mnnpc_example_data, file = "data-raw/data-out-ak/mnnpc_example_data.rds")
+load("data-raw/data-out-ak/mnnpc_example_data.rds")
+
+# select one releve for formatting example
+mnnpc_example_releve <- mnnpc_example_data$`St. Croix State Forest` %>% 
+  filter(relnumb == "4710")
+
+# save
+save(mnnpc_example_releve, file = "data-raw/data-out-ak/mnnpc_example_releve.rds")
+load("data-raw/data-out-ak/mnnpc_example_releve.rds")
 
 
 #### data for testing ####
