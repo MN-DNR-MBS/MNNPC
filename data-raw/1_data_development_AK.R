@@ -952,10 +952,13 @@ mnnpc_community_attributes <- att_tab_state %>%
 
 # check for NAs
 mnnpc_community_attributes %>%
-  filter(if_any(-npc_code_parent, is.na))
+  filter(if_any(-c(npc_code_parent, ecs_section), is.na))
 
 mnnpc_community_attributes %>% 
   filter(rank != "system" & is.na(npc_code_parent))
+
+mnnpc_community_attributes %>% 
+  filter(str_detect(npc_code, "_") & is.na(ecs_section))
 
 # save
 save(mnnpc_community_attributes, 
@@ -964,6 +967,8 @@ load("data-raw/data-out-ak/mnnpc_community_attributes.rds")
 
 
 #### example data and releve ####
+
+# need to load MNNPC objects, see top of community attributes section
 
 # look at example
 load("../RMAVIS/data/example_data.rda")
@@ -1004,13 +1009,22 @@ rel_ex2 <- releve2 %>%
             relnumb = relnumb)
 
 # get taxa from database
+# convert hybrid names
+# remove taxa that don't have accepted names
 rel_tax1 <- rel_ex1 %>% 
   inner_join(crosswalk_raw %>%
                distinct(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
   select(-relnumb) %>% 
   rename(relnumb = quadrat,
          scov = scov_mid) %>% 
-  filter(!is.na(scov))
+  filter(!is.na(scov)) %>%
+  left_join(mnnpc_hybrid_crosswalk) %>%
+  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) %>%
+  select(-taxon_rep) %>%
+  rename(taxon_name = taxon) %>%
+  inner_join(mnnpc_taxa_lookup %>%
+               filter(!is.na(recommended_taxon_name)) %>% 
+               select(taxon_name))
 
 rel_tax2 <- rel_ex2 %>% 
   inner_join(crosswalk_raw %>%
@@ -1018,7 +1032,14 @@ rel_tax2 <- rel_ex2 %>%
   select(-relnumb) %>% 
   rename(relnumb = quadrat,
          scov = scov_mid) %>% 
-  filter(!is.na(scov))
+  filter(!is.na(scov)) %>%
+  left_join(mnnpc_hybrid_crosswalk) %>%
+  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) %>%
+  select(-taxon_rep) %>%
+  rename(taxon_name = taxon) %>%
+  inner_join(mnnpc_taxa_lookup %>%
+               filter(!is.na(recommended_taxon_name)) %>% 
+               select(taxon_name))
 
 # check
 count(rel_tax1, year, group, relnumb)

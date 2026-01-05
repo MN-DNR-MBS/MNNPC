@@ -206,7 +206,7 @@ process_dnr_releves <- function(releve_data,
     # stop if not aggregating into analysis groups
     if(aggregate_into_analysis_groups == F){
       
-      # taxa that don't have analysis groups
+      # taxa that don't have recommended names
       taxa_removed <- dat3 |>
         dplyr::filter(is.na(recommended_taxon_name)) |>
         dplyr::pull(taxon_name) |>
