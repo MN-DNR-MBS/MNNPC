@@ -30,7 +30,7 @@
 #'   \item{max_species}{The maximum number of species recorded in the plots which constitute the MN NPC unit.}
 #'   \item{mean_species}{The mean number of species in the plots which constitute the MN NPC unit.}
 #'   \item{species_count}{The total number of species recorded in the plots which constitute the MN NPC unit.}
-#'   \item{ecs_section}{The ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or NA/blank (i.e., statewide).}
+#'   \item{ecs_section}{The abbreviation of the ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or NA/blank (i.e., statewide).}
 #' }
 "mnnpc_community_attributes"
 

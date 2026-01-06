@@ -914,7 +914,7 @@ att_fun <- function(ecs_sec = all_sections){
              npc_code_parent = if_else(!is.na(npc_code_parent),
                                        paste(npc_code_parent, ecs_sec, sep = "_"),
                                        npc_code_parent),
-             ecs_section = ecs_name)
+             ecs_section = ecs_sec)
     
   }
   
@@ -1087,9 +1087,12 @@ load("data-raw/data-out-ak/mnnpc_example_releve.rds")
 test_dat <- crosswalk3 %>% 
   select(relnumb, analysis_group_strata, scov_adj,
          npc_class, npc_type, npc_subtype) %>% 
+  left_join(releve3 %>% 
+              select(relnumb, ecs_secabb)) %>% 
   rename(Quadrat = relnumb,
          Species = analysis_group_strata,
-         Cover = scov_adj)
+         Cover = scov_adj,
+         ecs_section = ecs_secabb)
 
 # save
 write_csv(test_dat,
