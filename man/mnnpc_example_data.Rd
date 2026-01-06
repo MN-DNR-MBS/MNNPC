@@ -25,9 +25,11 @@ A selection of example vegetation plot datasets, currently included are:
 }
 \details{
 \itemize{
-\item St. Croix State Forest
+\item St. Croix State Forest (https://silvlib.cfans.umn.edu/deer-exclosure-effects-mesic-oak-forest-st-croix-state-forest-mn-dnr)
 \item Earthworm-Invaded Forests
 }
+
+For more information on physiognomy codes and height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
 
 \code{mnnpc_example_data}
 }

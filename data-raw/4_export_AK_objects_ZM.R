@@ -2,7 +2,7 @@
 input_path <- file.path("data-raw", "data-out-ak")
 
 # Source functions
-source("./data-raw/2_releve_processing_AK.R")
+# source("./data-raw/2_releve_processing_AK.R")
 
 # Load objects created by A.K.
 load(file.path(input_path, "mnnpc_accepted_taxa.rds"))
@@ -15,90 +15,119 @@ load(file.path(input_path, "mnnpc_example_releve.rds"))
 load(file.path(input_path, "mnnpc_hybrid_crosswalk.rds"))
 
 # Example releve
-mnnpc_example_releve <- mnnpc_example_releve |>
-  dplyr::select(year, group, relnumb, physcode, minht, maxht, taxon, scov)
+# mnnpc_example_releve <- mnnpc_example_releve |>
+#   dplyr::select(year, group, relnumb, physcode, minht, maxht, taxon, scov)
 
+# check columns
+colnames(mnnpc_example_releve)
+
+# save
 usethis::use_data(mnnpc_example_releve, internal = FALSE, overwrite = TRUE)
 
 # Accepted taxa
-mnnpc_accepted_taxa <- tibble::tibble("taxon_name" = unique(c(mnnpc_taxa_lookup$recommended_taxon_name, mnnpc_taxa_lookup$analysis_group))) |>
-  dplyr::arrange(taxon_name)
+# mnnpc_accepted_taxa <- tibble::tibble("taxon_name" = unique(c(mnnpc_taxa_lookup$recommended_taxon_name, mnnpc_taxa_lookup$analysis_group))) |>
+#   dplyr::arrange(taxon_name)
 
+# check
+head(mnnpc_accepted_taxa)
+
+# save
 usethis::use_data(mnnpc_accepted_taxa, internal = FALSE, overwrite = TRUE)
 
 # Community attributes
-mnnpc_community_attributes <- mnnpc_community_attributes
+# mnnpc_community_attributes <- mnnpc_community_attributes
 
 usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE)
 
 # Example data
-st_croix_raw <- mnnpc_example_data[["St. Croix State Forest"]]
-st_croix_processed <- st_croix_raw |>
-  dplyr::mutate("year" = as.integer(year)) |>
-  dplyr::filter(!(taxon %in% c("Polytrichum", 
-                               "Unknown moss",
-                               "Unknown")))
+# st_croix_raw <- mnnpc_example_data[["St. Croix State Forest"]]
+# st_croix_processed <- st_croix_raw |>
+#   dplyr::mutate("year" = as.integer(year)) |>
+  # dplyr::filter(!(taxon %in% c("Polytrichum", 
+  #                              "Unknown moss",
+  #                              "Unknown")))
 
-st_croix_processed |>
-  dplyr::filter(!(taxon %in% mnnpc_accepted_taxa$taxon_name))
+# st_croix_processed |>
+#   dplyr::filter(!(taxon %in% mnnpc_accepted_taxa$taxon_name))
 
-isTRUE(all(all(st_croix_processed$scov > 0), all(st_croix_processed$scov <= 100)))
+# isTRUE(all(all(st_croix_processed$scov > 0), all(st_croix_processed$scov <= 100)))
 
-earthworm_forests_raw <- mnnpc_example_data[["Earthworm-Invaded Forests"]]
-earthworm_forests_processed <- earthworm_forests_raw |>
-  dplyr::mutate(
-    "scov" = dplyr::case_when(
-      scov > 100 ~ 100,
-      scov < 0 ~ 0,
-      TRUE ~ scov
-    )
-  ) |>
-  dplyr::mutate("year" = as.integer(year)) |>
-  dplyr::filter(!(taxon %in% c("Unknown", 
-                               "Non-sphagnum moss",
-                               "Unknown moss",
-                               "Unknown bryophytes"))) |>
-  dplyr::mutate(
-    "taxon" = dplyr::case_when(
-      taxon == "Lonicera xbella" ~ "Lonicera x bella",
-      TRUE ~ taxon
-    )
-  )
+# earthworm_forests_raw <- mnnpc_example_data[["Earthworm-Invaded Forests"]]
+# earthworm_forests_processed <- earthworm_forests_raw |>
+  # dplyr::mutate(
+  #   "scov" = dplyr::case_when(
+  #     scov > 100 ~ 100,
+  #     scov < 0 ~ 0,
+  #     TRUE ~ scov
+  #   )
+  # ) |>
+  # dplyr::mutate("year" = as.integer(year)) |>
+  # dplyr::filter(!(taxon %in% c("Unknown", 
+  #                              "Non-sphagnum moss",
+  #                              "Unknown moss",
+  #                              "Unknown bryophytes"))) |>
+  # dplyr::mutate(
+  #   "taxon" = dplyr::case_when(
+  #     taxon == "Lonicera xbella" ~ "Lonicera x bella",
+  #     TRUE ~ taxon
+  #   )
+  # )
 
-isTRUE(all(all(earthworm_forests_processed$scov > 0), all(earthworm_forests_processed$scov <= 100)))
+# isTRUE(all(all(earthworm_forests_processed$scov > 0), all(earthworm_forests_processed$scov <= 100)))
 
-mnnpc_example_data[["Earthworm-Invaded Forests"]] <- earthworm_forests_processed
-mnnpc_example_data[["St. Croix State Forest"]] <- st_croix_processed
+# mnnpc_example_data[["Earthworm-Invaded Forests"]] <- earthworm_forests_processed
+# mnnpc_example_data[["St. Croix State Forest"]] <- st_croix_processed
 
+# check variables
+str(mnnpc_example_data[["St. Croix State Forest"]]) # year is integer
+str(mnnpc_example_data[["Earthworm-Invaded Forests"]])
+
+# check that all taxa have accepted names
+mnnpc_example_data[["St. Croix State Forest"]] |>
+  dplyr::filter(!(taxon %in% mnnpc_taxa_lookup$taxon_name))
+mnnpc_example_data[["Earthworm-Invaded Forests"]] |>
+  dplyr::filter(!(taxon %in% mnnpc_taxa_lookup$taxon_name))
+
+# check scov values
+isTRUE(all(all(mnnpc_example_data[["St. Croix State Forest"]]$scov > 0), 
+           all(mnnpc_example_data[["St. Croix State Forest"]]$scov <= 100)))
+isTRUE(all(all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov > 0), 
+           all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov <= 100)))
+
+# save
 usethis::use_data(mnnpc_example_data, internal = FALSE, overwrite = TRUE)
 
 # Floristic tables
-mnnpc_floristic_tables <- mnnpc_floristic_tables
+# mnnpc_floristic_tables <- mnnpc_floristic_tables
 
 usethis::use_data(mnnpc_floristic_tables, internal = FALSE, overwrite = TRUE)
 
 # Taxonomic backbone
-mnnpc_taxonomic_backbone <- mnnpc_taxonomic_backbone |>
-  dplyr::left_join(mnnpc_taxa_lookup, by = "taxon_name") |>
-  dplyr::select(id,
-                informal_group, 
-                taxon_name, 
-                rank, 
-                scientific_name,
-                common_name,
-                species, genus, family, order, class, phylum, kingdom,
-                origin, 
-                publication
-                )
+# mnnpc_taxonomic_backbone <- mnnpc_taxonomic_backbone |>
+#   dplyr::left_join(mnnpc_taxa_lookup, by = "taxon_name") |>
+#   dplyr::select(id,
+#                 informal_group, 
+#                 taxon_name, 
+#                 rank, 
+#                 scientific_name,
+#                 common_name,
+#                 species, genus, family, order, class, phylum, kingdom,
+#                 origin, 
+#                 publication
+#                 )
 
+# check columns
+colnames(mnnpc_taxonomic_backbone)
+
+# save
 usethis::use_data(mnnpc_taxonomic_backbone, internal = FALSE, overwrite = TRUE)
 
 # Taxa lookup
-mnnpc_taxa_lookup <- mnnpc_taxa_lookup
+# mnnpc_taxa_lookup <- mnnpc_taxa_lookup
 
 usethis::use_data(mnnpc_taxa_lookup, internal = FALSE, overwrite = TRUE)
 
 # Hybrid crosswalk
-mnnpc_hybrid_crosswalk <- mnnpc_hybrid_crosswalk
+# mnnpc_hybrid_crosswalk <- mnnpc_hybrid_crosswalk
 
 usethis::use_data(mnnpc_hybrid_crosswalk, internal = FALSE, overwrite = TRUE)

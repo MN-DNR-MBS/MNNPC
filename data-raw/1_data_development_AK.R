@@ -662,11 +662,11 @@ UKVegTB::taxonomic_backbone %>%
 
 # select columns
 mnnpc_taxonomic_backbone <- mntaxa_lookup5 %>% 
-  select(starts_with("recommended")) %>% 
+  select(informal_group, starts_with("recommended")) %>% 
   distinct() %>% 
   rename_with(.fn = ~str_remove(.x, "recommended_")) %>% 
-  select(id, taxon_name, rank, scientific_name, publication,
-         common_name, origin, species:kingdom)
+  select(id, informal_group, taxon_name, rank, scientific_name,
+         common_name, species:kingdom, origin, publication)
 
 # check for duplicates
 get_dupes(mnnpc_taxonomic_backbone, taxon_name)
@@ -983,9 +983,11 @@ rel_ex1 <- releve2 %>%
                               str_detect(place_name, "Exclosure") ~ 
                                 "Inside Exclosure"),
             year = if_else(group == "Control", 2004, year(date_)), # artificially set same initial year for all
+            year = as.integer(year),
             quadrat = if_else(!is.na(original_releve_nbr), original_releve_nbr,
                               relnumb),
-            relnumb = relnumb)
+            relnumb = relnumb) %>% 
+  relocate(year)
 
 # format resample data
 resample2 <- resample %>%
@@ -1003,7 +1005,8 @@ rel_ex2 <- releve2 %>%
   inner_join(resample2 %>% 
                select(relnumb, group, quadrat)) %>% 
   transmute(year = year(date_),
-            year = if_else(year < 2018, 1990, year), # artificially set same initial year for all
+            year = if_else(year < 2018, 1990, year),  # artificially set same initial year for all
+            year = as.integer(year),
             group = group,
             quadrat = quadrat,
             relnumb = relnumb)
@@ -1021,10 +1024,10 @@ rel_tax1 <- rel_ex1 %>%
   left_join(mnnpc_hybrid_crosswalk) %>%
   mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) %>%
   select(-taxon_rep) %>%
-  rename(taxon_name = taxon) %>%
   inner_join(mnnpc_taxa_lookup %>%
                filter(!is.na(recommended_taxon_name)) %>% 
-               select(taxon_name))
+               select(taxon_name) %>%
+               rename(taxon = taxon_name))
 
 rel_tax2 <- rel_ex2 %>% 
   inner_join(crosswalk_raw %>%
@@ -1036,10 +1039,10 @@ rel_tax2 <- rel_ex2 %>%
   left_join(mnnpc_hybrid_crosswalk) %>%
   mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) %>%
   select(-taxon_rep) %>%
-  rename(taxon_name = taxon) %>%
   inner_join(mnnpc_taxa_lookup %>%
                filter(!is.na(recommended_taxon_name)) %>% 
-               select(taxon_name))
+               select(taxon_name) %>%
+               rename(taxon = taxon_name))
 
 # check
 count(rel_tax1, year, group, relnumb)
@@ -1060,6 +1063,10 @@ mnnpc_example_data$`St. Croix State Forest` %>%
 
 mnnpc_example_data$`Earthworm-Invaded Forests` %>%
   filter(if_any(everything(), is.na))
+
+# check structure
+str(mnnpc_example_data$`St. Croix State Forest`)
+str(mnnpc_example_data$`Earthworm-Invaded Forests`)
 
 # save
 save(mnnpc_example_data, file = "data-raw/data-out-ak/mnnpc_example_data.rds")

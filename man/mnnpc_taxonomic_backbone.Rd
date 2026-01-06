@@ -7,15 +7,12 @@
 \format{
 A data frame with 2904 rows and 15 columns, the definitions of which are:
 \describe{
-\item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 \item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
+\item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
 \item{taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-\item{scientific_name}{The scientific name of the taxon concept, which is equivalent to a concatentation of the taxon_name and authority.}
-\item{full_name}{The scientific name of the taxon concept, plus the height strata, if applicable.}
-\item{publication}{The parent publication containing the taxon_name description.}
+\item{scientific_name}{The scientific name of the taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available.}
 \item{common_name}{The common name associated with the taxon_name.}
-\item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown) of the taxon_name.}
 \item{species}{The name of the species taxon associated with the taxon_name, if applicable.}
 \item{genus}{The name of the genus taxon associated with the taxon_name.}
 \item{family}{The name of the family taxon associated with the taxon_name.}
@@ -23,6 +20,8 @@ A data frame with 2904 rows and 15 columns, the definitions of which are:
 \item{class}{The name of the class taxon associated with the taxon_name.}
 \item{phylum}{The name of the phylum taxon associated with the taxon_name.}
 \item{kingdom}{The name of the kingdom taxon associated with the taxon_name.}
+\item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown).}
+\item{publication}{The parent publication containing the taxon_name description.}
 }
 }
 \usage{

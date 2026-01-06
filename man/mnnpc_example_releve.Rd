@@ -5,7 +5,7 @@
 \alias{mnnpc_example_releve}
 \title{mnnpc_example_releve}
 \format{
-A data frame with 55 rows and 8 columns, the definitions of which are:
+A data frame with 53 rows and 8 columns, the definitions of which are:
 \describe{
 \item{year}{The year the plot was sampled.}
 \item{group}{The group containing the plot.}
@@ -21,7 +21,7 @@ A data frame with 55 rows and 8 columns, the definitions of which are:
 mnnpc_example_releve
 }
 \description{
-A releve plot from the St. Croix State Forest study to serve as an example for formatting. For more information on height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
+A releve plot from the St. Croix State Forest study (https://silvlib.cfans.umn.edu/deer-exclosure-effects-mesic-oak-forest-st-croix-state-forest-mn-dnr) to serve as an example for formatting. For more information on physiognomy codes and height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
 }
 \details{
 \code{mnnpc_example_releve}

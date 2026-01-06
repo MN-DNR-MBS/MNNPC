@@ -3,28 +3,29 @@
 \docType{data}
 \name{mnnpc_community_attributes}
 \alias{mnnpc_community_attributes}
-\title{Attributes for each MNNPC community.}
+\title{Attributes for each MN NPC unit.}
 \format{
-A data frame with 1378 rows and 11 columns, the definitions of which are:
+A data frame with 1378 rows and 12 columns, the definitions of which are:
 \describe{
-\item{fullname}{The full name of the MN NPC unit.}
-\item{name}{The name of the MN NPC unit.}
-\item{npc_code}{The code for the MN NPC unit.}
-\item{npc_code_parent}{The parent unit for the MN NPC unit.}
+\item{fullname}{The full name of the MN NPC unit, which may include the ECS Section, if applicable.}
+\item{name}{The name of the MN NPC unit, which may include the ECS Section, if applicable.}
+\item{npc_code}{The code for the MN NPC unit, which may have the ECS Section abbreviated appended with an underscore, if applicable.}
+\item{npc_code_parent}{The parent unit for the MN NPC unit, if applicable.}
 \item{basal}{A boolean (TRUE/FALSE) indicating whether the MN NPC unit is at the lowest rank and has no sub-units.}
-\item{rank}{The rank of the unit, one of: system, class, type, subtype.}
+\item{rank}{The rank of the unit, one of: system, system + floristic region, class, type, subtype.}
 \item{num_samples}{The number of plots/samples which constitute the MN NPC unit.}
 \item{min_species}{The minimum number of species recorded in the plots which constitute the MN NPC unit.}
 \item{max_species}{The maximum number of species recorded in the plots which constitute the MN NPC unit.}
 \item{mean_species}{The mean number of species in the plots which constitute the MN NPC unit.}
 \item{species_count}{The total number of species recorded in the plots which constitute the MN NPC unit.}
+\item{ecs_section}{The ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or NA/blank (i.e., statewide).}
 }
 }
 \usage{
 mnnpc_community_attributes
 }
 \description{
-Selected attributes for each MNNPC community.
+Selected attributes for each MN NPC unit, including statewide attributes and attributes specific to each Ecological Classification System Section.
 }
 \details{
 \code{mnnpc_community_attributes}

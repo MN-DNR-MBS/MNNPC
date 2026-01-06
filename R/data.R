@@ -11,25 +11,26 @@
 #' }
 "mnnpc_accepted_taxa"
 
-#' Attributes for each MNNPC community.
+#' Attributes for each MN NPC unit.
 #'
-#' Selected attributes for each MNNPC community.
+#' Selected attributes for each MN NPC unit, including statewide attributes and attributes specific to each Ecological Classification System Section.
 #'
 #' \code{mnnpc_community_attributes} 
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_community_attributes)` rows and `r ncol(MNNPC::mnnpc_community_attributes)` columns, the definitions of which are:
 #' \describe{
-#'   \item{fullname}{The full name of the MN NPC unit.}
-#'   \item{name}{The name of the MN NPC unit.}
-#'   \item{npc_code}{The code for the MN NPC unit.}
-#'   \item{npc_code_parent}{The parent unit for the MN NPC unit.}
+#'   \item{fullname}{The full name of the MN NPC unit, which may include the ECS Section, if applicable.}
+#'   \item{name}{The name of the MN NPC unit, which may include the ECS Section, if applicable.}
+#'   \item{npc_code}{The code for the MN NPC unit, which may have the ECS Section abbreviated appended with an underscore, if applicable.}
+#'   \item{npc_code_parent}{The parent unit for the MN NPC unit, if applicable.}
 #'   \item{basal}{A boolean (TRUE/FALSE) indicating whether the MN NPC unit is at the lowest rank and has no sub-units.}
-#'   \item{rank}{The rank of the unit, one of: system, class, type, subtype.}
+#'   \item{rank}{The rank of the unit, one of: system, system + floristic region, class, type, subtype.}
 #'   \item{num_samples}{The number of plots/samples which constitute the MN NPC unit.}
 #'   \item{min_species}{The minimum number of species recorded in the plots which constitute the MN NPC unit.}
 #'   \item{max_species}{The maximum number of species recorded in the plots which constitute the MN NPC unit.}
 #'   \item{mean_species}{The mean number of species in the plots which constitute the MN NPC unit.}
 #'   \item{species_count}{The total number of species recorded in the plots which constitute the MN NPC unit.}
+#'   \item{ecs_section}{The ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or NA/blank (i.e., statewide).}
 #' }
 "mnnpc_community_attributes"
 
@@ -37,8 +38,10 @@
 #'
 #' A selection of example vegetation plot datasets, currently included are:
 #' 
-#' - St. Croix State Forest
+#' - St. Croix State Forest (https://silvlib.cfans.umn.edu/deer-exclosure-effects-mesic-oak-forest-st-croix-state-forest-mn-dnr)
 #' - Earthworm-Invaded Forests
+#'
+#'For more information on physiognomy codes and height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
 #'
 #' \code{mnnpc_example_data} 
 #'
@@ -57,7 +60,7 @@
 
 #' Floristic Tables
 #'
-#' The floristic tables for each MNNPC unit.
+#' The floristic tables for each MN NPC unit.
 #'
 #' \code{mnnpc_floristic_tables} 
 #'
@@ -96,12 +99,11 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxa_lookup)` rows and `r ncol(MNNPC::mnnpc_taxa_lookup)` columns, the definitions of which are:
 #' \describe{
-#'   \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
+#'   \item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
 #'   \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
 #'   \item{recommended_taxon_name}{The accepted/recommended taxon name, see `MNNPC::mnnpc_accepted_taxa` and `MNNPC::mnnpc_taxonomic_backbone`.}
 #'   \item{recommended_rank}{The taxonomic rank of the accepted/recommended taxon.}
-#'   \item{recommended_scientific_name}{The scientific name of the accepted/recommended taxon concept, which is equivalent to a concatentation of the taxon_name and authority.}
-#'   \item{recommended_full_name}{The scientific name of the accepted/recommended taxon concept, plus the height strata, if applicable.}
+#'   \item{recommended_scientific_name}{The scientific name of the accepted/recommended taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available.}
 #'   \item{recommended_id}{The ID of the accepted/recommended taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
 #'   \item{recommended_publication}{The parent publication containing the accepted/recommended taxon description.}
 #'   \item{analysis_group}{The group in which the accepted/recommended taxon was placed for MN NPC classification analyses.}
@@ -117,15 +119,12 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxonomic_backbone)` rows and `r ncol(MNNPC::mnnpc_taxonomic_backbone)` columns, the definitions of which are:
 #' \describe{
-#'   \item{informal_group}{The informal taxonomic group in which the taxa belongs.}
 #'   \item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
+#'   \item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
 #'   \item{taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 #'   \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-#'   \item{scientific_name}{The scientific name of the taxon concept, which is equivalent to a concatentation of the taxon_name and authority.}
-#'   \item{full_name}{The scientific name of the taxon concept, plus the height strata, if applicable.}
-#'   \item{publication}{The parent publication containing the taxon_name description.}
+#'   \item{scientific_name}{The scientific name of the taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available.}
 #'   \item{common_name}{The common name associated with the taxon_name.}
-#'   \item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown) of the taxon_name.}
 #'   \item{species}{The name of the species taxon associated with the taxon_name, if applicable.}
 #'   \item{genus}{The name of the genus taxon associated with the taxon_name.}
 #'   \item{family}{The name of the family taxon associated with the taxon_name.}
@@ -133,6 +132,8 @@
 #'   \item{class}{The name of the class taxon associated with the taxon_name.}
 #'   \item{phylum}{The name of the phylum taxon associated with the taxon_name.}
 #'   \item{kingdom}{The name of the kingdom taxon associated with the taxon_name.}
+#'   \item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown).}
+#'   \item{publication}{The parent publication containing the taxon_name description.}
 #' }
 "mnnpc_taxonomic_backbone"
 
@@ -156,7 +157,7 @@
 
 #' mnnpc_example_releve
 #'
-#' A releve plot from the St. Croix State Forest study to serve as an example for formatting. For more information on height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
+#' A releve plot from the St. Croix State Forest study (https://silvlib.cfans.umn.edu/deer-exclosure-effects-mesic-oak-forest-st-croix-state-forest-mn-dnr) to serve as an example for formatting. For more information on physiognomy codes and height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
 #'
 #' \code{mnnpc_example_releve} 
 #'
@@ -241,3 +242,16 @@
 #'
 #' @format A string containing the phylogentic tree in the Newick format.
 "mnnpc_phylo_tree"
+
+#' Hybrid name crosswalk
+#'
+#' A data frame containing different formats of hybrid taxon names.
+#'
+#' \code{mnnpc_hybrid_crosswalk} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_hybrid_crosswalk)` rows and `r ncol(MNNPC::mnnpc_hybrid_crosswalk)` columns, the definitions of which are:
+#' \describe{
+#'   \item{taxon_rep}{The taxon name as it appears in other taxonomic data objects, such as `MNNPC::mnnpc_taxa_lookup`.}
+#'   \item{taxon}{Three alternative formats of the hybrid taxon name that include capitalized and lowercase "x" and spaces between "x" and other words.}
+#' }
+"mnnpc_hybrid_crosswalk"
