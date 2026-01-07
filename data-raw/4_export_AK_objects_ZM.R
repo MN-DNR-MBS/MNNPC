@@ -85,6 +85,7 @@ str(mnnpc_example_data[["Earthworm-Invaded Forests"]])
 # check that all taxa have accepted names
 mnnpc_example_data[["St. Croix State Forest"]] |>
   dplyr::filter(!(taxon %in% mnnpc_taxa_lookup$taxon_name))
+
 mnnpc_example_data[["Earthworm-Invaded Forests"]] |>
   dplyr::filter(!(taxon %in% mnnpc_taxa_lookup$taxon_name))
 

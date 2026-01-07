@@ -11,6 +11,18 @@
 #' }
 "mnnpc_accepted_taxa"
 
+#' ...
+#' 
+#' ...
+#'
+#' \code{mnnpc_diversity_metrics} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_diversity_metrics)` rows and `r ncol(MNNPC::mnnpc_diversity_metrics)` columns, the definitions of which are:
+#' \describe{
+#'   \item{}{}
+#' }
+"mnnpc_diversity_metrics"
+
 #' Attributes for each MN NPC unit.
 #'
 #' Selected attributes for each MN NPC unit, including statewide attributes and attributes specific to each Ecological Classification System Section.
