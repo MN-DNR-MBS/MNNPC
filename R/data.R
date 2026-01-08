@@ -186,18 +186,31 @@
 #' }
 "mnnpc_example_releve"
 
-#' mnnpc_scov_conv
+#' mnnpc_bb_conv
 #'
-#' A dataframe used to convert cover values from the Braun-Blanquet cover/abundance scale to percent cover based on approximate mid-points (Tüxen and Ellenberg 1937).
+#' A dataframe used to convert cover values from the Braun-Blanquet cover/abundance scale to percent cover based on approximate mid-points (Tüxen and Ellenberg 1937, van der Maarel 2007).
 #'
-#' \code{mnnpc_scov_conv} 
+#' \code{mnnpc_bb_conv} 
 #'
-#' @format A data frame with `r nrow(MNNPC::mnnpc_scov_conv)` rows and `r ncol(MNNPC::mnnpc_scov_conv)` columns, the definitions of which are:
+#' @format A data frame with `r nrow(MNNPC::mnnpc_bb_conv)` rows and `r ncol(MNNPC::mnnpc_bb_conv)` columns, the definitions of which are:
 #' \describe{
 #'   \item{scov}{Braun-Blanquet cover/abundance scale values.}
 #'   \item{scov_mid}{Percent cover values.}
 #' }
-"mnnpc_scov_conv"
+"mnnpc_bb_conv"
+
+#' mnnpc_dom_conv
+#'
+#' A dataframe used to convert cover values from the Domin cover/abundance scale to percent cover based on approximate mid-points.
+#'
+#' \code{mnnpc_dom_conv} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_dom_conv)` rows and `r ncol(MNNPC::mnnpc_dom_conv)` columns, the definitions of which are:
+#' \describe{
+#'   \item{scov}{Domin cover/abundance scale values.}
+#'   \item{scov_mid}{Percent cover values.}
+#' }
+"mnnpc_dom_conv"
 
 #' mnnpc_strata
 #'

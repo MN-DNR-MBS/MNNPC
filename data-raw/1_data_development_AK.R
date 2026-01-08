@@ -734,7 +734,8 @@ att_fun <- function(ecs_sec = all_sections){
     mutate(year = NA_real_,
            group = NA_real_,
            scov = scov_mid) %>% 
-    process_dnr_releves(aggregate_into_analysis_groups = F) %>% 
+    process_dnr_releves(aggregate_into_analysis_groups = F,
+                        cover_scale = "percentage") %>% 
     rename(relnumb = Quadrat) %>% 
     rename_with(str_to_lower) %>% 
     left_join(releve_sub %>% 
@@ -1017,8 +1018,7 @@ rel_ex2 <- releve2 %>%
 
 # get taxa from database
 # convert hybrid names
-# remove taxa that don't have accepted names
-rel_tax1 <- rel_ex1 %>% 
+rel_tax1a <- rel_ex1 %>% 
   inner_join(crosswalk_raw %>%
                distinct(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
   select(-relnumb) %>% 
@@ -1027,7 +1027,11 @@ rel_tax1 <- rel_ex1 %>%
   filter(!is.na(scov)) %>%
   left_join(mnnpc_hybrid_crosswalk) %>%
   mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) %>%
-  select(-taxon_rep) %>%
+  select(-taxon_rep)
+
+# remove taxa that don't have accepted names
+# separate this step so that example releve has taxa without accepted names
+rel_tax1b <- rel_tax1a %>%
   inner_join(mnnpc_taxa_lookup %>%
                filter(!is.na(recommended_taxon_name)) %>% 
                select(taxon_name) %>%
@@ -1055,7 +1059,7 @@ count(rel_tax2, year, group, relnumb) %>%
   data.frame()
 
 # add species
-mnnpc_example_data <- list("St. Croix State Forest" = rel_tax1 %>%
+mnnpc_example_data <- list("St. Croix State Forest" = rel_tax1b %>%
                              as.data.frame(),
                            "Earthworm-Invaded Forests" = rel_tax2 %>% 
                              as.data.frame())
@@ -1077,7 +1081,8 @@ save(mnnpc_example_data, file = "data-raw/data-out-ak/mnnpc_example_data.rds")
 load("data-raw/data-out-ak/mnnpc_example_data.rds")
 
 # select one releve for formatting example
-mnnpc_example_releve <- mnnpc_example_data$`St. Croix State Forest` %>% 
+# allow taxa without accepted names
+mnnpc_example_releve <- rel_tax1a %>% 
   filter(relnumb == "4710")
 
 # save

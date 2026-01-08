@@ -18,7 +18,8 @@ process_dnr_releves <- function(releve_data,
                                 process_malformed_data = TRUE,
                                 strip_suffixes = TRUE,
                                 match_to_accepted = TRUE,
-                                aggregate_into_analysis_groups = TRUE){
+                                aggregate_into_analysis_groups = TRUE,
+                                cover_scale = "braunBlanquet"){
   
   #### check for processed releve ####
   
@@ -100,17 +101,34 @@ process_dnr_releves <- function(releve_data,
     }
     
     
-    #### process data ####
+    #### convert cover to percentage ####
     
-    # convert scov to numeric if it's not already
-    if(is.numeric(dat2$scov) == F){
+    if(!(cover_scale %in% c("percentage", "proportional", "domin",
+                            "braunBlanquet"))){
+      
+      stop("Please specify a valid cover scale.")
+      
+    } else if(cover_scale == "proportional"){
+      
+      dat2$scov <- dat2$scov * 100
+      
+    } else if(cover_scale == "domin"){
       
       dat2 <- dat2 |>
-        dplyr::left_join(MNNPC::mnnpc_scov_conv) |>
+        dplyr::left_join(MNNPC::mnnpc_dom_conv) |>
+        dplyr::select(-scov) |>
+        dplyr::rename(scov = scov_mid)
+      
+    } else if(cover_scale == "braunBlanquet"){
+      
+      dat2 <- dat2 |>
+        dplyr::left_join(MNNPC::mnnpc_bb_conv) |>
         dplyr::select(-scov) |>
         dplyr::rename(scov = scov_mid)
       
     }
+    
+    #### process data ####
     
     # convert outside-of-plot cover to "r" unless it's a canopy tree
     if("outside_of_plot" %in% names(dat2)){

@@ -45,7 +45,7 @@ dat_raw <- crosswalk_raw |>
 
 #### process data ####
 
-dat_proc <- process_dnr_releves(dat_raw)
+dat_proc <- process_dnr_releves(dat_raw, cover_scale = "percentage")
 
 
 #### pre-processed data ####

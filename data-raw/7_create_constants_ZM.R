@@ -119,14 +119,23 @@ mnnpc_ecs_sections <- c("Statewide" = "statewide",
                         "Western Superior Uplands (WSU)" = "WSU")
 usethis::use_data(mnnpc_ecs_sections, internal = FALSE, overwrite = TRUE)
 
-# Scov midpoint conversion
-mnnpc_scov_conv <- data.frame(scov = c(as.character(5:1), "+", "r"),
-                              scov_mid = c(87.5, 62.5, 37.5, 15, 2.5, 0.5, 0.1))
+# Scov midpoint conversion for Braun-Blanquet (van der Maarel 2007)
+mnnpc_bb_conv <- data.frame(scov = c(as.character(5:1), "+", "r"),
+                              scov_mid = c(87.5, 62.5, 37.5, 15, 2.5, 0.1, 
+                                           0.02))
 
-usethis::use_data(mnnpc_scov_conv, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_bb_conv, internal = FALSE, overwrite = TRUE)
+
+# Scov midpoint conversion for Domin (RMAVIS)
+mnnpc_dom_conv <- data.frame(scov = c(as.character(10:1), "+"),
+                            scov_mid = c(95.5, 83, 63, 42, 30, 18, 8, 3, 5, 3,
+                                         0.1))
+
+usethis::use_data(mnnpc_dom_conv, internal = FALSE, overwrite = TRUE)
 
 # Strata for physcodes
-mnnpc_strata <- data.frame(physcode = c(rep(c("D", "E"), each = 3), "B", "C", "F", "G", "H", "K", "S", "X"),
+mnnpc_strata <- data.frame(physcode = c(rep(c("D", "E"), each = 3), 
+                                        "B", "C", "F", "G", "H", "K", "S", "X"),
                            strata_lower = c(rep(c(1, 4, 6), 2), rep(1, 8)),
                            strata_upper = c(rep(c(3, 5, 8), 2), rep(8, 8)))
 
