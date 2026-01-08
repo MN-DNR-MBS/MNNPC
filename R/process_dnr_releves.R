@@ -8,6 +8,7 @@
 #' @param strip_suffixes Specify whether to strip suffixes (e.g. s.l., s.s., and s.a.) from taxon names, a boolean (TRUE/FALSE).
 #' @param match_to_accepted Specify whether to convert raw taxon names to accepted/recommended taxon names, a boolean (TRUE/FALSE).
 #' @param aggregate_into_analysis_groups Specify whether to aggregate taxa into analysis groups, a boolean (TRUE/FALSE).
+#' @param cover_scale Specify the scale of species cover values, one of: "percentage", "proportional", "domin", "braunBlanquet", or "none".
 #'
 #' @returns A data frame containing the releve data with five columns: "Year", "Group", "Quadrat", "Species", "Cover"
 #' @export
