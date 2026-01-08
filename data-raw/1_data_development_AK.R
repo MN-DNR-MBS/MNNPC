@@ -305,7 +305,7 @@ mntaxa_dlist %>%
 # combine MNTaxa and analysis codes
 # used Minnesota Wildflowers and other sites choose the analysis group that is 
 # most likely in new releves when there are duplicate analysis groups for a
-# taxon
+# taxon. Derek Anderson advised on remaining.
 taxa_crosswalk <- mntaxa_dlist %>% 
   filter(!(taxon_id %in% analysis_codes$taxon_id)) %>% 
   select(-c(rank)) %>% 
@@ -317,20 +317,24 @@ taxa_crosswalk <- mntaxa_dlist %>%
               distinct(taxon_id, hybrid)) %>% 
   filter(!(taxon == "Arabis holboellii" & 
                analysis_group == "Boechera retrofracta") &
-           !(taxon == "Botrychium lunaria" & 
-               analysis_group == "Botrychium crenulatum") &
+           !(taxon == "Botrychium lunaria" &
+               analysis_group == "Botrychium crenulatum") & # this should be corrected in MNTaxa
            !(taxon == "Cardamine pratensis" & 
                analysis_group == "Cardamine dentata") &
            !(taxon == "Cerastium brachypodum" &
                analysis_group == "Cerastium nutans") &
-           !(taxon == "Chamerion angustifolium subsp. angustifolium" &
+           !(taxon == "Chamerion angustifolium subsp. angustifolium" & # this should be corrected in MNTaxa
                analysis_group == "Eriophorum angustifolium") &
            !(taxon == "Cuscuta campestris" &
                analysis_group == "Cuscuta pentagona") &
            !(taxon == "Quercus x schuettei" &
                analysis_group == "Quercus x hillii") &
            !(taxon == "Scirpus pendulus" &
-               analysis_group == "Scirpus atrocinctus/cyperinus/pedicellatus")) %>% 
+               analysis_group == "Scirpus atrocinctus/cyperinus/pedicellatus") &
+           !(taxon == "Potentilla finitima" &
+               analysis_group == "Potentilla pensylvanica") & # should be corrected in MNTaxa
+           !(taxon == "Solanum ptycanthum" &
+               analysis_group == "Solanum nigrum")) %>%
   distinct() %>% 
   mutate(analysis_group_includes = case_when(str_detect(analysis_group,
                                                       "and genus") ~
