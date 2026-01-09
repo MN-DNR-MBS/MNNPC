@@ -1026,7 +1026,8 @@ rel_tax1a <- rel_ex1 %>%
          scov = scov_mid) %>% 
   filter(!is.na(scov)) %>%
   left_join(mnnpc_hybrid_crosswalk) %>%
-  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) %>%
+  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon),
+         relnumb = as.numeric(as.factor(relnumb))) %>%
   select(-taxon_rep)
 
 # remove taxa that don't have accepted names
@@ -1045,7 +1046,8 @@ rel_tax2 <- rel_ex2 %>%
          scov = scov_mid) %>% 
   filter(!is.na(scov)) %>%
   left_join(mnnpc_hybrid_crosswalk) %>%
-  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) %>%
+  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon),
+         relnumb = as.numeric(as.factor(relnumb))) %>%
   select(-taxon_rep) %>%
   inner_join(mnnpc_taxa_lookup %>%
                filter(!is.na(recommended_taxon_name)) %>% 
@@ -1053,7 +1055,7 @@ rel_tax2 <- rel_ex2 %>%
                rename(taxon = taxon_name))
 
 # check
-count(rel_tax1, year, group, relnumb)
+count(rel_tax1a, year, group, relnumb)
 count(rel_tax2, year, group, relnumb) %>% 
   arrange(relnumb, year, group) %>% 
   data.frame()
@@ -1063,7 +1065,6 @@ mnnpc_example_data <- list("St. Croix State Forest" = rel_tax1b %>%
                              as.data.frame(),
                            "Earthworm-Invaded Forests" = rel_tax2 %>% 
                              as.data.frame())
-
 
 # check for NAs
 mnnpc_example_data$`St. Croix State Forest` %>%
@@ -1083,7 +1084,7 @@ load("data-raw/data-out-ak/mnnpc_example_data.rds")
 # select one releve for formatting example
 # allow taxa without accepted names
 mnnpc_example_releve <- rel_tax1a %>% 
-  filter(relnumb == "4710")
+  filter(relnumb == 1)
 
 # save
 save(mnnpc_example_releve, file = "data-raw/data-out-ak/mnnpc_example_releve.rds")
