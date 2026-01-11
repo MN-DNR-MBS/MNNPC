@@ -7,7 +7,7 @@ example_data_options <- c("None" = "none",
                           "Earthworm-Invaded Forests" = "Earthworm-Invaded Forests")
 
 usethis::use_data(example_data_options,
-                  internal = TRUE, overwrite = TRUE)
+                  internal = TRUE, overwrite = TRUE, compress = "xz")
 
 # External Objects --------------------------------------------------------
 mnnpc_vc_types_named <- c("Acid Peatland (AP)" = "AP",
@@ -22,10 +22,10 @@ mnnpc_vc_types_named <- c("Acid Peatland (AP)" = "AP",
                           "Wet Forest (WF)" = "WF", 
                           "Wet Meadow/Carr (WM)" = "WM", 
                           "Wet Prarie (WP)" = "WP")
-usethis::use_data(mnnpc_vc_types_named, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_vc_types_named, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 mnnpc_vc_types <- unname(mnnpc_vc_types_named)
-usethis::use_data(mnnpc_vc_types, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_vc_types, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 mnnpc_vc_types_flreg_named <- c("Acid Peatland, Northern (APn)" = "APn",
                                 "Fire-Dependent Forest, Central (FDc)" = "FDc",
@@ -57,10 +57,10 @@ mnnpc_vc_types_flreg_named <- c("Acid Peatland, Northern (APn)" = "APn",
                                 "Wet Meadow/Carr, Southern (WMs)" = "WMs",
                                 "Wet Prarie, Northern (WPn)" = "WPn",
                                 "Wet Prarie, Southern (WPs)" = "WPs")
-usethis::use_data(mnnpc_vc_types_flreg_named, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_vc_types_flreg_named, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 mnnpc_vc_types_flreg <- unname(mnnpc_vc_types_flreg_named)
-usethis::use_data(mnnpc_vc_types_flreg, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_vc_types_flreg, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 mnnpc_vc_types_flreg_nested <- list("AP" = c("AP", "APn"),
                                     "FD" = c("FD", "FDc", "FDn", "FDs", "FDw"), 
@@ -104,7 +104,7 @@ mnnpc_vc_types_flreg_nested <- list("AP" = c("AP", "APn"),
                                     "WMs" = "WMs",
                                     "WPn" = "WPn",
                                     "WPs" = "WPs")
-usethis::use_data(mnnpc_vc_types_flreg_nested, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_vc_types_flreg_nested, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 mnnpc_ecs_sections <- c("Statewide" = "statewide", 
                         "Lake Agassiz, Aspen Parklands (LAP)" = "LAP", 
@@ -117,21 +117,21 @@ mnnpc_ecs_sections <- c("Statewide" = "statewide",
                         "Red River Valley (RRV)" = "RRV", 
                         "Southern Superior Uplands (SSU)" = "SSU", 
                         "Western Superior Uplands (WSU)" = "WSU")
-usethis::use_data(mnnpc_ecs_sections, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_ecs_sections, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Scov midpoint conversion for Braun-Blanquet (van der Maarel 2007)
 mnnpc_bb_conv <- data.frame(scov = c(as.character(5:1), "+", "r"),
                               scov_mid = c(87.5, 62.5, 37.5, 15, 2.5, 0.1, 
                                            0.02))
 
-usethis::use_data(mnnpc_bb_conv, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_bb_conv, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Scov midpoint conversion for Domin (RMAVIS)
 mnnpc_dom_conv <- data.frame(scov = c(as.character(10:1), "+"),
                             scov_mid = c(95.5, 83, 63, 42, 30, 18, 8, 3, 5, 3,
                                          0.1))
 
-usethis::use_data(mnnpc_dom_conv, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_dom_conv, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Strata for physcodes
 mnnpc_strata <- data.frame(physcode = c(rep(c("D", "E"), each = 3), 
@@ -139,12 +139,12 @@ mnnpc_strata <- data.frame(physcode = c(rep(c("D", "E"), each = 3),
                            strata_lower = c(rep(c(1, 4, 6), 2), rep(1, 8)),
                            strata_upper = c(rep(c(3, 5, 8), 2), rep(8, 8)))
 
-usethis::use_data(mnnpc_strata, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_strata, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Height conversion table
 mnnpc_ht_conv <- data.frame(ht = 1:8,
                             ht_min_m = c(0, 0.1, 0.5, 2, 5, 10, 20, 35),
                             ht_max_m = c(0.1, 0.5, 2, 5, 10, 20, 35, 50))
 
-usethis::use_data(mnnpc_ht_conv, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_ht_conv, internal = FALSE, overwrite = TRUE, compress = "xz")
 

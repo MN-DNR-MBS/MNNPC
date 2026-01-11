@@ -11,15 +11,27 @@
 #' }
 "mnnpc_accepted_taxa"
 
-#' ...
-#' 
-#' ...
+#' Diversity statistics
 #'
-#' \code{mnnpc_diversity_metrics} 
+#' Diversity statistics for the MNNPC calculated using the R package `rdiversity`.
+#'
+#' \code{mnnpc_diversity_metrics}
+#' 
+#' @references Reeve, R., Leinster, T., Cobbold, C.A., Thompson, J., Brummitt, N., Mitchell, S.N., Matthews, L., 2016. How to partition diversity. https://doi.org/10.48550/arXiv.1404.6520
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_diversity_metrics)` rows and `r ncol(MNNPC::mnnpc_diversity_metrics)` columns, the definitions of which are:
 #' \describe{
-#'   \item{}{}
+#'   \item{ecs_section}{The abbreviation of the ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or Statewide (statewide).}
+#'   \item{rank}{The MNNPC unit rank associated with the npc_class, npc_type, or npc_subtype.}
+#'   \item{npc_class}{The names of the MNNPC unit classes, the highest rank.}
+#'   \item{npc_type}{The names of the MNNPC unit types.}
+#'   \item{npc_subtype}{The names of the MNNPC unit subtypes.}
+#'   \item{Quadrat}{The name of the quadrat/releve.}
+#'   \item{measure}{The name of the diversity measure, one of: normalised alpha, normalised beta, and gamma.}
+#'   \item{metric}{The name of the diversity metric, one of: naive, taxonomic, and phylogenetic.}
+#'   \item{partition_level}{The diversity partition level, which for this object is equal to metacommunity for rows containing data for MNNPC class, type, or subtypes; for quadrats/releves the partition level is equal to subcommunity.}
+#'   \item{q}{The Hill number, for this dataset three Hill numbers were used: 0, 1, and 2.}
+#'   \item{diversity}{The diversity value.}
 #' }
 "mnnpc_diversity_metrics"
 
@@ -69,6 +81,29 @@
 #'   \item{scov}{The percent cover of the taxon in the plot within the strata.}
 #' }
 "mnnpc_example_data"
+
+#' Fidelity measures
+#' 
+#' Statistical measures of fidelity for taxa present in the MNNPC classification,
+#' calculated following Chytrý et al (2002).
+#'
+#' \code{mnnpc_fidelity_metrics}
+#' 
+#' @references Chytrý, M., Tichý, L., Holt, J., Botta-Dukát, Z., 2002. Determination of diagnostic species with statistical fidelity measures. Journal of Vegetation Science 13, 79–90. https://doi.org/10.1111/j.1654-1103.2002.tb02025.x
+#'
+#' @format A list of `r length(MNNPC::mnnpc_fidelity_metrics)` data frames with `r nrow(MNNPC::mnnpc_fidelity_metrics)` rows and `r ncol(MNNPC::mnnpc_example_data)` columns, the definitions of which are:
+#' \describe{
+#'   \item{ecs_section}{The abbreviation of the ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or Statewide (statewide).}
+#'   \item{system}{The MNNPC unit system code.}
+#'   \item{npc_class}{The MNNPC unit class code.}
+#'   \item{species}{The name of the species/taxon.}
+#'   \item{u}{The fidelity measure u, more specifically Bruelheide's u.}
+#'   \item{phi}{The fidelity measure phi.}
+#'   \item{chisq}{The fidelity measure chisq.}
+#'   \item{g}{The fidelity measure g.}
+#'   \item{indval}{The fidelity measure indval.}
+#' }
+"mnnpc_fidelity_metrics"
 
 #' Floristic Tables
 #'

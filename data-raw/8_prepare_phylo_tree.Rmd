@@ -171,8 +171,8 @@ table(mnnpc_phylo_taxa_lookup$phylo)
 # Export .rda files to RMAVIS
 
 ```{r export_rda_files_to_rmavis}
-usethis::use_data(mnnpc_phylo_tree, internal = FALSE, overwrite = TRUE)
-usethis::use_data(mnnpc_phylo_taxa_lookup, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_phylo_tree, internal = FALSE, overwrite = TRUE, compress = "xz")
+usethis::use_data(mnnpc_phylo_taxa_lookup, internal = FALSE, overwrite = TRUE, compress = "xz")
 ```
 
 

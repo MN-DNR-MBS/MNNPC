@@ -1,3 +1,10 @@
+# MNNPC 1.0.0 (XX-01-2026)
+
+* Adding `MNNPC::mnnpc_fidelity_metrics` and `MNNPC::mnnpc_diversity_metrics`.
+* Ensuring data compression is xz.
+* Adding the cover_scale option to `MNNPC::process_dnr_releves`.
+* ...
+
 # MNNPC 0.9.9 (02-01-2026)
 
 * Removing `MNNPC::mnnpc_taxa_conv`, all lookup information now contained in `MNNPC::mnnpc_taxa_lookup` and a new object `MNNPC::mnnpc_hybrid_crosswalk`.

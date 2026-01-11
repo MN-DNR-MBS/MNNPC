@@ -47,7 +47,7 @@ function produce_fidelity_metrics(;data::DataFrame, sections::Vector{String}, ou
         
     end
 
-    VegSci.check_cluster_releveID_duplicates(classes_dict)
+    # VegSci.check_cluster_releveID_duplicates(classes_dict)
 
     # Define function to calculate and return all fidelity values
     calc_all_fidelity_values = function(rm, cd)
@@ -70,12 +70,16 @@ function produce_fidelity_metrics(;data::DataFrame, sections::Vector{String}, ou
         
     end
 
-    # Fidelity values across all classes
+    # Fidelity values across all systems and classes
     all_classes_fidelity_values_df = calc_all_fidelity_values(releves_mat, classes_dict)
+    insertcols!(all_classes_fidelity_values_df, 1, :system => String.("All"))
+
     sort!(all_classes_fidelity_values_df, [:npc_class])
 
+    # Check length 
+    size(unique(all_classes_fidelity_values_df[:, [:npc_class, :species]]))[1] == nrow(all_classes_fidelity_values_df)
+
     # Fidelity values within classes by system
-    # all_systems = ["AP", "FD", "FF", "FP", "MH", "MR", "OP", "RO", "UP", "WF", "WM", "WP"]
     systems = sort(unique(SubString.(class_df.npc_class, 1, 2)))
 
     fidelity_values_dict = Dict
@@ -88,6 +92,7 @@ function produce_fidelity_metrics(;data::DataFrame, sections::Vector{String}, ou
         rm_sys = releves_mat[rm_sys_names, :]
         
         fidelity_values_df = calc_all_fidelity_values(rm_sys, cd_sys)
+        insertcols!(fidelity_values_df, 1, :system => String.(system))
 
         fidelity_values_dict_sys = Dict(system => fidelity_values_df)
         fidelity_values_dict = merge(fidelity_values_dict, fidelity_values_dict_sys)
@@ -95,29 +100,6 @@ function produce_fidelity_metrics(;data::DataFrame, sections::Vector{String}, ou
     end
 
     fidelity_values_dict["All"] = all_classes_fidelity_values_df
-
-    XLSX.openxlsx(joinpath(base_fp, string("mnnpc_fidelity_values_", output_name, ".xlsx")), mode = "w") do xf
-
-        all_systems = append!(["All"], systems)
-
-        sheet = xf[1]
-
-        for sys in all_systems
-
-            df = fidelity_values_dict[sys]
-
-            sort!(df, [:npc_class, :species])
-
-            # mapcols(col -> replace!(col, NaN => missing), df)
-            # foreach(col -> replace!(col, NaN => missing), eachcol(df)) 
-
-            sheet = XLSX.addsheet!(xf, sys)
-
-            XLSX.writetable!(sheet, df)
-
-        end
-
-    end
 
     fidelity_values_all_df = reduce(vcat, values(fidelity_values_dict))
 
@@ -127,7 +109,9 @@ function produce_fidelity_metrics(;data::DataFrame, sections::Vector{String}, ou
     
 end
 
-mnnpc_fidelity_metrics_all = produce_fidelity_metrics(data = mnnpc_dd, sections = ecs_sections, output_name = "statewide")
+mnnpc_fidelity_metrics_statewide = produce_fidelity_metrics(data = mnnpc_dd, sections = ecs_sections, output_name = "statewide")
+
+mnnpc_fidelity_metrics_all = DataFrame()
 
 for section in ecs_sections
 
@@ -137,4 +121,6 @@ for section in ecs_sections
 
 end
 
-CSV.write(joinpath(base_fp, "mnnpc_fidelity_metrics.csv"), mnnpc_fidelity_metrics_all)
+mnnpc_fidelity_metrics = vcat(mnnpc_fidelity_metrics_statewide, mnnpc_fidelity_metrics_all)
+
+CSV.write(joinpath(base_fp, "mnnpc_fidelity_metrics.csv"), mnnpc_fidelity_metrics)

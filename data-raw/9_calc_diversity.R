@@ -159,5 +159,6 @@ mnnpc_diversity_metrics <- mnnpc_diversity_results_all |>
                 measure, "metric" = "dat_id", partition_level, q, diversity)
 
 write.csv(x = mnnpc_diversity_metrics, file = file.path(base_fp, paste0("mnnpc_diversity_metrics", ".csv")), row.names = FALSE)
+# mnnpc_diversity_metrics <- read.csv(file = file.path(base_fp, paste0("mnnpc_diversity_metrics", ".csv")))
 
-usethis::use_data(mnnpc_diversity_metrics, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_diversity_metrics, internal = FALSE, overwrite = TRUE, compress = "xz")

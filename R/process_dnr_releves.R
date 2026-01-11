@@ -20,7 +20,7 @@ process_dnr_releves <- function(releve_data,
                                 strip_suffixes = TRUE,
                                 match_to_accepted = TRUE,
                                 aggregate_into_analysis_groups = TRUE,
-                                cover_scale = "braunBlanquet"){
+                                cover_scale = "percentage"){
   
   #### check for processed releve ####
   
@@ -116,14 +116,14 @@ process_dnr_releves <- function(releve_data,
     } else if(cover_scale == "domin"){
       
       dat2 <- dat2 |>
-        dplyr::left_join(MNNPC::mnnpc_dom_conv) |>
+        dplyr::left_join(MNNPC::mnnpc_dom_conv, by = "scov") |>
         dplyr::select(-scov) |>
         dplyr::rename(scov = scov_mid)
       
     } else if(cover_scale == "braunBlanquet"){
       
       dat2 <- dat2 |>
-        dplyr::left_join(MNNPC::mnnpc_bb_conv) |>
+        dplyr::left_join(MNNPC::mnnpc_bb_conv, by = "scov") |>
         dplyr::select(-scov) |>
         dplyr::rename(scov = scov_mid)
       

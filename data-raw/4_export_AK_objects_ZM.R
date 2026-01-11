@@ -22,7 +22,7 @@ load(file.path(input_path, "mnnpc_hybrid_crosswalk.rds"))
 colnames(mnnpc_example_releve)
 
 # save
-usethis::use_data(mnnpc_example_releve, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_example_releve, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Accepted taxa
 # mnnpc_accepted_taxa <- tibble::tibble("taxon_name" = unique(c(mnnpc_taxa_lookup$recommended_taxon_name, mnnpc_taxa_lookup$analysis_group))) |>
@@ -32,12 +32,12 @@ usethis::use_data(mnnpc_example_releve, internal = FALSE, overwrite = TRUE)
 head(mnnpc_accepted_taxa)
 
 # save
-usethis::use_data(mnnpc_accepted_taxa, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_accepted_taxa, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Community attributes
 # mnnpc_community_attributes <- mnnpc_community_attributes
 
-usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Example data
 # st_croix_raw <- mnnpc_example_data[["St. Croix State Forest"]]
@@ -96,12 +96,12 @@ isTRUE(all(all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov > 0),
            all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov <= 100)))
 
 # save
-usethis::use_data(mnnpc_example_data, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_example_data, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Floristic tables
 # mnnpc_floristic_tables <- mnnpc_floristic_tables
 
-usethis::use_data(mnnpc_floristic_tables, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_floristic_tables, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Taxonomic backbone
 # mnnpc_taxonomic_backbone <- mnnpc_taxonomic_backbone |>
@@ -121,14 +121,14 @@ usethis::use_data(mnnpc_floristic_tables, internal = FALSE, overwrite = TRUE)
 colnames(mnnpc_taxonomic_backbone)
 
 # save
-usethis::use_data(mnnpc_taxonomic_backbone, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_taxonomic_backbone, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Taxa lookup
 # mnnpc_taxa_lookup <- mnnpc_taxa_lookup
 
-usethis::use_data(mnnpc_taxa_lookup, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_taxa_lookup, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Hybrid crosswalk
 # mnnpc_hybrid_crosswalk <- mnnpc_hybrid_crosswalk
 
-usethis::use_data(mnnpc_hybrid_crosswalk, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_hybrid_crosswalk, internal = FALSE, overwrite = TRUE, compress = "xz")

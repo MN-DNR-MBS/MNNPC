@@ -1,7 +1,7 @@
 Package: MNNPC
 Title: Minnesota Native Plant Community Classification System data
-Version: 0.9.9
-Date: 2025-01-02
+Version: 1.0.0
+Date: 2026-01-XX
 Authors@R: c(person(given = "Amy",
                     family = "Kendig",
                     role = c("aut", "cre"),
@@ -17,6 +17,7 @@ Description: Minnesota Native Plant Community Classification System objects for 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+LazyDataCompression: xz
 RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.4)

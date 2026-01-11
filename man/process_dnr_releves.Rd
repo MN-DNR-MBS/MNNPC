@@ -9,7 +9,8 @@ process_dnr_releves(
   process_malformed_data = TRUE,
   strip_suffixes = TRUE,
   match_to_accepted = TRUE,
-  aggregate_into_analysis_groups = TRUE
+  aggregate_into_analysis_groups = TRUE,
+  cover_scale = "percentage"
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ process_dnr_releves(
 \item{match_to_accepted}{Specify whether to convert raw taxon names to accepted/recommended taxon names, a boolean (TRUE/FALSE).}
 
 \item{aggregate_into_analysis_groups}{Specify whether to aggregate taxa into analysis groups, a boolean (TRUE/FALSE).}
+
+\item{cover_scale}{Specify the scale of species cover values, one of: "percentage", "proportional", "domin", "braunBlanquet", or "none".}
 }
 \value{
 A data frame containing the releve data with five columns: "Year", "Group", "Quadrat", "Species", "Cover"

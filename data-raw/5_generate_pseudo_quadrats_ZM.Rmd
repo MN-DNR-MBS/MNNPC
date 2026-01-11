@@ -132,7 +132,7 @@ pquads_duplicates <- pquads |>
 
 ```{r write_output_files}
 mnnpc_pquads <- pquads_no_duplicates
-usethis::use_data(mnnpc_pquads, internal = FALSE, overwrite = TRUE)
+usethis::use_data(mnnpc_pquads, internal = FALSE, overwrite = TRUE, compress = "xz")
 ```
 
 
