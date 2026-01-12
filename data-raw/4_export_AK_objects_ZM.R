@@ -15,8 +15,6 @@ load(file.path(input_path, "mnnpc_example_releve.rds"))
 load(file.path(input_path, "mnnpc_hybrid_crosswalk.rds"))
 
 # Example releve
-# mnnpc_example_releve <- mnnpc_example_releve |>
-#   dplyr::select(year, group, relnumb, physcode, minht, maxht, taxon, scov)
 
 # check columns
 colnames(mnnpc_example_releve)
@@ -25,8 +23,6 @@ colnames(mnnpc_example_releve)
 usethis::use_data(mnnpc_example_releve, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Accepted taxa
-# mnnpc_accepted_taxa <- tibble::tibble("taxon_name" = unique(c(mnnpc_taxa_lookup$recommended_taxon_name, mnnpc_taxa_lookup$analysis_group))) |>
-#   dplyr::arrange(taxon_name)
 
 # check
 head(mnnpc_accepted_taxa)
@@ -35,7 +31,13 @@ head(mnnpc_accepted_taxa)
 usethis::use_data(mnnpc_accepted_taxa, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Community attributes
-# mnnpc_community_attributes <- mnnpc_community_attributes
+mnnpc_community_attributes <- mnnpc_community_attributes |>
+  dplyr::mutate(
+    "ecs_section" = dplyr::case_when(
+      is.na(ecs_section) ~ "statewide",
+      TRUE ~ ecs_section
+    )
+  )
 
 usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE, compress = "xz")
 
