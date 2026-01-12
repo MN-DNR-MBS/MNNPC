@@ -8,7 +8,7 @@
 devtools::document()
 
 # 4) Test package
-# devtools::test()
+devtools::test()
 
 # 5) Compute code coverage
 # covr::codecov()

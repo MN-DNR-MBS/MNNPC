@@ -12,7 +12,7 @@ testthat::test_that("process_dnr_releves works", {
 testthat::test_that("process_dnr_releves works on malformed data", {
   
   test_data_malformed <- MNNPC::mnnpc_example_data$`St. Croix State Forest` |>
-    dplyr::filter(relnumb == "B926" & year == 2010)
+    dplyr::filter(relnumb == "2" & year == 2010)
   
   test_data_malformed[1, 8] <- NA
   test_data_malformed[2, 7] <- NA
@@ -29,6 +29,22 @@ testthat::test_that("process_dnr_releves works on malformed data", {
   testthat::expect_equal(colnames(actual), expected_colnames)
   
 })
+
+# testthat::test_that("process_dnr_releves works on empty data", {
+#   
+#   test_data_empty <- MNNPC::mnnpc_example_data$`St. Croix State Forest` |>
+#     dplyr::filter(relnumb == "2" & year == 2010) |>
+#     dplyr::mutate("taxon" = NA, "scov" = NA)
+#   
+#   actual <- MNNPC::process_dnr_releves(releve_data = test_data_empty, 
+#                                        process_malformed_data = TRUE,
+#                                        cover_scale = "percentage")
+#   
+#   expected_colnames <- c("Year", "Group", "Quadrat", "Species", "Cover")
+#   
+#   testthat::expect_equal(colnames(actual), expected_colnames)
+#   
+# })
 
 testthat::test_that("process_dnr_releves works with name-matching argument variation", {
   

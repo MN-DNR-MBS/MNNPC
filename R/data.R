@@ -184,24 +184,6 @@
 #' }
 "mnnpc_taxonomic_backbone"
 
-#' MNNPC system code types/prefixes
-#'
-#' A vector of codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
-#'
-#' \code{mnnpc_vc_types} 
-#'
-#' @format A data frame with `r length(MNNPC::mnnpc_vc_types)` which contains ...
-"mnnpc_vc_types"
-
-#' MNNPC system code types/prefixes with full names
-#'
-#' A vector of named codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
-#'
-#' \code{mnnpc_vc_types_named} 
-#'
-#' @format A data frame with `r length(MNNPC::mnnpc_vc_types_named)` which contains ...
-"mnnpc_vc_types_named"
-
 #' mnnpc_example_releve
 #'
 #' A releve plot from the St. Croix State Forest study (https://silvlib.cfans.umn.edu/deer-exclosure-effects-mesic-oak-forest-st-croix-state-forest-mn-dnr) to serve as an example for formatting. For more information on physiognomy codes and height levels, see A handbook for collecting vegetation plot data in Minnesota: The relevé method.
@@ -315,3 +297,58 @@
 #'   \item{taxon}{Three alternative formats of the hybrid taxon name that include capitalized and lowercase "x" and spaces between "x" and other words.}
 #' }
 "mnnpc_hybrid_crosswalk"
+
+
+#' MNNPC ECS Sections
+#'
+#' A vector of named ECS section codes with full names.
+#' 
+#' \code{mnnpc_ecs_sections} 
+#'
+#' @format A named vector of strings of length `r length(MNNPC::mnnpc_ecs_sections)`.
+"mnnpc_ecs_sections"
+
+#' MNNPC system codes
+#' 
+#' A vector of codes for the MNNPC community systems which are prefixes for all child community classes, types, and sub-types.
+#'
+#' \code{mnnpc_vc_systems} 
+#'
+#' @format A vector of strings of length `r length(MNNPC::mnnpc_vc_systems)`.
+"mnnpc_vc_systems"
+
+#' MNNPC system codes with full names
+#'
+#' A vector of named codes for the MNNPC community system which are prefixes for all child community classes, types, and sub-types.
+#'
+#' \code{mnnpc_vc_systems_named} 
+#'
+#' @format A named vector of strings of length `r length(MNNPC::mnnpc_vc_systems_named)`.
+"mnnpc_vc_systems_named"
+
+#' MNNPC systems with floristic regions
+#'
+#' A vector of codes consisting of the MNNPC community systems and floristic regions.
+#' 
+#' \code{mnnpc_vc_systems_flreg} 
+#'
+#' @format A vector of strings of length `r length(MNNPC::mnnpc_vc_systems_flreg)`.
+"mnnpc_vc_systems_flreg"
+
+#' MNNPC systems with floristic regions with full names
+#'
+#' A named vector of MNNPC systems and floristic regions with full names.
+#' 
+#' \code{mnnpc_vc_systems_flreg_named} 
+#'
+#' @format A named vector of strings of length `r length(MNNPC::mnnpc_vc_systems_flreg_named)`.
+"mnnpc_vc_systems_flreg_named"
+
+#' MNNPC systems by region
+#'
+#' A list of MNNPC systems and system-regions with list entried equal to all child system-regions.
+#' 
+#' \code{mnnpc_vc_systems_flreg_nested} 
+#'
+#' @format A list of length `r length(MNNPC::mnnpc_vc_systems_flreg_nested)`
+"mnnpc_vc_systems_flreg_nested"
