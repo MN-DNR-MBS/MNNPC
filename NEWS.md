@@ -1,9 +1,8 @@
-# MNNPC 1.0.0 (XX-01-2026)
+# MNNPC 1.0.0 (04-02-2026)
 
 * Adding `MNNPC::mnnpc_fidelity_metrics` and `MNNPC::mnnpc_diversity_metrics`.
 * Ensuring data compression is xz.
 * Adding the cover_scale option to `MNNPC::process_dnr_releves`.
-* ...
 
 # MNNPC 0.9.9 (02-01-2026)
 

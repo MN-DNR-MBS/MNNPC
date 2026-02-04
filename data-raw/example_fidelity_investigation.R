@@ -13,9 +13,7 @@ foo <- MNNPC::mnnpc_fidelity_metrics |>
   dplyr::select(-system, -u_abs) |>
   tidyr::pivot_wider(id_cols = c(ecs_section, species),
                      names_from = npc_class,
-                     values_from = u) |>
-  tidyr::drop_na()
-
+                     values_from = u)
 
 # Join floristic tables and fidelity metrics then filter for high/low constancy
 const <- 4
