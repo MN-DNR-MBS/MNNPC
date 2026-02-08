@@ -3,6 +3,16 @@
 # prepare releve data for analyses within RMAVIS
 # originals saved in npc-releve project in case this needs to be re-run
 
+# to load
+load("../npc-releve/data/originals-20260208/crosswalk.rds")
+load("../npc-releve/data/originals-20260208/releve.rds")
+load("../npc-releve/data/originals-20260208/spatial_releve.rds")
+load("../npc-releve/data/originals-20260208/spatial_ecs_subsec.rds")
+load("../npc-releve/data/originals-20260208/mntaxa_taxa.rds")
+load("../npc-releve/data/originals-20260208/mntaxa_accepted.rds")
+releve_mask <- read.csv("../npc-releve/data/releve_masking_crosswalk_20260208.csv") %>%
+  mutate(relnumb = as.character(relnumb))
+
 #### load packages ####
 
 # install mntaxa (development)
@@ -800,7 +810,8 @@ if(stratify == "none"){
     crosswalk13 <- crosswalk13a %>%
       mutate(analysis_group_strata = str_replace(analysis_group_strata, "13", " understory") %>% 
                str_replace("45", " subcanopy") %>%
-               str_replace("68", " canopy"),
+               str_replace("68", " canopy") %>%
+               str_remove("18"),
              code_strata = str_replace(code_strata, "13", "_understory") %>% 
                str_replace("45", "_subcanopy") %>%
                str_replace("68", "_canopy"))
@@ -809,7 +820,8 @@ if(stratify == "none"){
     
     crosswalk13 <- crosswalk13a %>%
       mutate(analysis_group_strata = str_replace(analysis_group_strata, "14", " understory") %>% 
-               str_replace("58", " canopy"),
+               str_replace("58", " canopy") %>%
+               str_remove("18"),
              code_strata = str_replace(code_strata, "14", "_understory") %>% 
                str_replace("58", "_canopy"))
     
@@ -832,16 +844,18 @@ crosswalk13 %>%
 # make sure releve numbers only occur once in dataset
 get_dupes(releve6, relnumb)
 
-# mask releve numbers
-releve_mask <- releve6 %>%
-  transmute(relnumb_orig = relnumb,
-            relnumb = sample(releve6$relnumb, nrow(releve6), replace = F) %>%
-              as.factor() %>%
-              as.numeric() %>%
-              as.character())
-
-# save
-write_csv(releve_mask, "../npc-releve/data/releve_masking_crosswalk_20260208.csv")
+# # mask releve numbers
+# releve_mask <- releve6 %>%
+#   transmute(relnumb_orig = relnumb,
+#             relnumb = sample(releve6$relnumb, nrow(releve6), replace = F) %>%
+#               as.factor() %>%
+#               as.numeric() %>%
+#               as.character())
+# 
+# # save
+# write_csv(releve_mask, "../npc-releve/data/releve_masking_crosswalk_20260208.csv")
+releve_mask <- read.csv("../npc-releve/data/releve_masking_crosswalk_20260208.csv") %>%
+  mutate(relnumb = as.character(relnumb))
 
 # import releve info
 stcroix <- readxl::read_excel("../npc-releve/data/duxbury_deer_releve_data_working.xlsx")
@@ -979,7 +993,8 @@ systems <- read_csv("../npc-releve/data/npc_systems.csv")
 # mask releve numbers and select required info
 releve7 <- releve6 %>%
   left_join(systems) %>%
-  select(relnumb, npc_system_id, npc_system, npc_code, ecs_secname) %>%
+  select(relnumb, used_in_fieldguide, npc_system_id, npc_system, npc_code, 
+         npc_class_name, npc_type_name, npc_subtype_name, ecs_secname) %>%
   rename(relnumb_orig = relnumb) %>%
   left_join(releve_mask) %>%
   select(-relnumb_orig) %>%

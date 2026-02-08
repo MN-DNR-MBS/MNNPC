@@ -1,3 +1,5 @@
+#### need to re-save (changed "" to NA in mntaxa)
+
 #### set-up ####
 
 # clear environment
@@ -11,25 +13,21 @@ library(sf)
 library(khroma)
 library(polylabelr)
 
+# install mntaxa (development)
+pak::pak("MN-DNR-MBS/mntaxa", upgrade = T)
+library(mntaxa)
+
 # import data
 load("data-raw/data-out-ak/releve_species_grouped_data.rds")
 load("data-raw/data-out-ak/releve_species_ungrouped_data.rds")
 load("data-raw/data-out-ak/releve_plot_data.rds")
-
-
-# mntaxa_lookup <- read_csv("../../intermediate-data/mntaxa_lookup_20251214.csv")
-# mntaxa <- read_csv("../../intermediate-data/mntaxa_taxa_20251214.csv")
-# mntaxa_dlist <- read_csv("../../intermediate-data/mntaxa_synonymies_20251214.csv")
-# analysis_codes <- read_csv("../../intermediate-data/analysis_codes_20251214.csv")
-# releve_taxa <- read_csv("../../intermediate-data/releve_taxa_formatted_20251214a.csv")
-# mntaxa_lookup_genus <- read_csv("../../intermediate-data/mntaxa_lookup_genera_20251214.csv")
-# mntaxa_dlist_pars <- read_csv("../../intermediate-data/mntaxa_dlist_parents_20251224.csv")
 ecs_sec_sf <- st_read("V:/gdrs/data/pub/us_mn_state_dnr/geos_ecological_class_system/fgdb/geos_ecological_class_system.gdb", 
                       "ecs_sections_of_mn_v99a")
 
+
 #### format releve data ####
 
-# section info
+# add abbreviations for sections
 ecs_sections <- tibble(ecs_secabb = c("LAP",
                                       "MIM",
                                       "MOP",
@@ -51,33 +49,29 @@ ecs_sections <- tibble(ecs_secabb = c("LAP",
                                        "Southern Superior Uplands",
                                        "Western Superior Uplands"))
 
-# add classification
-# format species names
-crosswalk2 <- crosswalk %>%
-  left_join(releve2 %>%
-               select(relnumb, npc_system, npc_system_id, npc_class_name,
-                      npc_class, npc_type_name, npc_type, npc_subtype_name, 
-                      npc_subtype, ecs_secabb))
-
-# select releves
-releve3 <- releve2 %>%
+# select plots used in field guide
+releve <- releve_plots %>%
+  left_join(ecs_sections) %>%
   filter(used_in_fieldguide == "yes")
 
-crosswalk3 <- crosswalk2 %>% 
-  filter(relnumb %in% releve3$relnumb)
+# add plot attributes to species data
+spec_grp <- releve_species_grouped %>%
+  inner_join(releve)
+spec_raw <- releve_species_ungrouped %>%
+  inner_join(releve)
 
 # are all classified to class?
-sort(unique(releve3$npc_class)) # yes
+sort(unique(releve$npc_class)) # yes
          
 # check that there aren't duplicates
-get_dupes(releve3, relnumb)
-get_dupes(crosswalk3, relnumb, code_strata)
+get_dupes(releve, relnumb)
+get_dupes(spec_grp, relnumb, code_strata)
 
 # are the releve numbers equal?
-nrow(releve3) == n_distinct(crosswalk3$relnumb)
+nrow(releve) == n_distinct(spec_grp$relnumb)
 
-# all ECS sections
-all_sections <- releve3 %>% 
+# all ECS sections in data
+all_sections <- releve %>% 
   distinct(ecs_secabb) %>% 
   pull(ecs_secabb)
 
@@ -91,10 +85,10 @@ head(nvc_floristic_tables)
 flor_fun <- function(ecs_sec = all_sections){
   
   # select samples in section
-  releve_sub <- releve3 %>% 
+  releve_sub <- releve %>% 
     filter(ecs_secabb %in% ecs_sec)
   
-  crosswalk_sub <- crosswalk3 %>% 
+  spec_sub <- spec_grp %>% 
     filter(relnumb %in% releve_sub$relnumb)
 
   # samples per group
@@ -132,13 +126,13 @@ flor_fun <- function(ecs_sec = all_sections){
     mutate(perc_type = rels_subtype / rels_tot)
 
   # floristic tables
-  flor_type <- crosswalk_sub %>%
+  flor_type <- spec_sub %>%
     filter(!is.na(npc_type)) %>%
     group_by(npc_class, npc_type, analysis_group_strata) %>%
     summarize(absolute_frequency = n_distinct(relnumb),
-              minimum_cover = min(scov_adj),
-              mean_cover = mean(scov_adj),
-              maximum_cover = max(scov_adj),
+              minimum_cover = min(scov),
+              mean_cover = mean(scov),
+              maximum_cover = max(scov),
               .groups = "drop") %>%
     left_join(samps_type) %>%
     mutate(relative_frequency = absolute_frequency / n,
@@ -161,12 +155,12 @@ flor_fun <- function(ecs_sec = all_sections){
 
   # class tables
   # keep species in at least 5% of a type's samples or 5% of the class (if no types)
-  flor_class <- crosswalk_sub %>%
+  flor_class <- spec_sub %>%
     group_by(npc_class, analysis_group_strata) %>%
     summarize(absolute_frequency = n_distinct(relnumb),
-              minimum_cover = min(scov_adj),
-              mean_cover = mean(scov_adj),
-              maximum_cover = max(scov_adj),
+              minimum_cover = min(scov),
+              mean_cover = mean(scov),
+              maximum_cover = max(scov),
               .groups = "drop") %>%
     left_join(samps_class) %>%
     mutate(relative_frequency = absolute_frequency / n,
@@ -187,13 +181,13 @@ flor_fun <- function(ecs_sec = all_sections){
   flor_class_spp <- flor_class %>%
     distinct(npc_class, analysis_group_strata)
 
-  flor_subtype <- crosswalk_sub %>%
+  flor_subtype <- spec_sub %>%
     filter(!is.na(npc_subtype)) %>%
     group_by(npc_class, npc_type, npc_subtype, analysis_group_strata) %>%
     summarize(absolute_frequency = n_distinct(relnumb),
-              minimum_cover = min(scov_adj),
-              mean_cover = mean(scov_adj),
-              maximum_cover = max(scov_adj),
+              minimum_cover = min(scov),
+              mean_cover = mean(scov),
+              maximum_cover = max(scov),
               .groups = "drop") %>%
     left_join(samps_subtype) %>%
     mutate(relative_frequency = absolute_frequency / n,
@@ -274,20 +268,62 @@ UKVegTB::taxa_lookup %>%
   as_tibble()
 # all taxa, recommended taxon_name = dlist, recommended TVK = dlist_id
 
-# duplicate group due to different IDs
-mntaxa_dlist %>% 
-  distinct(taxon, dlist_assignment) %>% 
+# get accepted names from mntaxa
+mntaxa_acc <- lookup_mntaxa(taxonomy_levels = TRUE,
+                            sources = FALSE,
+                            releve = TRUE,
+                            phys = FALSE,
+                            strata = TRUE,
+                            origin = FALSE,
+                            common = FALSE,
+                            cvals = FALSE,
+                            exclude = FALSE,
+                            replace_sub_var = TRUE,
+                            replace_family = TRUE,
+                            replace_genus = TRUE,
+                            drop_higher = FALSE,
+                            higher_include = c("Belonia", "Chara", "Lychnothamnus", "Nitella", "Nitellopsis",
+                                               "Spirogyra", "Tolypella"),
+                            excluded_duplicates = TRUE,
+                            clean_duplicates = TRUE,
+                            group_accepted = FALSE,
+                            group_analysis = FALSE)
+
+# duplicate accepted name due to different IDs
+mntaxa_acc %>% 
+  distinct(taxon, acc_assignment) %>% 
   get_dupes(taxon)
+
+# get physcode names
+load_mntaxa(
+  synonymies = FALSE,
+  all_taxa = FALSE,
+  taxonomy_levels = FALSE,
+  sources = FALSE,
+  phys = TRUE,
+  origin = FALSE,
+  common = FALSE,
+  cvals = FALSE,
+  exclude = FALSE,
+  envir = .GlobalEnv
+)
+
+#### start here with editing ####
+# format (matched save lookup)
+mntaxa_acc2 <- mntaxa_acc
+  
+
+
 
 # remove taxa from mntaxa that are in analysis codes
 # combine MNTaxa and analysis codes
 # used Minnesota Wildflowers and other sites choose the analysis group that is 
 # most likely in new releves when there are duplicate analysis groups for a
 # taxon. Derek Anderson advised on remaining.
-taxa_crosswalk <- mntaxa_dlist %>% 
+taxa_crosswalk <- mntaxa_acc %>% 
   filter(!(taxon_id %in% analysis_codes$taxon_id)) %>% 
   select(-c(rank)) %>% 
-  mutate(analysis_group = dlist_assignment) %>% 
+  mutate(analysis_group = acc_assignment) %>% 
   full_join(analysis_codes %>% 
               rename(analysis_group = analysis_code)) %>% 
   distinct() %>% 
@@ -316,14 +352,14 @@ taxa_crosswalk <- mntaxa_dlist %>%
   distinct() %>% 
   mutate(analysis_group_includes = case_when(str_detect(analysis_group,
                                                       "and genus") ~
-                                           paste(word(dlist_assignment, 1),
-                                                 dlist_assignment,
+                                           paste(word(acc_assignment, 1),
+                                                 acc_assignment,
                                                  sep = "/"),
                                            str_detect(analysis_group,
                                                       "genus") ~
-                                             paste(word(dlist_assignment, 1),
+                                             paste(word(acc_assignment, 1),
                                                    "genus and species"),
-                                           TRUE ~ dlist_assignment))
+                                           TRUE ~ acc_assignment))
 
 # taxa added back in with analysis groups
 # all are genus level
@@ -331,38 +367,38 @@ taxa_crosswalk <- mntaxa_dlist %>%
 analysis_taxa <- taxa_crosswalk %>% 
   anti_join(mntaxa_lookup %>% 
               distinct(taxon)) %>% 
-  rename(c_value = dlist_c_value)
+  rename(c_value = acc_c_value)
 
 # use info for species-level when it's mapped to a species and genus level otherwise
 # if missing higher orders, fill in with genus
 analysis_taxa2 <- analysis_taxa %>% 
-  filter(dlist_rank != "species") %>% 
+  filter(acc_rank != "species") %>% 
   select(taxon_id, taxon, analysis_group, analysis_group_includes) %>% 
   left_join(mntaxa_lookup_genus) %>% 
   full_join(analysis_taxa %>% 
-              filter(dlist_rank == "species") %>% 
+              filter(acc_rank == "species") %>% 
               left_join(mntaxa %>% 
                           distinct(taxon_id, rank)) %>% 
               left_join(mntaxa_lookup %>% 
-                          select(starts_with("dlist")) %>% 
+                          select(starts_with("acc")) %>% 
                           distinct())) %>% 
-  mutate(dlist_genus = if_else(is.na(dlist_genus), word(dlist_assignment, 1),
-                               dlist_genus)) %>% 
+  mutate(acc_genus = if_else(is.na(acc_genus), word(acc_assignment, 1),
+                               acc_genus)) %>% 
   left_join(mntaxa_lookup %>% 
-              select(dlist_genus:dlist_kingdom) %>% 
+              select(acc_genus:acc_kingdom) %>% 
               distinct() %>% 
-              rename_with(.cols = -dlist_genus,
+              rename_with(.cols = -acc_genus,
                           .fn = ~paste0(.x, "_rep"))) %>% 
-  mutate(dlist_family = if_else(is.na(dlist_family), dlist_family_rep,
-                                dlist_family),
-         dlist_order = if_else(is.na(dlist_order), dlist_order_rep,
-                                dlist_order),
-         dlist_class = if_else(is.na(dlist_class), dlist_class_rep,
-                                dlist_class),
-         dlist_phylum = if_else(is.na(dlist_phylum), dlist_phylum_rep,
-                                dlist_phylum),
-         dlist_kingdom = if_else(is.na(dlist_kingdom), dlist_kingdom_rep,
-                                dlist_kingdom)) %>% 
+  mutate(acc_family = if_else(is.na(acc_family), acc_family_rep,
+                                acc_family),
+         acc_order = if_else(is.na(acc_order), acc_order_rep,
+                                acc_order),
+         acc_class = if_else(is.na(acc_class), acc_class_rep,
+                                acc_class),
+         acc_phylum = if_else(is.na(acc_phylum), acc_phylum_rep,
+                                acc_phylum),
+         acc_kingdom = if_else(is.na(acc_kingdom), acc_kingdom_rep,
+                                acc_kingdom)) %>% 
   select(-ends_with("rep"))
 
 # check for duplicates
@@ -380,33 +416,33 @@ analysis_taxa2 %>%
   data.frame()
 
 # genera with no analysis group
-# remove if they show up in the taxon or dlist_assignment columns
+# remove if they show up in the taxon or acc_assignment columns
 mntaxa_lookup_genus2 <- mntaxa_lookup_genus %>% 
   anti_join(taxa_crosswalk %>% 
               distinct(taxon)) %>% 
   anti_join(taxa_crosswalk %>% 
-              distinct(dlist_assignment) %>% 
-              rename(taxon = dlist_assignment))
+              distinct(acc_assignment) %>% 
+              rename(taxon = acc_assignment))
 
 # select column
 # add analysis group taxa
 # format hybrid columns
 # add analysis groups
-# add genera - okay to use lookup instead of dlist because these shouldn't be mapped to analysis groups
+# add genera - okay to use lookup instead of acc because these shouldn't be mapped to analysis groups
 mntaxa_lookup2 <- mntaxa_lookup %>% 
-  select(taxon, hybrid, rank, c_value, starts_with("dlist")) %>%
+  select(taxon, hybrid, rank, c_value, starts_with("acc")) %>%
   distinct() %>% 
   left_join(taxa_crosswalk %>% 
               distinct(taxon, analysis_group, analysis_group_includes)) %>% 
   full_join(analysis_taxa2 %>% 
-              select(taxon, hybrid, rank, c_value, starts_with("dlist"), 
+              select(taxon, hybrid, rank, c_value, starts_with("acc"), 
                      analysis_group, analysis_group_includes) %>%
               distinct()) %>% 
   full_join(mntaxa_lookup_genus2 %>% 
-              select(taxon, hybrid, rank, c_value, starts_with("dlist")) %>%
+              select(taxon, hybrid, rank, c_value, starts_with("acc")) %>%
               distinct()) %>% 
   mutate(hybrid = if_else(!is.na(hybrid), 1, 0),
-         dlist_hybrid = if_else(!is.na(dlist_hybrid), 1, 0))
+         acc_hybrid = if_else(!is.na(acc_hybrid), 1, 0))
 
 # for hybrids, crosswalk various versions of the x
 hybrid_crosswalk <- mntaxa_lookup2 %>% 
@@ -415,11 +451,11 @@ hybrid_crosswalk <- mntaxa_lookup2 %>%
   distinct(taxon) %>% 
   rename(taxon_rep = taxon) %>% 
   full_join(mntaxa_lookup2 %>% 
-              filter(dlist_hybrid == 1 & 
-                       (str_detect(dlist_assignment, " x ") | 
-                          str_sub(dlist_assignment, 1, 2) == "x ")) %>% 
-              distinct(dlist_assignment) %>% 
-              rename(taxon_rep = dlist_assignment)) %>% 
+              filter(acc_hybrid == 1 & 
+                       (str_detect(acc_assignment, " x ") | 
+                          str_sub(acc_assignment, 1, 2) == "x ")) %>% 
+              distinct(acc_assignment) %>% 
+              rename(taxon_rep = acc_assignment)) %>% 
   mutate(taxon_1 = str_replace_all(taxon_rep, " x ", " x"),
          taxon_1 = if_else(str_sub(taxon_1, 1, 2) == "x ",
                          sub("^..", "x", taxon_1),
@@ -442,31 +478,31 @@ hybrid_crosswalk <- mntaxa_lookup2 %>%
 get_dupes(hybrid_crosswalk)
 
 # taxa missing phys
-taxa_missing_phys <- filter(mntaxa_lookup2, is.na(dlist_physiognomy)) %>% 
-  distinct(dlist_assignment) %>% 
-  arrange(dlist_assignment) %>% 
+taxa_missing_phys <- filter(mntaxa_lookup2, is.na(acc_physiognomy)) %>% 
+  distinct(acc_assignment) %>% 
+  arrange(acc_assignment) %>% 
   data.frame() %>% 
-  mutate(dlist_physiognomy_rep = case_when(
-    dlist_assignment == "Acer x freemanii" ~ "broadleaf deciduous",
-    dlist_assignment == "Azolla caroliniana" ~ "floating aquatic",
-    dlist_assignment == "Gentiana x pallidocyanea" ~ "forb",
-    dlist_assignment == "Lathyrus sylvestris" ~ "climber/forb",
-    dlist_assignment == "Lycopodium appalachianum x lucidulum" ~ "clubmoss",
-    dlist_assignment == "Lycopodium appalachianum x selago" ~ "clubmoss",
-    dlist_assignment == "Marsilea quadrifolia" ~ 
+  mutate(acc_physiognomy_rep = case_when(
+    acc_assignment == "Acer x freemanii" ~ "broadleaf deciduous",
+    acc_assignment == "Azolla caroliniana" ~ "floating aquatic",
+    acc_assignment == "Gentiana x pallidocyanea" ~ "forb",
+    acc_assignment == "Lathyrus sylvestris" ~ "climber/forb",
+    acc_assignment == "Lycopodium appalachianum x lucidulum" ~ "clubmoss",
+    acc_assignment == "Lycopodium appalachianum x selago" ~ "clubmoss",
+    acc_assignment == "Marsilea quadrifolia" ~ 
       "emergent aquatic/floating aquatic",
-    dlist_assignment == "Pennisetum" ~ "graminoid",
-    dlist_assignment == "Petunia axillaris" ~ "forb",
-    dlist_assignment == "Polystichum lonchitis" ~ "forb"))
+    acc_assignment == "Pennisetum" ~ "graminoid",
+    acc_assignment == "Petunia axillaris" ~ "forb",
+    acc_assignment == "Polystichum lonchitis" ~ "forb"))
 
 # repair physiognomy
 # add strata to trees
 mntaxa_lookup3 <- mntaxa_lookup2 %>% 
   left_join(taxa_missing_phys) %>% 
-  mutate(dlist_physiognomy = if_else(is.na(dlist_physiognomy),
-                                     dlist_physiognomy_rep,
-                                     dlist_physiognomy)) %>% 
-  select(-dlist_physiognomy_rep)
+  mutate(acc_physiognomy = if_else(is.na(acc_physiognomy),
+                                     acc_physiognomy_rep,
+                                     acc_physiognomy)) %>% 
+  select(-acc_physiognomy_rep)
 
 # taxa in floristic tables that aren't in lookup
 mnnpc_floristic_tables %>%
@@ -486,62 +522,62 @@ releve_missing <- crosswalk_raw %>%
   distinct(taxon) %>% 
   anti_join(mntaxa_lookup3)
 
-# add in manual dlist assignments (done in releve_processing)
+# add in manual acc assignments (done in releve_processing)
 releve_missing_groups <- releve_missing %>% 
   inner_join(releve_taxa %>% 
-              select(taxon, starts_with("dlist"), analysis_group) %>% 
+              select(taxon, starts_with("acc"), analysis_group) %>% 
               distinct() %>% 
               mutate(taxon = str_remove(taxon, 
                                         " s\\.s\\.| s\\.l\\.| s\\.a\\."))) %>%
   left_join(mntaxa_lookup3 %>% 
               select(starts_with("analysis_group")) %>% 
               distinct()) %>% 
-  rename(c_value = dlist_c_value) %>% 
+  rename(c_value = acc_c_value) %>% 
   mutate(hybrid = 0,
-         dlist_hybrid = hybrid, # all are NA
+         acc_hybrid = hybrid, # all are NA
          rank = "species group",
-         dlist_rank = "species group",
-         dlist_species = NA_character_,
-         dlist_genus = word(dlist_assignment, 1)) %>%
+         acc_rank = "species group",
+         acc_species = NA_character_,
+         acc_genus = word(acc_assignment, 1)) %>%
   left_join(mntaxa_lookup3 %>% 
-              distinct(dlist_genus, dlist_family, dlist_order, dlist_class,
-                       dlist_phylum, dlist_kingdom)) %>% 
+              distinct(acc_genus, acc_family, acc_order, acc_class,
+                       acc_phylum, acc_kingdom)) %>% 
   select(colnames(mntaxa_lookup3))
 
-# add in dlist info based on genus
+# add in acc info based on genus
 releve_missing_genus <- releve_missing %>% 
   anti_join(releve_missing_groups) %>% 
   filter(str_detect(taxon, "/|\\(") | str_count(taxon, "\\w+") == 1) %>% 
   mutate(taxon_rep = word(taxon, 1, 1)) %>% 
   inner_join(mntaxa_lookup3 %>% 
               rename(taxon_rep = taxon)) %>% 
-  left_join(mntaxa_dlist_pars %>% 
-              distinct(dlist_taxon, c_value) %>% 
-              rename(dlist_assignment = dlist_taxon)) %>% 
+  left_join(mntaxa_acc_pars %>% 
+              distinct(acc_taxon, c_value) %>% 
+              rename(acc_assignment = acc_taxon)) %>% 
   mutate(hybrid = 0, rank = "genus") %>% 
   select(colnames(mntaxa_lookup3))
 
-# add in dlist info based on family
-# use dlist_pars to get the dlist_id
+# add in acc info based on family
+# use acc_pars to get the acc_id
 releve_missing_family <- releve_missing %>% 
   anti_join(releve_missing_groups) %>% 
   anti_join(releve_missing_genus) %>% 
   filter(str_count(taxon, "\\w+") == 1) %>% 
-  mutate(dlist_assignment = word(taxon, 1)) %>% 
-  inner_join(mntaxa_dlist_pars %>% 
-              select(starts_with("dlist"), c_value) %>% 
+  mutate(acc_assignment = word(taxon, 1)) %>% 
+  inner_join(mntaxa_acc_pars %>% 
+              select(starts_with("acc"), c_value) %>% 
               distinct() %>% 
-              rename(dlist_assignment = dlist_taxon)) %>% 
+              rename(acc_assignment = acc_taxon)) %>% 
   left_join(mntaxa %>% 
               distinct(taxon_id, is_hybrid, rank, author, publication) %>% 
               rename(hybrid = is_hybrid,
-                     dlist_id = taxon_id,
-                     dlist_publication = publication)) %>% 
-  mutate(dlist_hybrid = hybrid, # all dlist_hybrid were NA
-         dlist_full_name = paste(dlist_assignment, author),
+                     acc_id = taxon_id,
+                     acc_publication = publication)) %>% 
+  mutate(acc_hybrid = hybrid, # all acc_hybrid were NA
+         acc_full_name = paste(acc_assignment, author),
          analysis_group = NA_character_,
          analysis_group_includes = NA_character_,
-         dlist_id = as.character(dlist_id)) %>% 
+         acc_id = as.character(acc_id)) %>% 
   select(colnames(mntaxa_lookup3))
 
 # remaining
@@ -557,7 +593,7 @@ mntaxa_lookup4 <- mntaxa_lookup3 %>%
   full_join(releve_missing_genus) %>% 
   full_join(releve_missing_family)
 
-# add dlist to taxon list if it has an analysis group
+# add acc to taxon list if it has an analysis group
   # otherwise it's a genus or family that was added just to put 
   # a recommended name on releve taxa
 # remove duplicates with multiple hybrid values
@@ -567,19 +603,19 @@ mntaxa_lookup5 <- mntaxa_lookup4 %>%
               filter(!is.na(analysis_group)) %>% 
               select(-c(taxon, hybrid, rank)) %>% 
               distinct() %>% 
-              mutate(taxon = dlist_assignment,
-                     hybrid = dlist_hybrid,
-                     rank = dlist_rank)) %>%   
+              mutate(taxon = acc_assignment,
+                     hybrid = acc_hybrid,
+                     rank = acc_rank)) %>%   
   group_by(taxon) %>% 
   mutate(hybrid = as.numeric(sum(hybrid) > 0)) %>% 
   ungroup() %>% 
   distinct() %>% 
   mutate(rank = if_else(rank == "species" & str_detect(taxon, "/"),
                         "species group", rank),
-         dlist_rank = if_else(dlist_rank == "species" & 
-                                str_detect(dlist_assignment, "/"),
-                        "species group", dlist_rank)) %>% 
-  rename_with(.fn = ~str_replace(.x, "dlist_", "recommended_")) %>%
+         acc_rank = if_else(acc_rank == "species" & 
+                                str_detect(acc_assignment, "/"),
+                        "species group", acc_rank)) %>% 
+  rename_with(.fn = ~str_replace(.x, "acc_", "recommended_")) %>%
   rename(taxon_name = taxon,
          recommended_taxon_name = recommended_assignment,
          informal_group = recommended_physiognomy,
@@ -621,7 +657,7 @@ load("data-raw/data-out-ak/mnnpc_taxa_lookup.rds")
 load("../RMAVIS/data/accepted_taxa.rda")
 head(accepted_taxa)
 
-# dlist ID and name
+# acc ID and name
 mnnpc_accepted_taxa <- mnnpc_taxa_lookup %>% 
   distinct(recommended_taxon_name) %>% 
   rename(taxon_name = recommended_taxon_name) %>% 
