@@ -12,29 +12,22 @@ library(khroma)
 library(polylabelr)
 
 # import data
-crosswalk <- read_csv("../../intermediate-data/crosswalk_table_formatted_20251224a.csv",
-                      guess_max = Inf) 
-crosswalk_raw <- read_csv("../../intermediate-data/crosswalk_raw_no_dups_20251224a.csv",
-                          guess_max = Inf)
-releve <- read_csv("../../intermediate-data/releve_table_formatted_20251224a.csv")
-stcroix <- read_excel("../../data/duxbury_deer_releve_data_working.xlsx")
-resample <- read_excel("../../../releve-resample/data/releve_list_southern_20251120.xlsx")
-mntaxa_lookup <- read_csv("../../intermediate-data/mntaxa_lookup_20251214.csv")
-mntaxa <- read_csv("../../intermediate-data/mntaxa_taxa_20251214.csv")
-mntaxa_dlist <- read_csv("../../intermediate-data/mntaxa_synonymies_20251214.csv")
-analysis_codes <- read_csv("../../intermediate-data/analysis_codes_20251214.csv")
-releve_taxa <- read_csv("../../intermediate-data/releve_taxa_formatted_20251214a.csv")
-mntaxa_lookup_genus <- read_csv("../../intermediate-data/mntaxa_lookup_genera_20251214.csv")
-mntaxa_dlist_pars <- read_csv("../../intermediate-data/mntaxa_dlist_parents_20251224.csv")
+load("data-raw/data-out-ak/releve_species_grouped_data.rds")
+load("data-raw/data-out-ak/releve_species_ungrouped_data.rds")
+load("data-raw/data-out-ak/releve_plot_data.rds")
+
+
+# mntaxa_lookup <- read_csv("../../intermediate-data/mntaxa_lookup_20251214.csv")
+# mntaxa <- read_csv("../../intermediate-data/mntaxa_taxa_20251214.csv")
+# mntaxa_dlist <- read_csv("../../intermediate-data/mntaxa_synonymies_20251214.csv")
+# analysis_codes <- read_csv("../../intermediate-data/analysis_codes_20251214.csv")
+# releve_taxa <- read_csv("../../intermediate-data/releve_taxa_formatted_20251214a.csv")
+# mntaxa_lookup_genus <- read_csv("../../intermediate-data/mntaxa_lookup_genera_20251214.csv")
+# mntaxa_dlist_pars <- read_csv("../../intermediate-data/mntaxa_dlist_parents_20251224.csv")
 ecs_sec_sf <- st_read("V:/gdrs/data/pub/us_mn_state_dnr/geos_ecological_class_system/fgdb/geos_ecological_class_system.gdb", 
                       "ecs_sections_of_mn_v99a")
 
 #### format releve data ####
-
-# system info
-npc_systems <- releve %>% 
-  distinct(npc_system_id, npc_system) %>% 
-  mutate(npc_system = str_to_title(npc_system))
 
 # section info
 ecs_sections <- tibble(ecs_secabb = c("LAP",
@@ -57,21 +50,6 @@ ecs_sections <- tibble(ecs_secabb = c("LAP",
                                        "Red River Valley",
                                        "Southern Superior Uplands",
                                        "Western Superior Uplands"))
-
-# add NPC and section info
-releve2 <- releve %>%
-  select(-npc_system) %>% 
-  mutate(npc_class = str_sub(npc_code, 1, 5),
-         npc_type = if_else(nchar(npc_code) > 5, str_sub(npc_code, 1, 6),
-                            NA_character_),
-         npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
-                               NA_character_),
-         npc_system_id = if_else(str_detect(npc_system_id, "_|\\/"),
-                                 npc_system_id,
-                                 str_sub(npc_system_id, 1, 2)),
-         npc_sys_flor = str_sub(npc_code, 1, 3)) %>% 
-  left_join(npc_systems) %>% 
-  left_join(ecs_sections)
 
 # add classification
 # format species names
@@ -969,126 +947,6 @@ mnnpc_community_attributes %>%
 save(mnnpc_community_attributes, 
      file = "data-raw/data-out-ak/mnnpc_community_attributes.rds")
 load("data-raw/data-out-ak/mnnpc_community_attributes.rds")
-
-
-#### example data and releve ####
-
-# need to load MNNPC objects, see top of community attributes section
-
-# look at example
-load("../RMAVIS/data/example_data.rda")
-head(example_data$`Newborough Warren`)
-
-# get releves from database
-rel_ex1 <- releve2 %>%
-  filter(relnumb %in% stcroix$RELNO) %>%
-  transmute(group = case_when(is.na(place_name) ~ "Control",
-                              str_detect(place_name, "Outside Exclosure") ~ 
-                                "Outside Exclosure",
-                              str_detect(place_name, "Exclosure") ~ 
-                                "Inside Exclosure"),
-            year = if_else(group == "Control", 2004, year(date_)), # artificially set same initial year for all
-            year = as.integer(year),
-            quadrat = if_else(!is.na(original_releve_nbr), original_releve_nbr,
-                              relnumb),
-            relnumb = relnumb) %>% 
-  relocate(year)
-
-# format resample data
-resample2 <- resample %>%
-  filter(str_detect(npc, "MHs38|MHs39")) %>% 
-  rename(quadrat = orig_relnumb) %>% 
-  full_join(resample %>%
-              filter(str_detect(npc, "MHs38|MHs39")) %>% 
-              select(-relnumb) %>% 
-              rename(relnumb = orig_relnumb) %>% 
-              mutate(quadrat = relnumb)) %>% 
-  mutate(group = if_else(str_detect(npc, "MHs38"), "Oak-Basswood Group", 
-                         "Maple-Basswood Group"))
-
-rel_ex2 <- releve2 %>% 
-  inner_join(resample2 %>% 
-               select(relnumb, group, quadrat)) %>% 
-  transmute(year = year(date_),
-            year = if_else(year < 2018, 1990, year),  # artificially set same initial year for all
-            year = as.integer(year),
-            group = group,
-            quadrat = quadrat,
-            relnumb = relnumb)
-
-# get taxa from database
-# convert hybrid names
-rel_tax1a <- rel_ex1 %>% 
-  inner_join(crosswalk_raw %>%
-               distinct(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
-  select(-relnumb) %>% 
-  rename(relnumb = quadrat,
-         scov = scov_mid) %>% 
-  filter(!is.na(scov)) %>%
-  left_join(mnnpc_hybrid_crosswalk) %>%
-  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon),
-         relnumb = as.numeric(as.factor(relnumb))) %>%
-  select(-taxon_rep)
-
-# remove taxa that don't have accepted names
-# separate this step so that example releve has taxa without accepted names
-rel_tax1b <- rel_tax1a %>%
-  inner_join(mnnpc_taxa_lookup %>%
-               filter(!is.na(recommended_taxon_name)) %>% 
-               select(taxon_name) %>%
-               rename(taxon = taxon_name))
-
-rel_tax2 <- rel_ex2 %>% 
-  inner_join(crosswalk_raw %>%
-               select(relnumb, physcode, minht, maxht, taxon, scov_mid)) %>% 
-  select(-relnumb) %>% 
-  rename(relnumb = quadrat,
-         scov = scov_mid) %>% 
-  filter(!is.na(scov)) %>%
-  left_join(mnnpc_hybrid_crosswalk) %>%
-  mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon),
-         relnumb = as.numeric(as.factor(relnumb))) %>%
-  select(-taxon_rep) %>%
-  inner_join(mnnpc_taxa_lookup %>%
-               filter(!is.na(recommended_taxon_name)) %>% 
-               select(taxon_name) %>%
-               rename(taxon = taxon_name))
-
-# check
-count(rel_tax1a, year, group, relnumb)
-count(rel_tax2, year, group, relnumb) %>% 
-  arrange(relnumb, year, group) %>% 
-  data.frame()
-
-# add species
-mnnpc_example_data <- list("St. Croix State Forest" = rel_tax1b %>%
-                             as.data.frame(),
-                           "Earthworm-Invaded Forests" = rel_tax2 %>% 
-                             as.data.frame())
-
-# check for NAs
-mnnpc_example_data$`St. Croix State Forest` %>%
-  filter(if_any(everything(), is.na))
-
-mnnpc_example_data$`Earthworm-Invaded Forests` %>%
-  filter(if_any(everything(), is.na))
-
-# check structure
-str(mnnpc_example_data$`St. Croix State Forest`)
-str(mnnpc_example_data$`Earthworm-Invaded Forests`)
-
-# save
-save(mnnpc_example_data, file = "data-raw/data-out-ak/mnnpc_example_data.rds")
-load("data-raw/data-out-ak/mnnpc_example_data.rds")
-
-# select one releve for formatting example
-# allow taxa without accepted names
-mnnpc_example_releve <- rel_tax1a %>% 
-  filter(relnumb == 1)
-
-# save
-save(mnnpc_example_releve, file = "data-raw/data-out-ak/mnnpc_example_releve.rds")
-load("data-raw/data-out-ak/mnnpc_example_releve.rds")
 
 
 #### data for testing ####

@@ -135,7 +135,7 @@ process_dnr_releves <- function(releve_data,
     if("outside_of_plot" %in% names(dat2)){
       
       dat2 <- dat2 |>
-        dplyr::mutate(scov = ifelse(outside_of_plot == 1 & 
+        dplyr::mutate(scov = ifelse(outside_of_plot %in% c(1, "t", "T", TRUE) & 
                                       !(physcode %in% c("D", "E") & 
                                           maxht >= 5), 
                                     0.1, scov))
