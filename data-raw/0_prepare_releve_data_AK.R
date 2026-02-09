@@ -10,8 +10,6 @@ load("../npc-releve/data/originals-20260208/spatial_releve.rds")
 load("../npc-releve/data/originals-20260208/spatial_ecs_subsec.rds")
 load("../npc-releve/data/originals-20260208/mntaxa_taxa.rds")
 load("../npc-releve/data/originals-20260208/mntaxa_accepted.rds")
-releve_mask <- read.csv("../npc-releve/data/releve_masking_crosswalk_20260208.csv") %>%
-  mutate(relnumb = as.character(relnumb))
 
 #### load packages ####
 
@@ -93,21 +91,22 @@ subsec_include <- c() # ECS subsection names
 
 #### import data ####
 
-# connect to database
-db_con <- odbcConnect("Releve")
-
-# load data
-releve <- sqlFetch(db_con, "vw_releve_export") %>% as_tibble()
-crosswalk <- sqlFetch(db_con, "vw_rel_data_crosswalk") %>% as_tibble()
-
-# close database connection
-close(db_con)
-
-# import supporting data
-ecs_subsec <- st_read("V:/gdrs/data/pub/us_mn_state_dnr/geos_ecological_class_system/fgdb/geos_ecological_class_system.gdb", 
-                      "ecs_subsections_of_mn_v99a")
-spat_releve <- st_read ("V:/gdrs/data/org/us_mn_state_dnr/biota_dnr_releve_sites/fgdb/biota_dnr_releve_sites.gdb",
-                        "dnr_releve_sites")
+# # connect to database
+# db_con <- odbcConnect("Releve")
+# 
+# # load data
+# releve <- sqlFetch(db_con, "vw_releve_export") %>% as_tibble()
+# crosswalk <- sqlFetch(db_con, "vw_rel_data_crosswalk") %>% as_tibble()
+# 
+# # close database connection
+# close(db_con)
+# 
+# # import supporting data
+# ecs_subsec <- st_read("V:/gdrs/data/pub/us_mn_state_dnr/geos_ecological_class_system/fgdb/geos_ecological_class_system.gdb", 
+#                       "ecs_subsections_of_mn_v99a")
+# spat_releve <- st_read ("V:/gdrs/data/org/us_mn_state_dnr/biota_dnr_releve_sites/fgdb/biota_dnr_releve_sites.gdb",
+#                         "dnr_releve_sites")
+systems <- read_csv("../npc-releve/data/npc_systems.csv")
 
 
 #### format supporting tables ####
@@ -987,11 +986,14 @@ crosswalk11_prepared <- crosswalk11 %>%
   summarize(scov = sum(scov_mid, na.rm = T),
             .groups = "drop")
 
-# get system names
-systems <- read_csv("../npc-releve/data/npc_systems.csv")
-
-# mask releve numbers and select required info
+# mask releve numbers
+# add system names that match first two letters (groups alder swamps up)
+# select required info
+# format npc names
 releve7 <- releve6 %>%
+  mutate(npc_system_id = if_else(str_detect(npc_system_id, "_|\\/"),
+                                 npc_system_id,
+                                 str_sub(npc_system_id, 1, 2))) %>% 
   left_join(systems) %>%
   select(relnumb, used_in_fieldguide, npc_system_id, npc_system, npc_code, 
          npc_class_name, npc_type_name, npc_subtype_name, ecs_secname) %>%
@@ -1004,9 +1006,6 @@ releve7 <- releve6 %>%
                             NA_character_),
          npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
                                NA_character_),
-         npc_system_id = if_else(str_detect(npc_system_id, "_|\\/"),
-                                 npc_system_id,
-                                 str_sub(npc_system_id, 1, 2)),
          npc_sys_flor = str_sub(npc_code, 1, 3),
          npc_system = str_to_title(npc_system)) %>%
   relocate(ecs_secname, .after = last_col())
