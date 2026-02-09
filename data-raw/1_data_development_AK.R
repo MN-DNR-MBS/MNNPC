@@ -653,6 +653,11 @@ mntaxa_groups3 <- mntaxa_groups2 %>%
 # check that it worked
 get_dupes(mntaxa_groups3, taxon)
 
+# make sure all original taxa are there
+mntaxa_groups %>% 
+  distinct(taxon) %>% 
+  anti_join(mntaxa_groups3)
+
 # make sure all taxa from floristic tables are included
 mnnpc_floristic_tables %>% 
   transmute(analysis_group = str_remove(npc_taxon_name, " understory") %>% 
@@ -682,9 +687,9 @@ mntaxa_lookup <- lookup_mntaxa(taxonomy_levels = TRUE,
                             common = FALSE,
                             cvals = FALSE,
                             exclude = FALSE,
-                            replace_sub_var = FALSE,
-                            replace_family = FALSE,
-                            replace_genus = FALSE,
+                            replace_sub_var = TRUE,
+                            replace_family = TRUE,
+                            replace_genus = TRUE,
                             drop_higher = FALSE,
                             higher_include = c("Belonia", 
                                                "Chara", 
@@ -758,7 +763,11 @@ crosswalk_taxa_notaccepted %>%
 # missing informal group
 filter(mntaxa_lookup2, is.na(informal_group)) %>% 
   count(recommended_rank)
-# all are family or genus
+# all are family
+
+# combined accepted taxa
+filter(mntaxa_lookup2, str_detect(recommended_taxon_name, "\\/")) %>% 
+  distinct(recommended_taxon_name)
 
 # format columns for look-up table
 mnnpc_taxa_lookup <- mntaxa_lookup2 %>%
