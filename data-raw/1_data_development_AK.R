@@ -60,6 +60,9 @@ releve <- releve_plots %>%
 spec_grp <- releve_species_grouped %>%
   inner_join(releve)
 
+spec_raw <- releve_species_ungrouped %>%
+  inner_join(releve)
+
 # are all classified to class?
 sort(unique(releve$npc_class)) # yes
          

@@ -11,10 +11,12 @@ load("../npc-releve/data/originals-20260208/spatial_ecs_subsec.rds")
 load("../npc-releve/data/originals-20260208/mntaxa_taxa.rds")
 load("../npc-releve/data/originals-20260208/mntaxa_accepted.rds")
 
+# data importing functions and calls below have been commented out
+
 #### load packages ####
 
 # install mntaxa (development)
-pak::pak("MN-DNR-MBS/mntaxa", upgrade = T)
+# pak::pak("MN-DNR-MBS/mntaxa", upgrade = T)
 
 library(mntaxa)
 library(RODBC)
@@ -409,10 +411,10 @@ crosswalk6 <- crosswalk5 %>%
 
 #### resolve duplicate taxa within releve strata ####
 
-# mntaxa taxa
-mntaxa_taxa <- taxa_mntaxa(taxonomy_levels = T,
-                           sources = F,
-                           releve = T)
+# # mntaxa taxa
+# mntaxa_taxa <- taxa_mntaxa(taxonomy_levels = T,
+#                            sources = F,
+#                            releve = T)
 
 # add rank
 # round dates
@@ -606,33 +608,33 @@ crosswalk9 <- crosswalk8 %>%
 
 #### add taxonomic and analysis groups ####
 
-# get taxonomic groups with strata codes
-mntaxa_acc <- lookup_mntaxa(taxonomy_levels = F,
-                            sources = F,
-                            releve = T,
-                            phys = F,
-                            strata = T,
-                            origin = F,
-                            common = F,
-                            cvals = F,
-                            exclude = F,
-                            replace_sub_var = T,
-                            replace_family = T,
-                            replace_genus = T,
-                            drop_higher = T, 
-                            higher_include = c("Belonia", 
-                                               "Chara", 
-                                               "Lychnothamnus", 
-                                               "Nitella", 
-                                               "Nitellopsis", 
-                                               "Spirogyra", 
-                                               "Tolypella"),
-                            excluded_duplicates = T, 
-                            clean_duplicates = F, 
-                            group_accepted = T, 
-                            group_analysis = T) %>%
-  rename(taxon_name = taxon) %>%
-  select(-rank) # already added with mntaxa
+# # get taxonomic groups with strata codes
+# mntaxa_acc <- lookup_mntaxa(taxonomy_levels = F,
+#                             sources = F,
+#                             releve = T,
+#                             phys = F,
+#                             strata = T,
+#                             origin = F,
+#                             common = F,
+#                             cvals = F,
+#                             exclude = F,
+#                             replace_sub_var = T,
+#                             replace_family = T,
+#                             replace_genus = T,
+#                             drop_higher = T, 
+#                             higher_include = c("Belonia", 
+#                                                "Chara", 
+#                                                "Lychnothamnus", 
+#                                                "Nitella", 
+#                                                "Nitellopsis", 
+#                                                "Spirogyra", 
+#                                                "Tolypella"),
+#                             excluded_duplicates = T, 
+#                             clean_duplicates = F, 
+#                             group_accepted = T, 
+#                             group_analysis = T) %>%
+#   rename(taxon_name = taxon) %>%
+#   select(-rank) # already added with mntaxa
 
 # add MNtaxa accepted names, analysis groups, and physcode
 crosswalk10 <- crosswalk9 %>%
@@ -871,8 +873,11 @@ rel_ex1 <- releve6 %>%
                                 "Outside Exclosure",
                               str_detect(place_name, "Exclosure") ~ 
                                 "Inside Exclosure"),
-            year = if_else(group == "Control", 2004, year(date_)), # artificially set same initial year for all
-            year = as.integer(year),
+            year = year(date_), # artificially set same initial year for all
+            year = case_when(year <= 2004 ~ 1,
+                             year <= 2010 ~ 2,
+                             TRUE ~ 3) %>% 
+              as.integer(),
             relnumb_orig = if_else(!is.na(original_releve_nbr), 
                                    original_releve_nbr,
                                    relnumb),
@@ -895,8 +900,8 @@ rel_ex2 <- releve6 %>%
   inner_join(resample2 %>% 
                select(relnumb_orig, relnumb, group)) %>% 
   transmute(year = year(date_),
-            year = if_else(year < 2018, 1990, year),  # artificially set same initial year for all
-            year = as.integer(year),
+            year = if_else(year < 2018, 1, 2) %>% 
+              as.integer(),  
             group = group,
             relnumb_orig = relnumb_orig,
             relnumb = relnumb)
@@ -1027,10 +1032,10 @@ save(releve_species_ungrouped,
      file = "data-raw/data-out-ak/releve_species_ungrouped_data.rds")
 save(releve_plots, file = "data-raw/data-out-ak/releve_plot_data.rds")
 
-# save original data in case needed
-save(crosswalk, file = "../npc-releve/data/originals-20260208/crosswalk.rds")
-save(releve, file = "../npc-releve/data/originals-20260208/releve.rds")
-save(spat_releve, file = "../npc-releve/data/originals-20260208/spatial_releve.rds")
-save(ecs_subsec, file = "../npc-releve/data/originals-20260208/spatial_ecs_subsec.rds")
-save(mntaxa_taxa, file = "../npc-releve/data/originals-20260208/mntaxa_taxa.rds")
-save(mntaxa_acc, file = "../npc-releve/data/originals-20260208/mntaxa_accepted.rds")
+# # save original data in case needed
+# save(crosswalk, file = "../npc-releve/data/originals-20260208/crosswalk.rds")
+# save(releve, file = "../npc-releve/data/originals-20260208/releve.rds")
+# save(spat_releve, file = "../npc-releve/data/originals-20260208/spatial_releve.rds")
+# save(ecs_subsec, file = "../npc-releve/data/originals-20260208/spatial_ecs_subsec.rds")
+# save(mntaxa_taxa, file = "../npc-releve/data/originals-20260208/mntaxa_taxa.rds")
+# save(mntaxa_acc, file = "../npc-releve/data/originals-20260208/mntaxa_accepted.rds")
