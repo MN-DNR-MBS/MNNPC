@@ -4,7 +4,7 @@
 rm(list = ls())
 
 # install mntaxa (development)
-pak::pak("MN-DNR-MBS/mntaxa", upgrade = T)
+pak::pak("MN-DNR-MBS/mntaxa")
 
 # load packages
 library(tidyverse)
@@ -22,7 +22,6 @@ load("data-raw/data-out-ak/releve_plot_data.rds")
 load("../npc-releve/data/originals-20260208/crosswalk.rds")
 ecs_sec_sf <- st_read("V:/gdrs/data/pub/us_mn_state_dnr/geos_ecological_class_system/fgdb/geos_ecological_class_system.gdb", 
                       "ecs_sections_of_mn_v99a")
-
 
 
 #### format releve data ####
@@ -732,6 +731,7 @@ mntaxa_lookup2 <- mntaxa_lookup %>%
          recommended_scientific_name = acc_full_name,
          recommended_id = acc_taxon_id,
          recommended_publication = acc_publication,
+         recommended_stratacode = acc_stratacode,
          acc_physcode) %>% 
   separate_rows(acc_physcode, sep = "/") %>% 
   left_join(phys_codes_raw %>% 
@@ -740,9 +740,14 @@ mntaxa_lookup2 <- mntaxa_lookup %>%
   group_by(across(c(taxon_name, starts_with("recommended")))) %>% 
   summarize(informal_group = paste(sort(unique(informal_group)), 
                                    collapse = "/"),
+            recommended_physcode = paste(sort(unique(acc_physcode)), 
+                                         collapse = "/"),
             .groups = "drop") %>% 
   mutate(informal_group = if_else(informal_group == "", NA_character_,
-                                  informal_group))
+                                  informal_group),
+         recommended_physcode = if_else(recommended_physcode == "", 
+                                        NA_character_,
+                                        recommended_physcode))
 
 # check that all releve taxa are included (strip suffixes, crosswalk hybrids)
 crosswalk_taxa_notaccepted <- crosswalk %>% 
@@ -779,6 +784,7 @@ mnnpc_taxa_lookup <- mntaxa_lookup2 %>%
                      recommended_assignment = acc_assignment, 
                      analysis_group)) %>% 
   arrange(taxon_name) %>%
+  relocate(informal_group) %>% 
   as.data.frame()
 
 # check for duplicates
@@ -786,8 +792,9 @@ get_dupes(mnnpc_taxa_lookup, taxon_name)
 
 # missing data
 mnnpc_taxa_lookup %>%
-  filter(if_any(everything(), is.na)) %>% 
+  filter(if_any(-recommended_stratacode, is.na)) %>% 
   count(recommended_rank)
+# all above species
 
 # save lookup
 save(mnnpc_taxa_lookup, file = "data-raw/data-out-ak/mnnpc_taxa_lookup.rds")
@@ -835,7 +842,6 @@ mnnpc_taxonomic_backbone <- mntaxa_backbone %>%
 # check for duplicates
 get_dupes(mnnpc_taxonomic_backbone, taxon_name)
 # higher levels that are combined together or omitted from analyses
-
 
 # check that all taxa are included
 mnnpc_accepted_taxa %>% 

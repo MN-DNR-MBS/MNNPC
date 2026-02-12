@@ -773,12 +773,10 @@ if(stratify == "none"){
     filter((minht >= strata_lower & minht <= strata_upper) | # select all overlap between observed and desired strata
              (strata_lower >= minht & strata_lower <= maxht) |
              (strata_lower == 1 & strata_upper == 8)) %>%
-    mutate(maxht = case_when(is.na(maxht) & physcode %in% c("M", "L") ~ 1, # add heights for mosses & lichens
-                             is.na(maxht) & strata_upper == 8 & strata_lower == 1 ~ 8, # add heights for missing values
-                             TRUE ~ maxht),
-           minht = case_when(is.na(minht) & physcode %in% c("M", "L") ~ 1,
-                             is.na(minht) & strata_upper == 8 & strata_lower == 1 ~ 1,
-                             TRUE ~ minht)) %>%
+    mutate(minht = ifelse(is.na(minht) & strata_lower == 1 &
+                            strata_upper == 8, 1, minht),
+           maxht = ifelse(is.na(maxht) & strata_lower == 1 &
+                            strata_upper == 8, 8, maxht)) %>%
     left_join(ht_conv %>%
                 rename(minht = ht) %>%
                 select(minht, ht_min_m)) %>%

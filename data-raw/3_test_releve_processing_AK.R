@@ -1,20 +1,28 @@
 #### import data ####
 
 # import data
-crosswalk_pre <- read.csv("../../intermediate-data/crosswalk_table_formatted_20251224a.csv")
-crosswalk_raw <- read.csv("../../intermediate-data/crosswalk_raw_no_dups_20251224a.csv")
-releve <- read.csv("../../intermediate-data/releve_table_formatted_20251224a.csv")
-
-# example data
-load("data-raw/data-out-ak/mnnpc_example_data.rds")
-resample <- readxl::read_excel("../../../releve-resample/data/releve_list_southern_20251120.xlsx")
+load("data-raw/data-out-ak/releve_species_grouped_data.rds")
+load("data-raw/data-out-ak/releve_species_ungrouped_data.rds")
+load("data-raw/data-out-ak/releve_plot_data.rds")
+load("../npc-releve/data/originals-20260208/crosswalk.rds")
 
 # remove everything except above
-rm(list = ls()[!ls() %in% c("crosswalk_raw", "crosswalk_pre", "releve",
+rm(list = ls()[!ls() %in% c("crosswalk",
+                            "releve_plots", 
+                            "releve_species_grouped",
+                            "releve_species_ungrouped",
                             "resample")])
 
-# load objects from package
-devtools::load_all()
+# load finalized objects
+#devtools::load_all()
+
+# load recent objects
+load("data-raw/data-out-ak/mnnpc_hybrid_crosswalk.rds")
+load("data-raw/data-out-ak/mnnpc_taxa_lookup.rds")
+load("data-raw/data-out-ak/mnnpc_example_data.rds")
+load("data/mnnpc_bb_conv.rda")
+load("data/mnnpc_strata.rda")
+load("data/mnnpc_ht_conv.rda")
 
 
 #### test parameters ####
@@ -23,7 +31,7 @@ devtools::load_all()
 n_test <- 5
 
 # randomly select releves
-rels <- sample(releve$relnumb, n_test)
+rels <- sample(releve_plots$relnumb, n_test)
 
 # relnumb will match to crosswalk tables
 # make up year and group
@@ -36,16 +44,16 @@ parms <- data.frame(relnumb = rels,
 
 # select releve to test
 # add columns
-dat_raw <- crosswalk_raw |>
-  dplyr::select(relnumb, physcode, minht, maxht, pcov, taxon, relid, scov_mid,
+dat_raw <- crosswalk |>
+  dplyr::select(relnumb, physcode, minht, maxht, pcov, taxon, relid, scov,
                 outside_of_plot) |>
   dplyr::inner_join(parms) |>
-  dplyr::rename(scov = scov_mid)
+  dplyr::rename(scov = scov)
 
 
 #### process data ####
 
-dat_proc <- process_dnr_releves(dat_raw, cover_scale = "percentage")
+dat_proc <- process_dnr_releves(dat_raw, cover_scale = "braunBlanquet")
 
 
 #### pre-processed data ####
@@ -53,12 +61,12 @@ dat_proc <- process_dnr_releves(dat_raw, cover_scale = "percentage")
 # select releves
 # add columns
 # format to match processed data
-dat_val <- crosswalk_pre |>
+dat_val <- releve_species_grouped |>
   dplyr::inner_join(parms) |>
-  dplyr::select(year, group, relnumb, analysis_group_strata, scov_adj) |>
+  dplyr::select(year, group, relnumb, analysis_group_strata, scov) |>
   dplyr::arrange(year, group, relnumb, analysis_group_strata)|>
   dplyr::rename(Year = year, Group = group, Quadrat = relnumb,
-                Species = analysis_group_strata, Cover = scov_adj)
+                Species = analysis_group_strata, Cover = scov)
 
 
 #### compare ####
