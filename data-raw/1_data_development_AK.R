@@ -4,7 +4,7 @@
 rm(list = ls())
 
 # install mntaxa (development)
-pak::pak("MN-DNR-MBS/mntaxa")
+pak::pak("MN-DNR-MBS/mntaxa", upgrade = T)
 
 # load packages
 library(tidyverse)
@@ -720,6 +720,7 @@ load_mntaxa(
   common = FALSE,
   cvals = FALSE,
   exclude = FALSE,
+  source = "package",
   envir = .GlobalEnv
 )
 
