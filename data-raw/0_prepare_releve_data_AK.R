@@ -8,15 +8,13 @@ load("../npc-releve/data/originals-20260208/crosswalk.rds")
 load("../npc-releve/data/originals-20260208/releve.rds")
 load("../npc-releve/data/originals-20260208/spatial_releve.rds")
 load("../npc-releve/data/originals-20260208/spatial_ecs_subsec.rds")
-load("../npc-releve/data/originals-20260208/mntaxa_taxa.rds")
-load("../npc-releve/data/originals-20260208/mntaxa_accepted.rds")
 
 # data importing functions and calls below have been commented out
 
 #### load packages ####
 
 # install mntaxa (development)
-# pak::pak("MN-DNR-MBS/mntaxa", upgrade = T)
+pak::pak("MN-DNR-MBS/mntaxa", upgrade = T)
 
 library(mntaxa)
 library(RODBC)
@@ -203,16 +201,22 @@ releve2 <- releve %>%
          npc_code_orig = npc_code) %>% 
   left_join(npc_code_corrections) %>% 
   mutate(npc_code = if_else(!is.na(npc_code_rep), npc_code_rep, npc_code_orig),
+         npc_system_id =  if_else(str_detect(npc_code, "_|\\/"),
+                                  npc_code,
+                                  str_sub(npc_code, 1, 2))) %>% 
+  left_join(systems) %>% 
+  mutate(npc_system = str_to_title(npc_system),
+         npc_sys_flor = str_sub(npc_code, 1, 3),
+         npc_class = str_sub(npc_code, 1, 5),
          npc_class_name = if_else(!is.na(npc_class_name_rep), 
                                   npc_class_name_rep, npc_class_name),
+         npc_type = if_else(nchar(npc_code) > 5, str_sub(npc_code, 1, 6),
+                            NA_character_),
          npc_type_name = if_else(!is.na(npc_type_name_rep), npc_type_name_rep, 
                                  npc_type_name),
-         npc_system_id = case_when(str_detect(npc_code, "_|/") ~ npc_code,
-                                   str_sub(npc_code, 1, 4) %in% c("APn8", "APn9") ~ 
-                                     str_sub(npc_code, 1, 4),
-                                   str_sub(npc_code, 1, 5) == "WFn74" ~ "WFn74",
-                                   str_sub(npc_code, 1, 5) == "FPn73" ~ "FPn73",
-                                   TRUE ~ str_sub(npc_code, 1, 2))) %>%
+         npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
+                               NA_character_)
+         ) %>%
   select(-c(npc_code_rep, npc_class_name_rep, npc_type_name_rep)) %>% 
   rename(relnumb = dnr_releve_nbr) %>%
   filter(relnumb %in% releve_include & relnumb != "5307")
@@ -411,10 +415,10 @@ crosswalk6 <- crosswalk5 %>%
 
 #### resolve duplicate taxa within releve strata ####
 
-# # mntaxa taxa
-# mntaxa_taxa <- taxa_mntaxa(taxonomy_levels = T,
-#                            sources = F,
-#                            releve = T)
+# mntaxa taxa
+mntaxa_taxa <- taxa_mntaxa(taxonomy_levels = T,
+                           sources = F,
+                           releve = T)
 
 # add rank
 # round dates
@@ -596,57 +600,48 @@ crosswalk8 <- crosswalk7 %>%
   full_join(crosswalk_dups_res)
 
 
-#### select taxa in crosswalk table ####
-
-# remove taxa based on reliability
-# convert missing cover to 0 
-# (will sometimes remove missing cover, but RMAVIS has presence/absence analyses)
-crosswalk9 <- crosswalk8 %>%
-  filter(relid <= relid_thresh) %>%  # remove observations with poor reliability
-  mutate(scov_mid = replace_na(scov_mid, 0)) # remove observations with no cover
-
-
 #### add taxonomic and analysis groups ####
 
-# # get taxonomic groups with strata codes
-# mntaxa_acc <- lookup_mntaxa(taxonomy_levels = F,
-#                             sources = F,
-#                             releve = T,
-#                             phys = F,
-#                             strata = T,
-#                             origin = F,
-#                             common = F,
-#                             cvals = F,
-#                             exclude = F,
-#                             replace_sub_var = T,
-#                             replace_family = T,
-#                             replace_genus = T,
-#                             drop_higher = T, 
-#                             higher_include = c("Belonia", 
-#                                                "Chara", 
-#                                                "Lychnothamnus", 
-#                                                "Nitella", 
-#                                                "Nitellopsis", 
-#                                                "Spirogyra", 
-#                                                "Tolypella"),
-#                             excluded_duplicates = T, 
-#                             clean_duplicates = F, 
-#                             group_accepted = T, 
-#                             group_analysis = T) %>%
-#   rename(taxon_name = taxon) %>%
-#   select(-rank) # already added with mntaxa
+# get taxonomic groups with strata codes
+mntaxa_acc <- lookup_mntaxa(taxonomy_levels = F,
+                            sources = F,
+                            releve = T,
+                            phys = F,
+                            strata = T,
+                            origin = F,
+                            common = F,
+                            cvals = F,
+                            exclude = F,
+                            replace_sub_var = T,
+                            replace_family = T,
+                            replace_genus = T,
+                            drop_higher = T,
+                            higher_include = c("Belonia",
+                                               "Chara",
+                                               "Lychnothamnus",
+                                               "Nitella",
+                                               "Nitellopsis",
+                                               "Spirogyra",
+                                               "Tolypella"),
+                            excluded_duplicates = T,
+                            clean_duplicates = F,
+                            group_accepted = T,
+                            group_analysis = T) %>%
+  rename(taxon_name = taxon) %>%
+  select(-rank) # already added with mntaxa_taxa
 
 # add MNtaxa accepted names, analysis groups, and physcode
-crosswalk10 <- crosswalk9 %>%
+crosswalk9 <- crosswalk8 %>%
   select(-analysis_group) %>%
   inner_join(mntaxa_acc) %>%
-  mutate(physcode = if_else(!is.na(acc_physcode), acc_physcode, physcode))
+  mutate(physcode_orig = physcode,
+         physcode = if_else(!is.na(acc_physcode), acc_physcode, physcode))
 
 # taxa removed
-releve_taxa_removed <- crosswalk9 %>% 
+releve_taxa_removed <- crosswalk8 %>% 
   distinct(relnumb, taxon_id, taxon, rank) %>% 
-  anti_join(crosswalk10) %>% 
-  left_join(crosswalk9 %>%
+  anti_join(crosswalk9) %>% 
+  left_join(crosswalk8 %>%
               distinct(relnumb, taxon_id, taxon, physcode)) %>%
   arrange(taxon)
 
@@ -677,34 +672,21 @@ releve_taxa_removed %>%
   count(physcode)
 
 
-#### filter physcode ####
+#### filter physcode and reliability ####
 
 # pattern for combined physcodes
 phys_pattern <- paste0("\\b(", paste(physcode_include, collapse = "|"), ")\\b")
 
 # filter
-crosswalk11 <- crosswalk10 %>%
-  filter(str_detect(physcode, phys_pattern))
+crosswalk10 <- crosswalk9 %>%
+  filter(str_detect(physcode, phys_pattern) &
+           relid <= relid_thresh)
 
 # see omitted physcodes
-crosswalk10 %>%
-  anti_join(crosswalk11) %>%
+crosswalk9 %>%
+  anti_join(crosswalk10) %>%
   count(physcode)
 # A
-
-
-#### summarize by analysis code and/or species ####
-
-# summarize by analysis code within strata
-# sum scov_mid across species and inside/outside of plot for each analysis code
-crosswalk12 <- crosswalk11 %>%
-  group_by(relnumb, physcode, minht, maxht, analysis_group) %>% # took out pcov
-  summarize(outside_of_plot = paste(unique(outside_of_plot), collapse = ", "),
-            scov_mid = sum(scov_mid, na.rm = T),
-            acc_stratacode = paste(sort(unique(acc_stratacode)), collapse = "/"),
-            acc_stratacode = if_else(acc_stratacode == "", NA_character_,
-                                     acc_stratacode),
-            .groups = "drop")
 
 
 #### divide height classes into strata ####
@@ -713,17 +695,21 @@ crosswalk12 <- crosswalk11 %>%
 if(stratify == "none"){
   
   # flip min and max ht if they're reversed
-  crosswalk13 <- crosswalk12 %>%
+  # sum scov of analysis codes in same releves
+  crosswalk11 <- crosswalk10 %>%
     mutate(minht_orig = minht,
            maxht_orig = maxht,
            minht = if_else(maxht_orig < minht_orig, maxht_orig, minht_orig),
            maxht = if_else(maxht_orig < minht_orig, minht_orig, maxht_orig)) %>%
-    select(-c(minht_orig, maxht_orig))
+    select(-c(minht_orig, maxht_orig)) %>% 
+    group_by(relnumb, analysis_group) %>%
+    summarize(scov = sum(scov_mid, na.rm = T), 
+              .groups = "drop")
   
 } else {
   
   # get physcodes in data
-  crosswalk_phys <- crosswalk12 %>%
+  crosswalk_phys <- crosswalk10 %>%
     distinct(physcode, acc_stratacode)
   
   # no stratification
@@ -761,7 +747,7 @@ if(stratify == "none"){
   # select height levels within strata
   # calculate scov for that height level
   # sum across the same analysis codes and height levels within stratum
-  crosswalk13a <- crosswalk12 %>%
+  crosswalk11a <- crosswalk10 %>%
     mutate(minht_orig = minht,
            maxht_orig = maxht,
            minht = if_else(maxht_orig < minht_orig, maxht_orig, minht_orig),
@@ -785,10 +771,10 @@ if(stratify == "none"){
                 select(maxht, ht_max_m)) %>%
     mutate(max_min_range = ht_max_m - ht_min_m,
            scov_per_m = scov_mid / max_min_range) %>% # divide scov over all meters in observed range
-    group_by(relnumb, physcode, minht, maxht, analysis_group, 
-             outside_of_plot, scov_per_m, strata_lower, strata_upper) %>%
+    group_by(relnumb, physcode, acc_stratacode, minht, maxht, scov_per_m,
+             taxon_id, taxon, outside_of_plot, physcode_orig, # unique observation identifiers
+             analysis_group, strata_lower, strata_upper) %>%
     reframe(ht = seq(minht, maxht)) %>% # expand rows to include every height level within range
-    ungroup() %>%
     filter(ht >= strata_lower & ht <= strata_upper) %>% # select height levels within strata
     left_join(ht_conv %>%
                 mutate(ht_range = ht_max_m - ht_min_m) %>%
@@ -806,7 +792,7 @@ if(stratify == "none"){
   # replace strata numbers with names
   if(stratify == "nonpeat"){
     
-    crosswalk13 <- crosswalk13a %>%
+    crosswalk11 <- crosswalk11a %>%
       mutate(analysis_group_strata = str_replace(analysis_group_strata, "13", " understory") %>% 
                str_replace("45", " subcanopy") %>%
                str_replace("68", " canopy") %>%
@@ -817,7 +803,7 @@ if(stratify == "none"){
     
   } else {
     
-    crosswalk13 <- crosswalk13a %>%
+    crosswalk11 <- crosswalk11a %>%
       mutate(analysis_group_strata = str_replace(analysis_group_strata, "14", " understory") %>% 
                str_replace("58", " canopy") %>%
                str_remove("18"),
@@ -830,7 +816,7 @@ if(stratify == "none"){
 }
 
 # check characters in code strata
-crosswalk13 %>% 
+crosswalk11 %>% 
   distinct(code_strata) %>% 
   pull(code_strata) %>% 
   regmatches(gregexpr("[^A-Za-z0-9]", .)) %>% 
@@ -973,7 +959,7 @@ load("data-raw/data-out-ak/mnnpc_example_releve.rds")
 
 # grouped data
 # mask releve numbers
-crosswalk13_prepared <- crosswalk13 %>%
+crosswalk11_prepared <- crosswalk11 %>%
   rename(relnumb_orig = relnumb) %>%
   left_join(releve_mask) %>%
   select(-relnumb_orig) %>%
@@ -981,7 +967,7 @@ crosswalk13_prepared <- crosswalk13 %>%
 
 # ungrouped data
 # mask releve numbers
-crosswalk11_prepared <- crosswalk11 %>%
+crosswalk10_prepared <- crosswalk10 %>%
   rename(relnumb_orig = relnumb) %>%
   left_join(releve_mask) %>%
   group_by(relnumb, physcode, minht, maxht, taxon, acc_assignment,
@@ -990,36 +976,22 @@ crosswalk11_prepared <- crosswalk11 %>%
             .groups = "drop")
 
 # mask releve numbers
-# add system names that match first two letters (groups alder swamps up)
 # select required info
-# format npc names
 releve7 <- releve6 %>%
-  mutate(npc_system_id = if_else(str_detect(npc_system_id, "_|\\/"),
-                                 npc_system_id,
-                                 str_sub(npc_system_id, 1, 2))) %>% 
-  left_join(systems) %>%
-  select(relnumb, used_in_fieldguide, npc_system_id, npc_system, npc_code, 
-         npc_class_name, npc_type_name, npc_subtype_name, ecs_secname) %>%
   rename(relnumb_orig = relnumb) %>%
   left_join(releve_mask) %>%
   select(-relnumb_orig) %>%
-  relocate(relnumb) %>% 
-  mutate(npc_class = str_sub(npc_code, 1, 5),
-         npc_type = if_else(nchar(npc_code) > 5, str_sub(npc_code, 1, 6),
-                            NA_character_),
-         npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
-                               NA_character_),
-         npc_sys_flor = str_sub(npc_code, 1, 3),
-         npc_system = str_to_title(npc_system)) %>%
-  relocate(ecs_secname, .after = last_col())
+  select(relnumb, used_in_fieldguide, npc_code, npc_system_id, npc_system, 
+         npc_sys_flor,npc_class, npc_class_name, npc_type, npc_type_name,
+         npc_subtype, npc_subtype_name, ecs_secname)
 
 
 #### save ####
 
 # rename and save as data frame
-releve_species_grouped <- crosswalk13_prepared %>%
+releve_species_grouped <- crosswalk11_prepared %>%
   as.data.frame()
-releve_species_ungrouped <- crosswalk11_prepared %>%
+releve_species_ungrouped <- crosswalk10_prepared %>%
   as.data.frame()
 releve_plots <- releve7 %>%
   as.data.frame()
@@ -1035,5 +1007,3 @@ save(releve_plots, file = "data-raw/data-out-ak/releve_plot_data.rds")
 # save(releve, file = "../npc-releve/data/originals-20260208/releve.rds")
 # save(spat_releve, file = "../npc-releve/data/originals-20260208/spatial_releve.rds")
 # save(ecs_subsec, file = "../npc-releve/data/originals-20260208/spatial_ecs_subsec.rds")
-# save(mntaxa_taxa, file = "../npc-releve/data/originals-20260208/mntaxa_taxa.rds")
-# save(mntaxa_acc, file = "../npc-releve/data/originals-20260208/mntaxa_accepted.rds")
