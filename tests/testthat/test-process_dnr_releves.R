@@ -110,16 +110,35 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
   testthat::expect_equal(colnames(actual_acc_agg_grp), expected_colnames)
   
   # test that all unmatched species names are in lookup table
-  testthat::expect_true(all(actual_unacc_unagg_ungrp$Species %in%
-                              MNNPC::mnnpc_taxa_lookup$taxon_name))
-  
-  # test that all matched species names are in accepted list
+  testthat::expect_true(
+    all(grepl("Unknown", setdiff(actual_unacc_unagg_ungrp$Species,
+                                 MNNPC::mnnpc_taxa_lookup$taxon_name)))
+  )
   
   # test that aggregating or grouping without matching leads only to unmatched species names
+  testthat::expect_true(
+    all(grepl("Unknown", setdiff(actual_unacc_agg_ungrp$Species,
+                                 MNNPC::mnnpc_taxa_lookup$taxon_name)))
+  )
+  testthat::expect_true(
+    all(grepl("Unknown", setdiff(actual_unacc_unagg_grp$Species,
+                                 MNNPC::mnnpc_taxa_lookup$taxon_name)))
+  )
+  testthat::expect_true(
+    all(grepl("Unknown", setdiff(actual_unacc_agg_grp$Species,
+                                 MNNPC::mnnpc_taxa_lookup$taxon_name)))
+  )
   
+  # test that all matched species names are in recommended list
+  testthat::expect_true(
+    all(actual_acc_unagg_ungrp$Species %in% 
+          MNNPC::mnnpc_accepted_taxa$taxon_name)
+    )
+  
+  #### start here ####
   # test that grouping with or without aggregating leads to the same output
   
-  # test tha aggregating and grouping leading to some overlap?
+  # test that aggregating and grouping leading to some overlap?
   
   # older tests
   actual_unacc_agg$Species <- gsub("\\scanopy|\\sunderstory|\\ssub-canopy", "",
@@ -129,7 +148,6 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
 
   
   
-  testthat::expect_true(all(actual_acc_unagg$Species %in% MNNPC::mnnpc_taxa_lookup$recommended_taxon_name))
   
   testthat::expect_true(setdiff(actual_unacc_agg$Species,
                                 MNNPC::mnnpc_taxa_lookup$analysis_group) |>
