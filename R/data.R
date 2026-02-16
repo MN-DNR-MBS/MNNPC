@@ -7,6 +7,7 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_accepted_taxa)` rows and `r ncol(MNNPC::mnnpc_accepted_taxa)` columns, the definitions of which are:
 #' \describe{
+#'   \item{taxon_id}{Taxon ID in MNTaxa, if available.}
 #'   \item{taxon_name}{Taxon names.}
 #' }
 "mnnpc_accepted_taxa"
@@ -54,7 +55,7 @@
 #'   \item{max_species}{The maximum number of species recorded in the plots which constitute the MN NPC unit.}
 #'   \item{mean_species}{The mean number of species in the plots which constitute the MN NPC unit.}
 #'   \item{species_count}{The total number of species recorded in the plots which constitute the MN NPC unit.}
-#'   \item{ecs_section}{The abbreviation of the ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or NA/blank (i.e., statewide).}
+#'   \item{ecs_section}{The abbreviation of the ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or statewide.}
 #' }
 "mnnpc_community_attributes"
 
@@ -69,16 +70,17 @@
 #'
 #' \code{mnnpc_example_data} 
 #'
-#' @format A list of `r length(MNNPC::mnnpc_example_data)` data frames with `r nrow(MNNPC::mnnpc_example_data)` rows and `r ncol(MNNPC::mnnpc_example_data)` columns, the definitions of which are:
+#' @format A list of `r length(MNNPC::mnnpc_example_data)` data frames with `r nrow(MNNPC::mnnpc_example_data[[1]])` and `r nrow(MNNPC::mnnpc_example_data[[2]])` rows, respectively, and `r ncol(MNNPC::mnnpc_example_data[[1]])` columns, the definitions of which are:
 #' \describe{
-#'   \item{year}{The year the plot was sampled.}
+#'   \item{year}{The year the plot was sampled. Here, numbered from one on, but can be actual year.}
 #'   \item{group}{The group containing the plot.}
-#'   \item{relnumb}{The ID/releve number of the plot.}
+#'   \item{relnumb}{The ID/releve number of the plot (true numbers have been masked for data security).}
 #'   \item{physcode}{The physiognomy code of the taxon.}
 #'   \item{minht}{The minimum height class in which the taxon was recorded.}
 #'   \item{maxht}{The maximum height class in which the taxon was recorded.}
 #'   \item{taxon}{The taxon name, see `MNNPC::mnnpc_taxa_lookup`.}
 #'   \item{scov}{The percent cover of the taxon in the plot within the strata.}
+#'   \item{outside_of_plot}{Indicator of whether the observation occurred outside of the plot ("t" for true, "f" for false).}
 #' }
 "mnnpc_example_data"
 
@@ -146,15 +148,17 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxa_lookup)` rows and `r ncol(MNNPC::mnnpc_taxa_lookup)` columns, the definitions of which are:
 #' \describe{
-#'   \item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
+#'   \item{informal_group}{The informal taxonomic group (physiognomy) in which the taxon belongs.}
 #'   \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
-#'   \item{recommended_taxon_name}{The accepted/recommended taxon name, see `MNNPC::mnnpc_accepted_taxa` and `MNNPC::mnnpc_taxonomic_backbone`.}
+#'   \item{recommended_taxon_name}{The accepted/recommended taxon name, see `MNNPC::mnnpc_accepted_taxa` and `MNNPC::mnnpc_taxonomic_backbone`. Note that in some cases, taxa cannot be matched to a single accepted/recommended taxon, so these have been grouped together.}
 #'   \item{recommended_rank}{The taxonomic rank of the accepted/recommended taxon.}
-#'   \item{recommended_scientific_name}{The scientific name of the accepted/recommended taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available.}
+#'   \item{recommended_scientific_name}{The scientific name of the accepted/recommended taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available, and a qualifier, if applicable.}
 #'   \item{recommended_id}{The ID of the accepted/recommended taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
 #'   \item{recommended_publication}{The parent publication containing the accepted/recommended taxon description.}
+#'   \item{recommended_stratcode}{One of "ground", "shrube", or NA, where ground or shrub, when applied to a broadleaf deciduous or needleleaf evergreen, indicate that the accepted/recommended taxon should not be stratified.}
+#'   \item{recommended_physcode}{Physiognomy code for the accepted/recommended taxon.}
+#'   \item{recommended_assignment}{Combinations of accepted/recommended taxa names that cannot be distinguished when working with historical data due to taxonomic name changes.}
 #'   \item{analysis_group}{The group in which the accepted/recommended taxon was placed for MN NPC classification analyses.}
-#'   \item{analysis_group_includes}{The list of taxa in the group (separated by slashes) in which the accepted/recommended taxon was placed for MN NPC classification analyses.}
 #' }
 "mnnpc_taxa_lookup"
 
@@ -167,11 +171,14 @@
 #' @format A data frame with `r nrow(MNNPC::mnnpc_taxonomic_backbone)` rows and `r ncol(MNNPC::mnnpc_taxonomic_backbone)` columns, the definitions of which are:
 #' \describe{
 #'   \item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
-#'   \item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
 #'   \item{taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 #'   \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-#'   \item{scientific_name}{The scientific name of the taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available.}
-#'   \item{common_name}{The common name associated with the taxon_name.}
+#'   \item{qualifier}{Indicator of taxonomic uncertainty, if applicable (s.l. = sensu lato, s.s. = sensu stricto).}
+#'   \item{authority}{Author(s) responsible for describing taxon, if applicable.}
+#'   \item{publication}{The parent publication containing the taxon description.}
+#'   \item{common_name}{The common name associated with the taxon.}
+#'   \item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown).}
+#'   \item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
 #'   \item{species}{The name of the species taxon associated with the taxon_name, if applicable.}
 #'   \item{genus}{The name of the genus taxon associated with the taxon_name.}
 #'   \item{family}{The name of the family taxon associated with the taxon_name.}
@@ -179,8 +186,6 @@
 #'   \item{class}{The name of the class taxon associated with the taxon_name.}
 #'   \item{phylum}{The name of the phylum taxon associated with the taxon_name.}
 #'   \item{kingdom}{The name of the kingdom taxon associated with the taxon_name.}
-#'   \item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown).}
-#'   \item{publication}{The parent publication containing the taxon_name description.}
 #' }
 "mnnpc_taxonomic_backbone"
 
@@ -192,14 +197,15 @@
 #'
 #' @format A data frame with `r nrow(MNNPC::mnnpc_example_releve)` rows and `r ncol(MNNPC::mnnpc_example_releve)` columns, the definitions of which are:
 #' \describe{
-#'   \item{year}{The year the plot was sampled.}
+#'   \item{year}{The year the plot was sampled. Here, numbered from one on, but can be actual year.}
 #'   \item{group}{The group containing the plot.}
-#'   \item{relnumb}{The ID/releve number of the plot.}
+#'   \item{relnumb}{The ID/releve number of the plot (true numbers have been masked for data security).}
 #'   \item{physcode}{The physiognomy code of the taxon.}
 #'   \item{minht}{The minimum height class in which the taxon was recorded.}
 #'   \item{maxht}{The maximum height class in which the taxon was recorded.}
 #'   \item{taxon}{The taxon name, see `MNNPC::mnnpc_taxa_lookup`.}
 #'   \item{scov}{The percent cover of the taxon in the plot within the strata.}
+#'   \item{outside_of_plot}{Indicator of whether the observation occurred outside of the plot ("t" for true, "f" for false).}
 #' }
 "mnnpc_example_releve"
 

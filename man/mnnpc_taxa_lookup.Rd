@@ -5,17 +5,19 @@
 \alias{mnnpc_taxa_lookup}
 \title{A lookup between the accepted MNTaxa taxa and their synonyms}
 \format{
-A data frame with 5769 rows and 9 columns, the definitions of which are:
+A data frame with 5868 rows and 11 columns, the definitions of which are:
 \describe{
-\item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
+\item{informal_group}{The informal taxonomic group (physiognomy) in which the taxon belongs.}
 \item{taxon_name}{The taxon concept name, includes both accepted/recommended taxa and their synonyms.}
-\item{recommended_taxon_name}{The accepted/recommended taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}.}
+\item{recommended_taxon_name}{The accepted/recommended taxon name, see \code{MNNPC::mnnpc_accepted_taxa} and \code{MNNPC::mnnpc_taxonomic_backbone}. Note that in some cases, taxa cannot be matched to a single accepted/recommended taxon, so these have been grouped together.}
 \item{recommended_rank}{The taxonomic rank of the accepted/recommended taxon.}
-\item{recommended_scientific_name}{The scientific name of the accepted/recommended taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available.}
+\item{recommended_scientific_name}{The scientific name of the accepted/recommended taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available, and a qualifier, if applicable.}
 \item{recommended_id}{The ID of the accepted/recommended taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
 \item{recommended_publication}{The parent publication containing the accepted/recommended taxon description.}
+\item{recommended_stratcode}{One of "ground", "shrube", or NA, where ground or shrub, when applied to a broadleaf deciduous or needleleaf evergreen, indicate that the accepted/recommended taxon should not be stratified.}
+\item{recommended_physcode}{Physiognomy code for the accepted/recommended taxon.}
+\item{recommended_assignment}{Combinations of accepted/recommended taxa names that cannot be distinguished when working with historical data due to taxonomic name changes.}
 \item{analysis_group}{The group in which the accepted/recommended taxon was placed for MN NPC classification analyses.}
-\item{analysis_group_includes}{The list of taxa in the group (separated by slashes) in which the accepted/recommended taxon was placed for MN NPC classification analyses.}
 }
 }
 \usage{

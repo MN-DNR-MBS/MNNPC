@@ -5,16 +5,17 @@
 \alias{mnnpc_example_data}
 \title{Example vegetation plot data}
 \format{
-A list of 2 data frames with  rows and  columns, the definitions of which are:
+A list of 2 data frames with 554 and 1378 rows, respectively, and 9 columns, the definitions of which are:
 \describe{
-\item{year}{The year the plot was sampled.}
+\item{year}{The year the plot was sampled. Here, numbered from one on, but can be actual year.}
 \item{group}{The group containing the plot.}
-\item{relnumb}{The ID/releve number of the plot.}
+\item{relnumb}{The ID/releve number of the plot (true numbers have been masked for data security).}
 \item{physcode}{The physiognomy code of the taxon.}
 \item{minht}{The minimum height class in which the taxon was recorded.}
 \item{maxht}{The maximum height class in which the taxon was recorded.}
 \item{taxon}{The taxon name, see \code{MNNPC::mnnpc_taxa_lookup}.}
 \item{scov}{The percent cover of the taxon in the plot within the strata.}
+\item{outside_of_plot}{Indicator of whether the observation occurred outside of the plot ("t" for true, "f" for false).}
 }
 }
 \usage{

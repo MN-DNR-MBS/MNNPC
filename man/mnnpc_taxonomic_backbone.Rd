@@ -5,14 +5,17 @@
 \alias{mnnpc_taxonomic_backbone}
 \title{The taxonomic backbone for the MNNPC}
 \format{
-A data frame with 2904 rows and 15 columns, the definitions of which are:
+A data frame with 4060 rows and 16 columns, the definitions of which are:
 \describe{
 \item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
-\item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
 \item{taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}
 \item{rank}{The taxonomic rank of the taxon recorded in taxon_name.}
-\item{scientific_name}{The scientific name of the taxon concept, which is equivalent to a concatentation of the taxon_name and authority, if available.}
-\item{common_name}{The common name associated with the taxon_name.}
+\item{qualifier}{Indicator of taxonomic uncertainty, if applicable (s.l. = sensu lato, s.s. = sensu stricto).}
+\item{authority}{Author(s) responsible for describing taxon, if applicable.}
+\item{publication}{The parent publication containing the taxon description.}
+\item{common_name}{The common name associated with the taxon.}
+\item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown).}
+\item{informal_group}{The informal taxonomic group (physiognomy) in which the taxa belongs.}
 \item{species}{The name of the species taxon associated with the taxon_name, if applicable.}
 \item{genus}{The name of the genus taxon associated with the taxon_name.}
 \item{family}{The name of the family taxon associated with the taxon_name.}
@@ -20,8 +23,6 @@ A data frame with 2904 rows and 15 columns, the definitions of which are:
 \item{class}{The name of the class taxon associated with the taxon_name.}
 \item{phylum}{The name of the phylum taxon associated with the taxon_name.}
 \item{kingdom}{The name of the kingdom taxon associated with the taxon_name.}
-\item{origin}{The origin relative to Minnesota, USA (Introduced, Native, Unknown).}
-\item{publication}{The parent publication containing the taxon_name description.}
 }
 }
 \usage{

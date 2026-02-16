@@ -6,9 +6,9 @@
 \usage{
 process_dnr_releves(
   releve_data,
-  process_malformed_data = TRUE,
   strip_suffixes = TRUE,
   match_to_accepted = TRUE,
+  aggregate_into_accepted = FALSE,
   aggregate_into_analysis_groups = TRUE,
   cover_scale = "percentage"
 )
@@ -16,13 +16,13 @@ process_dnr_releves(
 \arguments{
 \item{releve_data}{See \code{MNNPC::mnnpc_example_releve}.}
 
-\item{process_malformed_data}{Specify whether to process data with missing values, a boolean (TRUE/FALSE).}
-
 \item{strip_suffixes}{Specify whether to strip suffixes (e.g. s.l., s.s., and s.a.) from taxon names, a boolean (TRUE/FALSE).}
 
-\item{match_to_accepted}{Specify whether to convert raw taxon names to accepted/recommended taxon names, a boolean (TRUE/FALSE).}
+\item{match_to_accepted}{Specify whether to convert raw taxon names to accepted (recommended_taxon_name in \code{MNNPC::mnnpc_taxa_lookup}), a boolean (TRUE/FALSE).}
 
-\item{aggregate_into_analysis_groups}{Specify whether to aggregate taxa into analysis groups, a boolean (TRUE/FALSE).}
+\item{aggregate_into_accepted}{Specify whether to aggregate taxa into accepted groups (recommended_assignment in \code{MNNPC::mnnpc_taxa_lookup}), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).}
+
+\item{aggregate_into_analysis_groups}{Specify whether to aggregate taxa into analysis groups (analysis_group in \code{MNNPC::mnnpc_taxa_lookup}), a boolean (TRUE/FALSE).}
 
 \item{cover_scale}{Specify the scale of species cover values, one of: "percentage", "proportional", "domin", "braunBlanquet", or "none".}
 }

@@ -5,7 +5,7 @@
 \alias{mnnpc_hybrid_crosswalk}
 \title{Hybrid name crosswalk}
 \format{
-A data frame with 429 rows and 2 columns, the definitions of which are:
+A data frame with 668 rows and 2 columns, the definitions of which are:
 \describe{
 \item{taxon_rep}{The taxon name as it appears in other taxonomic data objects, such as \code{MNNPC::mnnpc_taxa_lookup}.}
 \item{taxon}{Three alternative formats of the hybrid taxon name that include capitalized and lowercase "x" and spaces between "x" and other words.}

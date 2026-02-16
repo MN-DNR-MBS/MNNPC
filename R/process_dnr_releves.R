@@ -5,8 +5,9 @@
 #'
 #' @param releve_data See `MNNPC::mnnpc_example_releve`.
 #' @param strip_suffixes Specify whether to strip suffixes (e.g. s.l., s.s., and s.a.) from taxon names, a boolean (TRUE/FALSE).
-#' @param match_to_accepted Specify whether to convert raw taxon names to accepted/recommended taxon names, a boolean (TRUE/FALSE).
-#' @param aggregate_into_analysis_groups Specify whether to aggregate taxa into analysis groups, a boolean (TRUE/FALSE).
+#' @param match_to_accepted Specify whether to convert raw taxon names to accepted (recommended_taxon_name in `MNNPC::mnnpc_taxa_lookup`), a boolean (TRUE/FALSE).
+#' @param aggregate_into_accepted Specify whether to aggregate taxa into accepted groups (recommended_assignment in `MNNPC::mnnpc_taxa_lookup`), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).
+#' @param aggregate_into_analysis_groups Specify whether to aggregate taxa into analysis groups (analysis_group in `MNNPC::mnnpc_taxa_lookup`), a boolean (TRUE/FALSE).
 #' @param cover_scale Specify the scale of species cover values, one of: "percentage", "proportional", "domin", "braunBlanquet", or "none".
 #'
 #' @returns A data frame containing the releve data with five columns: "Year", "Group", "Quadrat", "Species", "Cover"
