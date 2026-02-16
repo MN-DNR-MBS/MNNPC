@@ -110,6 +110,8 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
   testthat::expect_equal(colnames(actual_acc_agg_grp), expected_colnames)
   
   # test that all unmatched species names are in lookup table
+  testthat::expect_true(all(actual_unacc_unagg_ungrp$Species %in%
+                              MNNPC::mnnpc_taxa_lookup$taxon_name))
   
   # test that all matched species names are in accepted list
   
@@ -125,8 +127,7 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
   actual_acc_agg$Species <- gsub("\\scanopy|\\sunderstory|\\ssub-canopy", "",
                                  actual_acc_agg$Species)
 
-  testthat::expect_true(setdiff(actual_unacc_unagg$Species,
-                                MNNPC::mnnpc_taxa_lookup$taxon_name) == "Polytrichum")
+  
   
   testthat::expect_true(all(actual_acc_unagg$Species %in% MNNPC::mnnpc_taxa_lookup$recommended_taxon_name))
   

@@ -522,11 +522,7 @@ save(mnnpc_community_attributes,
 load("data-raw/data-out-ak/mnnpc_community_attributes.rds")
 
 
-#### accepted taxa ####
-
-# look at example
-load("../RMAVIS/data/accepted_taxa.rda")
-head(accepted_taxa)
+#### hybrid crosswalk ####
 
 # get all accepted names and their IDs
 mntaxa_acc <- accepted_mntaxa(taxonomy_levels = TRUE,
@@ -538,24 +534,6 @@ mntaxa_acc <- accepted_mntaxa(taxonomy_levels = TRUE,
                               common = TRUE,
                               cvals = FALSE,
                               exclude = FALSE)
-
-# acc ID and name
-mnnpc_accepted_taxa <- mntaxa_acc %>% 
-  select(taxon_id, taxon_name = taxon) %>%
-  distinct() %>% 
-  as.data.frame()
-
-# check for duplicates
-get_dupes(mnnpc_accepted_taxa)
-
-# save
-save(mnnpc_accepted_taxa, file = "data-raw/data-out-ak/mnnpc_accepted_taxa.rds")
-load("data-raw/data-out-ak/mnnpc_accepted_taxa.rds")
-
-
-#### hybrid crosswalk ####
-
-# standardize hybrid name formatting
 
 # get taxa list
 mntaxa_taxa <- taxa_mntaxa(taxonomy_levels = FALSE,
@@ -802,6 +780,36 @@ save(mnnpc_taxa_lookup, file = "data-raw/data-out-ak/mnnpc_taxa_lookup.rds")
 load("data-raw/data-out-ak/mnnpc_taxa_lookup.rds")
 
 
+#### accepted taxa ####
+
+# look at example
+load("../RMAVIS/data/accepted_taxa.rda")
+head(accepted_taxa)
+
+# recommended names that aren't MNTaxa accepted
+mnnpc_taxa_lookup %>% 
+  distinct(taxon = recommended_taxon_name) %>% 
+  anti_join(mntaxa_acc)
+
+# accepted taxa
+# taxa groups created for lookup table
+mnnpc_accepted_taxa <- mntaxa_acc %>% 
+  distinct(taxon_id, taxon_name = taxon) %>%
+  mutate(taxon_id = as.character(taxon_id)) %>% 
+  full_join(mnnpc_taxa_lookup %>% 
+              distinct(taxon_id = recommended_id,
+                       taxon_name = recommended_taxon_name)) %>% 
+  arrange(taxon_name) %>% 
+  as.data.frame()
+
+# check for duplicates
+get_dupes(mnnpc_accepted_taxa, taxon_name)
+
+# save
+save(mnnpc_accepted_taxa, file = "data-raw/data-out-ak/mnnpc_accepted_taxa.rds")
+load("data-raw/data-out-ak/mnnpc_accepted_taxa.rds")
+
+
 #### taxonomic backbone ####
 
 # look at example
@@ -847,7 +855,7 @@ get_dupes(mnnpc_taxonomic_backbone, taxon_name)
 # check that all taxa are included
 mnnpc_accepted_taxa %>% 
   anti_join(mnnpc_taxonomic_backbone)
-# should return 0
+# all the grouped taxa
 
 # save
 save(mnnpc_taxonomic_backbone, file = "data-raw/data-out-ak/mnnpc_taxonomic_backbone.rds")
