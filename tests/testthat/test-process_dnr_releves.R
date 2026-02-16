@@ -12,7 +12,7 @@ testthat::test_that("process_dnr_releves works", {
 testthat::test_that("process_dnr_releves works on malformed data", {
   
   test_data_malformed <- MNNPC::mnnpc_example_data$`St. Croix State Forest` |>
-    dplyr::filter(relnumb == "2" & year == 2010)
+    dplyr::filter(relnumb == "582" & year == 2)
   
   test_data_malformed[1, 8] <- NA
   test_data_malformed[2, 7] <- NA
@@ -21,8 +21,7 @@ testthat::test_that("process_dnr_releves works on malformed data", {
   test_data_malformed[5, 4] <- NA
   
   actual <- MNNPC::process_dnr_releves(releve_data = test_data_malformed, 
-                                       process_malformed_data = TRUE,
-                                       cover_scale = "percentage")
+                                       cover_scale = "braunBlanquet")
   
   expected_colnames <- c("Year", "Group", "Quadrat", "Species", "Cover")
   
@@ -50,33 +49,77 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
   
   test_data <- MNNPC::mnnpc_example_releve
   
-  actual_unacc_unagg <- MNNPC::process_dnr_releves(releve_data = test_data,
+  actual_unacc_unagg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                    match_to_accepted = FALSE,
+                                                   aggregate_into_accepted = FALSE,
                                                    aggregate_into_analysis_groups = FALSE,
-                                                   cover_scale = "percentage")
+                                                   cover_scale = "braunBlanquet")
 
-  actual_acc_unagg <- MNNPC::process_dnr_releves(releve_data = test_data,
+  actual_acc_unagg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                  match_to_accepted = TRUE,
+                                                 aggregate_into_accepted = FALSE,
                                                  aggregate_into_analysis_groups = FALSE,
-                                                 cover_scale = "percentage")
+                                                 cover_scale = "braunBlanquet")
 
-  actual_unacc_agg <- MNNPC::process_dnr_releves(releve_data = test_data,
+  actual_unacc_agg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                  match_to_accepted = FALSE,
-                                                 aggregate_into_analysis_groups = TRUE,
-                                                 cover_scale = "percentage")
+                                                 aggregate_into_accepted = TRUE,
+                                                 aggregate_into_analysis_groups = FALSE,
+                                                 cover_scale = "braunBlanquet")
   
-  actual_acc_agg <- MNNPC::process_dnr_releves(releve_data = test_data,
+  actual_unacc_unagg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
+                                                       match_to_accepted = FALSE,
+                                                       aggregate_into_accepted = FALSE,
+                                                       aggregate_into_analysis_groups = TRUE,
+                                                       cover_scale = "braunBlanquet")
+  
+  actual_acc_agg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
+                                                       match_to_accepted = TRUE,
+                                                       aggregate_into_accepted = TRUE,
+                                                       aggregate_into_analysis_groups = FALSE,
+                                                       cover_scale = "braunBlanquet")
+  
+  actual_acc_unagg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
+                                                       match_to_accepted = TRUE,
+                                                       aggregate_into_accepted = FALSE,
+                                                       aggregate_into_analysis_groups = TRUE,
+                                                       cover_scale = "braunBlanquet")
+  
+  actual_unacc_agg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
+                                                     match_to_accepted = FALSE,
+                                                     aggregate_into_accepted = TRUE,
+                                                     aggregate_into_analysis_groups = TRUE,
+                                                     cover_scale = "braunBlanquet")
+  
+  actual_acc_agg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                match_to_accepted = TRUE,
+                                               aggregate_into_accepted = TRUE,
                                                aggregate_into_analysis_groups = TRUE,
-                                               cover_scale = "percentage")
+                                               cover_scale = "braunBlanquet")
   
+  # test that all have expected columns
   expected_colnames <- c("Year", "Group", "Quadrat", "Species", "Cover")
   
-  testthat::expect_equal(colnames(actual_unacc_unagg), expected_colnames)
-  testthat::expect_equal(colnames(actual_acc_unagg), expected_colnames)
-  testthat::expect_equal(colnames(actual_unacc_agg), expected_colnames)
-  testthat::expect_equal(colnames(actual_acc_agg), expected_colnames)
+  testthat::expect_equal(colnames(actual_unacc_unagg_ungrp), expected_colnames)
+  testthat::expect_equal(colnames(actual_acc_unagg_ungrp), expected_colnames)
+  testthat::expect_equal(colnames(actual_unacc_agg_ungrp), expected_colnames)
+  testthat::expect_equal(colnames(actual_unacc_unagg_grp), expected_colnames)
+  testthat::expect_equal(colnames(actual_acc_agg_ungrp), expected_colnames)
+  testthat::expect_equal(colnames(actual_acc_unagg_grp), expected_colnames)
+  testthat::expect_equal(colnames(actual_unacc_agg_grp), expected_colnames)
+  testthat::expect_equal(colnames(actual_acc_agg_grp), expected_colnames)
   
+  # test that all unmatched species names are in lookup table
+  
+  # test that all matched species names are in accepted list
+  
+  # test that aggregating or grouping without matching leads only to unmatched species names
+  
+  # test that grouping with or without aggregating leads to the same output
+  
+  # test tha aggregating and grouping leading to some overlap?
+  
+  # older tests
   actual_unacc_agg$Species <- gsub("\\scanopy|\\sunderstory|\\ssub-canopy", "",
                                    actual_unacc_agg$Species)
   actual_acc_agg$Species <- gsub("\\scanopy|\\sunderstory|\\ssub-canopy", "",
