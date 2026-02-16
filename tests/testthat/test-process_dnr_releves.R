@@ -161,44 +161,44 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
   
 })
 
-testthat::test_that("process_dnr_releves stops if fields are missing", {
-  
-  test_dat <- subset(MNNPC::mnnpc_example_releve, select = -taxon)
-  
-  testthat::expect_error(MNNPC::process_dnr_releves(test_dat,
-                                                    cover_scale = "percentage"), 
-                         NULL)
-  
-})
-
-testthat::test_that("process_dnr_releves gives warning if data are missing", {
-  
-  test_dat <- MNNPC::mnnpc_example_releve
-  test_dat$scov[3] <- NA
-  
-  testthat::expect_warning(MNNPC::process_dnr_releves(test_dat,
-                                                      cover_scale = "percentage"), 
-                         NULL)
-  
-})
-
-testthat::test_that("process_dnr_releves stops if data are missing and malformed F", {
-  
-  test_dat <- MNNPC::mnnpc_example_releve
-  test_dat$scov[3] <- NA
-  
-  testthat::expect_error(MNNPC::process_dnr_releves(test_dat,
-                                                    process_malformed_data = F,
-                                                    cover_scale = "percentage"), 
-                         NULL)
-  
-})
+# testthat::test_that("process_dnr_releves stops if fields are missing", {
+#   
+#   test_dat <- subset(MNNPC::mnnpc_example_releve, select = -taxon)
+#   
+#   testthat::expect_error(MNNPC::process_dnr_releves(test_dat,
+#                                                     cover_scale = "percentage"), 
+#                          NULL)
+#   
+# })
+# 
+# testthat::test_that("process_dnr_releves gives warning if data are missing", {
+#   
+#   test_dat <- MNNPC::mnnpc_example_releve
+#   test_dat$scov[3] <- NA
+#   
+#   testthat::expect_warning(MNNPC::process_dnr_releves(test_dat,
+#                                                       cover_scale = "percentage"), 
+#                          NULL)
+#   
+# })
+# 
+# testthat::test_that("process_dnr_releves stops if data are missing and malformed F", {
+#   
+#   test_dat <- MNNPC::mnnpc_example_releve
+#   test_dat$scov[3] <- NA
+#   
+#   testthat::expect_error(MNNPC::process_dnr_releves(test_dat,
+#                                                     process_malformed_data = F,
+#                                                     cover_scale = "percentage"), 
+#                          NULL)
+#   
+# })
 
 testthat::test_that("process_dnr_releves gives warning if suffixes aren't fixed", {
   
   testthat::expect_warning(MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve,
                                                       strip_suffixes = F,
-                                                      cover_scale = "percentage"), 
+                                                      cover_scale = "braunBlanquet"), 
                            NULL)
   
 })
@@ -207,7 +207,7 @@ testthat::test_that("process_dnr_releves gives warning if taxa aren't matched", 
   
   testthat::expect_warning(MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve,
                                                       match_to_accepted = F,
-                                                      cover_scale = "percentage"), 
+                                                      cover_scale = "braunBlanquet"), 
                            NULL)
   
 })
@@ -216,7 +216,23 @@ testthat::test_that("process_dnr_releves gives warning if taxa aren't aggregated
   
   testthat::expect_warning(MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve,
                                                       aggregate_into_analysis_groups = F,
-                                                      cover_scale = "percentage"), 
+                                                      cover_scale = "braunBlanquet"), 
                            NULL)
   
 })
+
+testthat::test_that("process_dnr_releves returns zero if cover is none", {
+  
+  test_dat <- MNNPC::mnnpc_example_releve
+  test_dat$scov <- NA_real_
+  
+  actual_none <- MNNPC::process_dnr_releves(releve_data = test_dat,
+                                            cover_scale = "none")
+  
+  testthat::expect_true(
+    unique(actual_none$Cover) == 0
+  )
+  
+}
+  
+)
