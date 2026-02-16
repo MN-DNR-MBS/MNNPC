@@ -277,7 +277,8 @@ process_dnr_releves <- function(releve_data,
         Year = year,
         Group = group,
         Quadrat = relnumb,
-        Species = recommended_assignment
+        Species = recommended_assignment,
+        Cover = scov
       )
     
     # return

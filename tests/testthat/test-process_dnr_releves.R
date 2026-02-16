@@ -135,26 +135,29 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
           MNNPC::mnnpc_accepted_taxa$taxon_name)
     )
   
-  #### start here ####
+  # test that aggregating leads to recommended assignments
+  testthat::expect_true(
+    all(actual_acc_agg_ungrp$Species %in% 
+          MNNPC::mnnpc_taxa_lookup$recommended_assignment)
+  )
+  
+  # test that grouping leads to analysis groups
+  testthat::expect_true(
+    all(gsub("\\scanopy|\\sunderstory|\\ssubcanopy", "",
+             actual_acc_agg_grp$Species) %in% 
+          MNNPC::mnnpc_taxa_lookup$analysis_group)
+  )
+  
+  testthat::expect_true(
+    all(gsub("\\scanopy|\\sunderstory|\\ssubcanopy", "",
+             actual_acc_unagg_grp$Species) %in% 
+          MNNPC::mnnpc_taxa_lookup$analysis_group)
+  )
+  
   # test that grouping with or without aggregating leads to the same output
-  
-  # test that aggregating and grouping leading to some overlap?
-  
-  # older tests
-  actual_unacc_agg$Species <- gsub("\\scanopy|\\sunderstory|\\ssub-canopy", "",
-                                   actual_unacc_agg$Species)
-  actual_acc_agg$Species <- gsub("\\scanopy|\\sunderstory|\\ssub-canopy", "",
-                                 actual_acc_agg$Species)
-
-  
-  
-  
-  testthat::expect_true(setdiff(actual_unacc_agg$Species,
-                                MNNPC::mnnpc_taxa_lookup$analysis_group) |>
-                          length() == 22)
-  
-  testthat::expect_true(all(actual_acc_agg$Species %in%
-                              MNNPC::mnnpc_taxa_lookup$analysis_group))
+  testthat::expect_true(
+    sum(rowSums(actual_acc_unagg_grp != actual_acc_agg_grp)) == 0
+  )
   
 })
 
