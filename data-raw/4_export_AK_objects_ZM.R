@@ -13,6 +13,7 @@ load(file.path(input_path, "mnnpc_taxa_lookup.rds"))
 load(file.path(input_path, "mnnpc_taxonomic_backbone.rds"))
 load(file.path(input_path, "mnnpc_example_releve.rds"))
 load(file.path(input_path, "mnnpc_hybrid_crosswalk.rds"))
+load(file.path(input_path, "mnnpc_floristic_table_data.rds"))
 
 # Example releve
 
@@ -87,15 +88,18 @@ str(mnnpc_example_data[["Earthworm-Invaded Forests"]])
 # check that all taxa have accepted names
 mnnpc_example_data[["St. Croix State Forest"]] |>
   dplyr::filter(!(taxon %in% mnnpc_taxa_lookup$taxon_name))
+# need to strip suffixes
 
 mnnpc_example_data[["Earthworm-Invaded Forests"]] |>
   dplyr::filter(!(taxon %in% mnnpc_taxa_lookup$taxon_name))
 
 # check scov values
-isTRUE(all(all(mnnpc_example_data[["St. Croix State Forest"]]$scov > 0), 
-           all(mnnpc_example_data[["St. Croix State Forest"]]$scov <= 100)))
-isTRUE(all(all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov > 0), 
-           all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov <= 100)))
+# isTRUE(all(all(mnnpc_example_data[["St. Croix State Forest"]]$scov > 0), 
+#            all(mnnpc_example_data[["St. Croix State Forest"]]$scov <= 100)))
+# isTRUE(all(all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov > 0), 
+#            all(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov <= 100)))
+unique(mnnpc_example_data[["St. Croix State Forest"]]$scov)
+unique(mnnpc_example_data[["Earthworm-Invaded Forests"]]$scov)
 
 # save
 usethis::use_data(mnnpc_example_data, internal = FALSE, overwrite = TRUE, compress = "xz")
@@ -134,3 +138,8 @@ usethis::use_data(mnnpc_taxa_lookup, internal = FALSE, overwrite = TRUE, compres
 # mnnpc_hybrid_crosswalk <- mnnpc_hybrid_crosswalk
 
 usethis::use_data(mnnpc_hybrid_crosswalk, internal = FALSE, overwrite = TRUE, compress = "xz")
+
+# Floristic tables data
+mnnpc_floristic_table_data <- flor_dat
+
+usethis::use_data(mnnpc_floristic_table_data, internal = FALSE, overwrite = TRUE, compress = "xz")

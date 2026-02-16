@@ -1,7 +1,7 @@
 testthat::test_that("process_dnr_releves works", {
   
   actual <- MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve,
-                                       cover_scale = "percentage")
+                                       cover_scale = "braunBlanquet")
   
   expected_colnames <- c("Year", "Group", "Quadrat", "Species", "Cover")
   

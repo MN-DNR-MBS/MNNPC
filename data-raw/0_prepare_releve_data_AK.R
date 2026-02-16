@@ -142,12 +142,12 @@ releve_include <- crosswalk %>%
 npc_code_corrections <- tibble(npc_code_orig = c("LB", "MR_93a", "MR_93b",
                                                  "RB", "Opn", "WMn83a"),
                                npc_code_rep = c("LK", "MR", "MR", "RV", "OPn",
-                                            "WMs83a"),
+                                                "WMs83a"),
                                npc_class_name_rep = c(rep(NA_character_, 5),
                                                       "Southern Seepage Meadow/Carr"),
                                npc_type_name_rep = c(rep(NA_character_, 5),
                                                      "Seepage Meadow/Carr"))
-  
+
 # get plot area from remarks, when available
 # replace 0 or 999 with NA plot area
 # format survey names
@@ -216,7 +216,7 @@ releve2 <- releve %>%
                                  npc_type_name),
          npc_subtype = if_else(nchar(npc_code) > 6, str_sub(npc_code, 1, 7),
                                NA_character_)
-         ) %>%
+  ) %>%
   select(-c(npc_code_rep, npc_class_name_rep, npc_type_name_rep)) %>% 
   rename(relnumb = dnr_releve_nbr) %>%
   filter(relnumb %in% releve_include & relnumb != "5307")
@@ -363,7 +363,7 @@ if(op_exclude == T){
   crosswalk3 <- crosswalk2 %>%
     mutate(scov = if_else(outside_of_plot == 1 & 
                             !(physcode %in% c("D", "E") & maxht >= 5), # allow canopy trees to have scov 
-                             "r", scov)) %>%
+                          "r", scov)) %>%
     left_join(scov_conv2)
   
 }
@@ -407,7 +407,7 @@ crosswalk6 <- crosswalk5 %>%
          sum_scov_mid = sum(scov_mid, na.rm = T)) %>%
   ungroup() %>%
   mutate(pcov_mid = if_else(!is.na(mode_pcov_mid), mode_pcov_mid, 
-                                sum_scov_mid)) %>%
+                            sum_scov_mid)) %>%
   select(-c(mode_pcov_mid, sum_scov_mid, pcov, pcov_ord)) %>%
   mutate(minht = as.numeric(minht),
          maxht = as.numeric(maxht)) # causes warnings because of non-numeric
@@ -499,7 +499,7 @@ crosswalk_dups3 <- crosswalk_dups2 %>%
 # multiple vitalities, remarks that suggest distinctions, or 
 crosswalk_dups_dist <- crosswalk_dups3 %>%
   filter(!(rank %in% c("subspecies", "variety", "species")) | 
-             str_detect(taxon, "\\ s\\.l\\.") | vitalities > 1 | 
+           str_detect(taxon, "\\ s\\.l\\.") | vitalities > 1 | 
            !(remarks_combined %in% c("", "dup entry") | 
                str_detect(remarks_combined, "orig"))) %>%
   group_by(relnumb, physcode, minht, maxht, pcov_mid, taxon_id, taxon, spcode,  # multiple pcov values can cause duplicates at end
@@ -589,7 +589,7 @@ crosswalk_dups %>%
   anti_join(crosswalk_dups_res) %>% 
   inner_join(crosswalk7) %>% 
   data.frame()
-  
+
 # update duplicates
 crosswalk8 <- crosswalk7 %>%
   anti_join(crosswalk_dups) %>%
@@ -812,7 +812,7 @@ if(stratify == "none"){
     
     
   }
-
+  
 }
 
 # check characters in code strata
@@ -900,7 +900,7 @@ rel_tax1 <- rel_ex1 %>%
   left_join(releve_mask) %>%
   select(-relnumb_orig) %>%
   mutate(outside_of_plot = fct_recode(as.character(outside_of_plot),
-                                       "t" = "1",
+                                      "t" = "1",
                                       "f" = "0") %>%
            as.character()) %>%
   relocate(relnumb, .after = "group")
