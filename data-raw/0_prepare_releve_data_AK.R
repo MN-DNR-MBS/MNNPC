@@ -351,11 +351,13 @@ crosswalk2 <- crosswalk %>%
 scov_conv2 <- scov_conv %>%
   rename(scov_mid = !!sym(midpoint_method))
 
+# exclude "x" scov before adding conversion
 # exclude outside-of-plot?
 if(op_exclude == T){
   
   crosswalk3 <- crosswalk2 %>%
     filter(outside_of_plot == 0) %>%
+    filter(is.na(scov) | scov != "x") %>% 
     left_join(scov_conv2)
   
 } else {
@@ -364,6 +366,7 @@ if(op_exclude == T){
     mutate(scov = if_else(outside_of_plot == 1 & 
                             !(physcode %in% c("D", "E") & maxht >= 5), # allow canopy trees to have scov 
                           "r", scov)) %>%
+    filter(is.na(scov) | scov != "x") %>% 
     left_join(scov_conv2)
   
 }
