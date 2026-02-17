@@ -363,7 +363,7 @@ process_dnr_releves <- function(releve_data,
         outside_of_plot %in% c(1, "t", "T", TRUE) &
           !(physcode %in% c("D", "E") &
               maxht >= 5),
-        min(MNNPC::mnnpc_bb_conv$scov_mid),
+        min(MNNPC::mnnpc_bb_conv$scov_mid, na.rm = T),
         scov
       ))
     
