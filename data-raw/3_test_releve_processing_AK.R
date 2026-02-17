@@ -13,15 +13,15 @@ rm(list = ls()[!ls() %in% c("crosswalk",
                             "resample")])
 
 # load finalized objects
-#devtools::load_all()
+devtools::load_all()
 
 # load recent objects
-load("data-raw/data-out-ak/mnnpc_hybrid_crosswalk.rds")
-load("data-raw/data-out-ak/mnnpc_taxa_lookup.rds")
-load("data-raw/data-out-ak/mnnpc_example_data.rds")
-load("data/mnnpc_bb_conv.rda")
-load("data/mnnpc_strata.rda")
-load("data/mnnpc_ht_conv.rda")
+# load("data-raw/data-out-ak/mnnpc_hybrid_crosswalk.rds")
+# load("data-raw/data-out-ak/mnnpc_taxa_lookup.rds")
+# load("data-raw/data-out-ak/mnnpc_example_data.rds")
+# load("data/mnnpc_bb_conv.rda")
+# load("data/mnnpc_strata.rda")
+# load("data/mnnpc_ht_conv.rda")
 
 
 #### test parameters ####
