@@ -32,14 +32,11 @@ head(mnnpc_accepted_taxa)
 usethis::use_data(mnnpc_accepted_taxa, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Community attributes
-mnnpc_community_attributes <- mnnpc_community_attributes |>
-  dplyr::mutate(
-    "ecs_section" = dplyr::case_when(
-      is.na(ecs_section) ~ "statewide",
-      TRUE ~ ecs_section
-    )
-  )
 
+# check
+head(mnnpc_community_attributes)
+
+# save
 usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Example data

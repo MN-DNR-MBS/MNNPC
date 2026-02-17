@@ -481,7 +481,7 @@ att_fun <- function(ecs_sec = all_sections){
 
 # floristic tables statewide and by region
 att_tab_state <- att_fun() %>% 
-  mutate(ecs_section = NA_character_)
+  mutate(ecs_section = "statewide")
 att_tab_LAP <- att_fun("LAP")
 att_tab_MIM <- att_fun("MIM")
 att_tab_MOP <- att_fun("MOP")
@@ -865,7 +865,7 @@ load("data-raw/data-out-ak/mnnpc_taxonomic_backbone.rds")
 #### floristic table data ####
 
 # data used to build floristic tables
-flor_dat <- spec_grp %>% 
+mnnpc_floristic_table_data <- spec_grp %>% 
   rename(Quadrat = relnumb,
          Species = analysis_group_strata,
          Cover = scov,
@@ -873,7 +873,7 @@ flor_dat <- spec_grp %>%
   relocate(Quadrat, Species, Cover)
 
 # save
-save(flor_dat, file = "data-raw/data-out-ak/mnnpc_floristic_table_data.rds")
+save(mnnpc_floristic_table_data, file = "data-raw/data-out-ak/mnnpc_floristic_table_data.rds")
 
 
 #### section map ####
