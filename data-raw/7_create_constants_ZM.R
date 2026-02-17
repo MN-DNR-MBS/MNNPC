@@ -120,16 +120,16 @@ mnnpc_ecs_sections <- c("Statewide" = "statewide",
 usethis::use_data(mnnpc_ecs_sections, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Scov midpoint conversion for Braun-Blanquet (van der Maarel 2007)
-mnnpc_bb_conv <- data.frame(scov = c(as.character(5:1), "+", "r"),
+mnnpc_bb_conv <- data.frame(scov = c(as.character(5:1), "+", "r", NA_character_),
                               scov_mid = c(87.5, 62.5, 37.5, 15, 2.5, 0.1, 
-                                           0.02))
+                                           0.02, NA_real_))
 
 usethis::use_data(mnnpc_bb_conv, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 # Scov midpoint conversion for Domin (RMAVIS)
-mnnpc_dom_conv <- data.frame(scov = c(as.character(10:1), "+"),
+mnnpc_dom_conv <- data.frame(scov = c(as.character(10:1), "+", NA_character_),
                             scov_mid = c(95.5, 83, 63, 42, 30, 18, 8, 3, 5, 3,
-                                         0.1))
+                                         0.1, NA_real_))
 
 usethis::use_data(mnnpc_dom_conv, internal = FALSE, overwrite = TRUE, compress = "xz")
 

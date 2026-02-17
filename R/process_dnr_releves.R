@@ -78,13 +78,13 @@ process_dnr_releves <- function(releve_data,
     
   } else if (cover_scale == "domin") {
     releve_data <- releve_data |>
-      dplyr::left_join(MNNPC::mnnpc_dom_conv, by = "scov") |>
+      dplyr::inner_join(MNNPC::mnnpc_dom_conv, by = "scov") |>
       dplyr::select(-scov) |>
       dplyr::rename(scov = scov_mid)
     
   } else if (cover_scale == "braunBlanquet") {
     releve_data <- releve_data |>
-      dplyr::left_join(MNNPC::mnnpc_bb_conv, by = "scov") |>
+      dplyr::inner_join(MNNPC::mnnpc_bb_conv, by = "scov") |>
       dplyr::select(-scov) |>
       dplyr::rename(scov = scov_mid)
     
