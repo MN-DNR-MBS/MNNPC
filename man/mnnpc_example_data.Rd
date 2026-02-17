@@ -14,7 +14,7 @@ A list of 2 data frames with 554 and 1378 rows, respectively, and 9 columns, the
 \item{minht}{The minimum height class in which the taxon was recorded.}
 \item{maxht}{The maximum height class in which the taxon was recorded.}
 \item{taxon}{The taxon name, see \code{MNNPC::mnnpc_taxa_lookup}.}
-\item{scov}{The percent cover of the taxon in the plot within the strata.}
+\item{scov}{The cover of the taxon in the plot within the strata on the Braun-Blanquet scale..}
 \item{outside_of_plot}{Indicator of whether the observation occurred outside of the plot ("t" for true, "f" for false).}
 }
 }

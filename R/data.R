@@ -79,7 +79,7 @@
 #'   \item{minht}{The minimum height class in which the taxon was recorded.}
 #'   \item{maxht}{The maximum height class in which the taxon was recorded.}
 #'   \item{taxon}{The taxon name, see `MNNPC::mnnpc_taxa_lookup`.}
-#'   \item{scov}{The percent cover of the taxon in the plot within the strata.}
+#'   \item{scov}{The cover of the taxon in the plot within the strata on the Braun-Blanquet scale..}
 #'   \item{outside_of_plot}{Indicator of whether the observation occurred outside of the plot ("t" for true, "f" for false).}
 #' }
 "mnnpc_example_data"
@@ -106,6 +106,37 @@
 #'   \item{indval}{The fidelity measure indval.}
 #' }
 "mnnpc_fidelity_metrics"
+
+#' Floristic Table Data
+#'
+#' The data used to build floristic tables for each MN NPC unit.
+#'
+#' \code{mnnpc_floristic_table_data} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_floristic_table_data)` rows and `r ncol(MNNPC::mnnpc_floristic_table_data)` columns, the definitions of which are:
+#' \describe{
+#'   \item{Quadrat}{The ID/releve number of the plot (true numbers have been masked for data security).}
+#'   \item{Species}{The formatted taxon name (analysis group and strata, if applicable), see `MNNPC::mnnpc_taxa_lookup`.}
+#'   \item{Cover}{The percent cover of the taxon in the plot within the strata.}
+#'   \item{analysis_group}{The analysis group, see `MNNPC::mnnpc_taxa_lookup`.}
+#'   \item{strata_lower}{The minimum height class of the strata.}
+#'   \item{strata_upper}{The maximum height class of the strata.}
+#'   \item{code_strata}{Equivalent to Species, but with spaces replaced by underscores.}
+#'   \item{used_in_fieldguide}{Indicator for whether the plot was used to inform MN NPC field guides published in 2003 and 2005.}
+#'   \item{npc_code}{The most specific MN NPC unit code that the plot was identified to.}
+#'   \item{npc_system_id}{Code for the system level of the MN NPC classification system.}
+#'   \item{npc_system}{Name of the system level of the MN NPC classification system.}
+#'   \item{npc_sys_flor}{Code for the system level and floristic region of the MN NPC classification system.}
+#'   \item{npc_class}{Code for the class level of the MN NPC classification system.}
+#'   \item{npc_class_name}{Name of the class level of the MN NPC classification system.}
+#'   \item{npc_type}{Code for the type level of the MN NPC classification system, if available.}
+#'   \item{npc_type_name}{Name of the type level of the MN NPC classification system, if available.}
+#'   \item{npc_subtype}{Code for the subtype level of the MN NPC classification system, if available.}
+#'   \item{npc_subtype_name}{Name of the subtype level of the MN NPC classification system, if available.
+#'   \item{ecs_secname}{Name of the ECS section where the plot occurs.}
+#'   \item{ecs_section}{Code of the ECS section where the plot occurs.}
+#' }
+"mnnpc_floristic_table_data"
 
 #' Floristic Tables
 #'
@@ -204,7 +235,7 @@
 #'   \item{minht}{The minimum height class in which the taxon was recorded.}
 #'   \item{maxht}{The maximum height class in which the taxon was recorded.}
 #'   \item{taxon}{The taxon name, see `MNNPC::mnnpc_taxa_lookup`.}
-#'   \item{scov}{The percent cover of the taxon in the plot within the strata.}
+#'   \item{scov}{The cover of the taxon in the plot within the strata on the Braun-Blanquet scale.}
 #'   \item{outside_of_plot}{Indicator of whether the observation occurred outside of the plot ("t" for true, "f" for false).}
 #' }
 "mnnpc_example_releve"
