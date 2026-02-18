@@ -756,12 +756,23 @@ filter(mntaxa_lookup2, is.na(informal_group)) %>%
 filter(mntaxa_lookup2, str_detect(recommended_taxon_name, "\\/")) %>% 
   distinct(recommended_taxon_name)
 
-# format columns for look-up table
-mnnpc_taxa_lookup <- mntaxa_lookup2 %>%
+# add assignment and analysis group
+mntaxa_lookup3 <- mntaxa_lookup2 %>%
   left_join(mntaxa_groups3 %>% 
               select(taxon_name = taxon, 
                      recommended_assignment = acc_assignment, 
-                     analysis_group)) %>% 
+                     analysis_group))
+
+# get combined taxa
+comb_tax <- mntaxa_lookup3 %>% 
+  filter(!(recommended_taxon_name) %in% mntaxa_lookup2$taxon_name) %>% 
+  mutate(taxon_name = recommended_taxon_name) %>% 
+  distinct()
+
+# add combined taxa
+# format columns for look-up table
+mnnpc_taxa_lookup <- mntaxa_lookup3 %>% 
+  full_join(comb_tax) %>% 
   arrange(taxon_name) %>%
   relocate(informal_group) %>% 
   as.data.frame()
