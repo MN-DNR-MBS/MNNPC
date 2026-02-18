@@ -1,3 +1,7 @@
+# MNNPC 1.1.0 (XX-02-2026)
+
+* 
+
 # MNNPC 1.0.0 (04-02-2026)
 
 * Adding `MNNPC::mnnpc_fidelity_metrics` and `MNNPC::mnnpc_diversity_metrics`.
