@@ -1,6 +1,7 @@
 # MNNPC 1.1.0 (XX-02-2026)
 
-* 
+* Adding `MNNPC::mnnpc_development_data` object which contains the releves used to define the MN NPC communities.
+* Finalising the floristic tables and taxonomic backbone information.
 
 # MNNPC 1.0.0 (04-02-2026)
 
