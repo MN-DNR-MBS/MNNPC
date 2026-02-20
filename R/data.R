@@ -111,9 +111,9 @@
 #'
 #' The data used to build floristic tables for each MN NPC unit.
 #'
-#' \code{mnnpc_floristic_table_data} 
+#' \code{mnnpc_development_data} 
 #'
-#' @format A data frame with `r nrow(MNNPC::mnnpc_floristic_table_data)` rows and `r ncol(MNNPC::mnnpc_floristic_table_data)` columns, the definitions of which are:
+#' @format A data frame with `r nrow(MNNPC::mnnpc_development_data)` rows and `r ncol(MNNPC::mnnpc_development_data)` columns, the definitions of which are:
 #' \describe{
 #'   \item{Quadrat}{The ID/releve number of the plot (true numbers have been masked for data security).}
 #'   \item{Species}{The formatted taxon name (analysis group and strata, if applicable), see `MNNPC::mnnpc_taxa_lookup`.}
@@ -136,7 +136,7 @@
 #'   \item{ecs_secname}{Name of the ECS section where the plot occurs.}
 #'   \item{ecs_section}{Code of the ECS section where the plot occurs.}
 #' }
-"mnnpc_floristic_table_data"
+"mnnpc_development_data"
 
 #' Floristic Tables
 #'
@@ -170,6 +170,21 @@
 #'   \item{taxon_name}{The taxon name, see `MNNPC::mnnpc_accepted_taxa` and `MNNPC::mnnpc_taxonomic_backbone`.}
 #' }
 "mnnpc_pquads"
+
+#' MN NPC Releves
+#'
+#' The releves used to define each MNNPC unit, by ECS section, produced using the 
+#' `MNNPC::mnnpc_development_data` object.
+#'
+#' \code{mnnpc_releves} 
+#'
+#' @format A data frame with `r nrow(MNNPC::mnnpc_releves)` rows and `r ncol(MNNPC::mnnpc_releves)` columns, the definitions of which are:
+#' \describe{
+#'   \item{npc_code}{The code for the MN NPC unit.}
+#'   \item{releve}{An anonymised ID for each releve.}
+#'   \item{taxon_name}{The taxon name, see `MNNPC::mnnpc_accepted_taxa` and `MNNPC::mnnpc_taxonomic_backbone`.}
+#' }
+"mnnpc_releves"
 
 #' A lookup between the accepted MNTaxa taxa and their synonyms
 #'

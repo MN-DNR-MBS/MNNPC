@@ -5,7 +5,7 @@
 \alias{mnnpc_example_data}
 \title{Example vegetation plot data}
 \format{
-A list of 2 data frames with 554 and 1378 rows, respectively, and 9 columns, the definitions of which are:
+A list of 2 data frames with 545 and 1371 rows, respectively, and 8 columns, the definitions of which are:
 \describe{
 \item{year}{The year the plot was sampled. Here, numbered from one on, but can be actual year.}
 \item{group}{The group containing the plot.}

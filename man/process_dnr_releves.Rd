@@ -8,7 +8,7 @@ process_dnr_releves(
   releve_data,
   strip_suffixes = TRUE,
   match_to_accepted = TRUE,
-  aggregate_into_accepted = FALSE,
+  aggregate_into_assigned = FALSE,
   aggregate_into_analysis_groups = TRUE,
   cover_scale = "percentage"
 )
@@ -20,7 +20,7 @@ process_dnr_releves(
 
 \item{match_to_accepted}{Specify whether to convert raw taxon names to accepted (recommended_taxon_name in \code{MNNPC::mnnpc_taxa_lookup}), a boolean (TRUE/FALSE).}
 
-\item{aggregate_into_accepted}{Specify whether to aggregate taxa into accepted groups (recommended_assignment in \code{MNNPC::mnnpc_taxa_lookup}), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).}
+\item{aggregate_into_assigned}{Specify whether to aggregate taxa into accepted groups (recommended_assignment in \code{MNNPC::mnnpc_taxa_lookup}), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).}
 
 \item{aggregate_into_analysis_groups}{Specify whether to aggregate taxa into analysis groups (analysis_group in \code{MNNPC::mnnpc_taxa_lookup}), a boolean (TRUE/FALSE).}
 
@@ -34,5 +34,5 @@ Process releve data into the format required by RMAVIS, specifically a data fram
 in long format containing "Year", "Group", "Quadrat", "Species", and "Cover" columns.
 }
 \examples{
-MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve)
+MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve, cover_scale = "braunBlanquet")
 }

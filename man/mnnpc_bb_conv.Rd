@@ -5,7 +5,7 @@
 \alias{mnnpc_bb_conv}
 \title{mnnpc_bb_conv}
 \format{
-A data frame with 7 rows and 2 columns, the definitions of which are:
+A data frame with 8 rows and 2 columns, the definitions of which are:
 \describe{
 \item{scov}{Braun-Blanquet cover/abundance scale values.}
 \item{scov_mid}{Percent cover values.}

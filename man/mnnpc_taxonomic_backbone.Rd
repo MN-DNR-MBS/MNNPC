@@ -5,7 +5,7 @@
 \alias{mnnpc_taxonomic_backbone}
 \title{The taxonomic backbone for the MNNPC}
 \format{
-A data frame with 4060 rows and 16 columns, the definitions of which are:
+A data frame with 3107 rows and 16 columns, the definitions of which are:
 \describe{
 \item{id}{The ID of the taxon in MNTaxa: The State of Minnesota Vascular Plant Checklist.}
 \item{taxon_name}{The taxon concept name, includes accepted or recommended taxa only.}

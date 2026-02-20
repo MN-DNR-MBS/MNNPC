@@ -5,7 +5,7 @@
 \alias{mnnpc_phylo_taxa_lookup}
 \title{A lookup between accepted taxon names and the taxon names present in the phylogenetic tree}
 \format{
-A data frame with 3476 rows and 5 columns, the definitions of which are:
+A data frame with 4092 rows and 6 columns, the definitions of which are:
 \describe{
 \item{taxon_name}{Accepted taxon names as present in \code{MNNPC::mnnpc_accepted_taxa}.}
 \item{search_name}{The taxon name used to search for OTL data, and as present in the \code{MNNPC::mnnpc_phylo_tree} object.}
@@ -19,7 +19,7 @@ mnnpc_phylo_taxa_lookup
 }
 \description{
 A lookup between accepted taxon names as present in \code{MNNPC::mnnpc_accepted_taxa} and the taxon names present in the \code{MNNPC::mnnpc_phylo_tree} phylogenetic tree object.
-At present 3415 taxa out of 4092 are present in the tree.
+At present 4037 taxa out of 4092 are present in the tree.
 The phylo_taxon_name are produced by reducing varieties and subspecies to the species rank, and removing strata and ecological group suffixes.
 }
 \details{

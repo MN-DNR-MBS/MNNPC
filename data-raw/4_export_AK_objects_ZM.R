@@ -6,14 +6,11 @@ load(file.path(input_path, "mnnpc_accepted_taxa.rds"))
 load(file.path(input_path, "mnnpc_community_attributes.rds"))
 load(file.path(input_path, "mnnpc_example_data.rds"))
 load(file.path(input_path, "mnnpc_example_releve.rds"))
-# load(file.path(input_path, "mnnpc_floristic_table_data.rds"))
+load(file.path(input_path, "mnnpc_floristic_table_data.rds"))
 load(file.path(input_path, "mnnpc_floristic_tables.rds"))
 load(file.path(input_path, "mnnpc_hybrid_crosswalk.rds"))
 load(file.path(input_path, "mnnpc_taxa_lookup.rds"))
 load(file.path(input_path, "mnnpc_taxonomic_backbone.rds"))
-load(file.path(input_path, "releve_plot_data.rds")) # Check
-load(file.path(input_path, "releve_species_grouped_data.rds")) # Check
-load(file.path(input_path, "releve_species_ungrouped_data.rds")) # Check
 
 # Example releve ---------------------------------------------------------
 
@@ -22,7 +19,7 @@ colnames(mnnpc_example_releve)
 
 # adjust
 mnnpc_example_releve <- mnnpc_example_releve |>
-  dplyr::filter(outside_of_plot == "f") |>
+  # dplyr::filter(outside_of_plot == "f") |>
   dplyr::select(-outside_of_plot)
 
 # save
@@ -41,7 +38,7 @@ usethis::use_data(mnnpc_community_attributes, internal = FALSE, overwrite = TRUE
 # Example data ---------------------------------------------------------
 st_croix_raw <- mnnpc_example_data[["St. Croix State Forest"]]
 st_croix_processed <- st_croix_raw |>
-  dplyr::filter(outside_of_plot == "f") |>
+  # dplyr::filter(outside_of_plot == "f") |>
   dplyr::select(-outside_of_plot) |>
   dplyr::filter(scov != "x") |>
   dplyr::mutate("taxon" = stringr::str_remove_all(string = taxon, pattern = "\\ss.s.$|\\ss.l.$")) |>
@@ -53,21 +50,21 @@ st_croix_processed <- st_croix_raw |>
 
 earthworm_forests_raw <- mnnpc_example_data[["Earthworm-Invaded Forests"]]
 earthworm_forests_processed <- earthworm_forests_raw  |>
-  dplyr::filter(outside_of_plot == "f") |>
+  # dplyr::filter(outside_of_plot == "f") |>
   dplyr::select(-outside_of_plot) |>
-  dplyr::filter(scov != "x") |>
-  dplyr::filter(!(taxon %in% c("Polytrichum",
-                               "Unknown moss",
-                               "Unknown",
-                               "Unknown bryophytes",
-                               "Non-sphagnum moss"))) |>
-  dplyr::mutate("taxon" = stringr::str_remove_all(string = taxon, pattern = "\\ss.s.$|\\ss.l.$")) |>
-  dplyr::mutate(
-    "taxon" = dplyr::case_when(
-      taxon == "Lonicera xbella" ~ "Lonicera x bella",
-      TRUE ~ taxon
-    )
-  )
+  dplyr::filter(scov != "x") #|>
+  # dplyr::filter(!(taxon %in% c("Polytrichum",
+  #                              "Unknown moss",
+  #                              "Unknown",
+  #                              "Unknown bryophytes",
+  #                              "Non-sphagnum moss"))) |>
+  # dplyr::mutate("taxon" = stringr::str_remove_all(string = taxon, pattern = "\\ss.s.$|\\ss.l.$")) |>
+  # dplyr::mutate(
+  #   "taxon" = dplyr::case_when(
+  #     taxon == "Lonicera xbella" ~ "Lonicera x bella",
+  #     TRUE ~ taxon
+  #   )
+  # )
 
 mnnpc_example_data[["St. Croix State Forest"]] <- st_croix_processed
 mnnpc_example_data[["Earthworm-Invaded Forests"]] <- earthworm_forests_processed
@@ -150,30 +147,43 @@ usethis::use_data(mnnpc_taxonomic_backbone, internal = FALSE, overwrite = TRUE, 
 usethis::use_data(mnnpc_hybrid_crosswalk, internal = FALSE, overwrite = TRUE, compress = "xz")
 
 
-# Floristic tables plot data ---------------------------------------------
+
+# MN NPC development data -------------------------------------------------
 
 # check
-all(releve_species_grouped$relnumb %in% releve_plots$relnumb)
-all(releve_species_ungrouped$relnumb %in% releve_plots$relnumb)
-
-plots_no_npc_code <- releve_plots |> dplyr::filter(is.na(npc_code))
-
-unique(releve_plots$npc_code) |> sort()
-
-all(mnnpc_community_attributes$npc_code %in% unique(releve_plots$npc_code))
-setdiff(mnnpc_community_attributes$npc_code, unique(releve_plots$npc_code))
+str(mnnpc_floristic_table_data)
 
 # prepare
-mnnpc_development_data <- releve_species_grouped |>
-  dplyr::left_join(releve_plots |>
-                     dplyr::select(relnumb, npc_code), 
-                   by = "relnumb") |>
-  dplyr::select(npc_code, 
-                relnumb, 
-                analysis_group_strata,
-                strata_lower,
-                strata_upper,
-                scov)
+mnnpc_development_data <- mnnpc_floristic_table_data
 
 # save
-usethis::use_data(mnnpc_floristic_table_data, internal = FALSE, overwrite = TRUE, compress = "xz")
+usethis::use_data(mnnpc_development_data, internal = FALSE, overwrite = TRUE, compress = "xz")
+
+# Releves ----------------------------------------------------------------
+
+# check
+
+
+# prepare
+mnnpc_releves_statewide <- mnnpc_floristic_table_data |>
+  dplyr::mutate(ecs_section = "statewide") |>
+  dplyr::select(npc_code, "releve" = "Quadrat", "taxon_name" = "Species")
+
+ecs_sections <- mnnpc_floristic_table_data$ecs_section |> unique()
+ecs_sections <- ecs_sections[!is.na(ecs_sections)]
+
+mnnpc_releves <- mnnpc_releves_statewide
+
+for(section in ecs_sections){
+  # section <- "MDL"
+  mnnpc_development_data_section <- mnnpc_floristic_table_data |>
+    dplyr::filter(ecs_section == section) |>
+    dplyr::mutate("npc_code" = paste0(npc_code, "_", section)) |>
+    dplyr::select(npc_code, "releve" = "Quadrat", "taxon_name" = "Species")
+  
+  mnnpc_releves <- mnnpc_releves |>
+    dplyr::bind_rows(mnnpc_development_data_section)
+}
+
+# save
+usethis::use_data(mnnpc_releves, internal = FALSE, overwrite = TRUE, compress = "xz")

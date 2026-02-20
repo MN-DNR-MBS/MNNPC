@@ -5,7 +5,7 @@
 \alias{mnnpc_dom_conv}
 \title{mnnpc_dom_conv}
 \format{
-A data frame with 11 rows and 2 columns, the definitions of which are:
+A data frame with 12 rows and 2 columns, the definitions of which are:
 \describe{
 \item{scov}{Domin cover/abundance scale values.}
 \item{scov_mid}{Percent cover values.}

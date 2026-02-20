@@ -6,7 +6,7 @@
 #' @param releve_data See `MNNPC::mnnpc_example_releve`.
 #' @param strip_suffixes Specify whether to strip suffixes (e.g. s.l., s.s., and s.a.) from taxon names, a boolean (TRUE/FALSE).
 #' @param match_to_accepted Specify whether to convert raw taxon names to accepted (recommended_taxon_name in `MNNPC::mnnpc_taxa_lookup`), a boolean (TRUE/FALSE).
-#' @param aggregate_into_accepted Specify whether to aggregate taxa into accepted groups (recommended_assignment in `MNNPC::mnnpc_taxa_lookup`), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).
+#' @param aggregate_into_assigned Specify whether to aggregate taxa into accepted groups (recommended_assignment in `MNNPC::mnnpc_taxa_lookup`), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).
 #' @param aggregate_into_analysis_groups Specify whether to aggregate taxa into analysis groups (analysis_group in `MNNPC::mnnpc_taxa_lookup`), a boolean (TRUE/FALSE).
 #' @param cover_scale Specify the scale of species cover values, one of: "percentage", "proportional", "domin", "braunBlanquet", or "none".
 #'
@@ -14,11 +14,11 @@
 #' @export
 #'
 #' @examples
-#' MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve)
+#' MNNPC::process_dnr_releves(releve_data = MNNPC::mnnpc_example_releve, cover_scale = "braunBlanquet")
 process_dnr_releves <- function(releve_data,
                                 strip_suffixes = TRUE,
                                 match_to_accepted = TRUE,
-                                aggregate_into_accepted = FALSE,
+                                aggregate_into_assigned = FALSE,
                                 aggregate_into_analysis_groups = TRUE,
                                 cover_scale = "percentage") {
   #### check for processed releve ####
@@ -201,7 +201,7 @@ process_dnr_releves <- function(releve_data,
   #### output matched taxa ####
   
   # stop if not aggregating
-  if (aggregate_into_accepted == F &
+  if (aggregate_into_assigned == F &
       aggregate_into_analysis_groups == F) {
     # taxa that don't have recommended names
     taxa_removed <- releve_data |>
@@ -248,7 +248,7 @@ process_dnr_releves <- function(releve_data,
   #### output accepted name groups ####
   
   # aggregate into accepted names (grouped due to taxonomy changes)
-  if (aggregate_into_accepted == T &
+  if (aggregate_into_assigned == T &
       aggregate_into_analysis_groups == F) {
     # taxa that don't have analysis groups
     taxa_removed <- releve_data |>

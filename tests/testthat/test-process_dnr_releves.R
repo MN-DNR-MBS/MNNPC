@@ -51,49 +51,49 @@ testthat::test_that("process_dnr_releves works with name-matching argument varia
   
   actual_unacc_unagg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                    match_to_accepted = FALSE,
-                                                   aggregate_into_accepted = FALSE,
+                                                   aggregate_into_assigned = FALSE,
                                                    aggregate_into_analysis_groups = FALSE,
                                                    cover_scale = "braunBlanquet")
 
   actual_acc_unagg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                  match_to_accepted = TRUE,
-                                                 aggregate_into_accepted = FALSE,
+                                                 aggregate_into_assigned = FALSE,
                                                  aggregate_into_analysis_groups = FALSE,
                                                  cover_scale = "braunBlanquet")
 
   actual_unacc_agg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                  match_to_accepted = FALSE,
-                                                 aggregate_into_accepted = TRUE,
+                                                 aggregate_into_assigned = TRUE,
                                                  aggregate_into_analysis_groups = FALSE,
                                                  cover_scale = "braunBlanquet")
   
   actual_unacc_unagg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                        match_to_accepted = FALSE,
-                                                       aggregate_into_accepted = FALSE,
+                                                       aggregate_into_assigned = FALSE,
                                                        aggregate_into_analysis_groups = TRUE,
                                                        cover_scale = "braunBlanquet")
   
   actual_acc_agg_ungrp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                        match_to_accepted = TRUE,
-                                                       aggregate_into_accepted = TRUE,
+                                                       aggregate_into_assigned = TRUE,
                                                        aggregate_into_analysis_groups = FALSE,
                                                        cover_scale = "braunBlanquet")
   
   actual_acc_unagg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                        match_to_accepted = TRUE,
-                                                       aggregate_into_accepted = FALSE,
+                                                       aggregate_into_assigned = FALSE,
                                                        aggregate_into_analysis_groups = TRUE,
                                                        cover_scale = "braunBlanquet")
   
   actual_unacc_agg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                      match_to_accepted = FALSE,
-                                                     aggregate_into_accepted = TRUE,
+                                                     aggregate_into_assigned = TRUE,
                                                      aggregate_into_analysis_groups = TRUE,
                                                      cover_scale = "braunBlanquet")
   
   actual_acc_agg_grp <- MNNPC::process_dnr_releves(releve_data = test_data,
                                                match_to_accepted = TRUE,
-                                               aggregate_into_accepted = TRUE,
+                                               aggregate_into_assigned = TRUE,
                                                aggregate_into_analysis_groups = TRUE,
                                                cover_scale = "braunBlanquet")
   

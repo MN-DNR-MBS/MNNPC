@@ -5,7 +5,7 @@
 \alias{mnnpc_example_releve}
 \title{mnnpc_example_releve}
 \format{
-A data frame with 269 rows and 9 columns, the definitions of which are:
+A data frame with 269 rows and 8 columns, the definitions of which are:
 \describe{
 \item{year}{The year the plot was sampled. Here, numbered from one on, but can be actual year.}
 \item{group}{The group containing the plot.}

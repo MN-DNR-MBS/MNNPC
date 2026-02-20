@@ -38,16 +38,13 @@ strings_to_remove <- paste(x = c(" ecological group",
                                  " canopy",
                                  " subcanopy",
                                  " sub-canopy",
-                                 " understory"), 
+                                 " understory",
+                                 "\\svar.*$",
+                                 "\\ssubsp.*$"), 
                            collapse = "|", sep = "")
 
 mnnpc_phylo_taxa_lookup <- mnnpc_accepted_taxa |>
-  dplyr::mutate("search_name" = stringr::str_remove_all(string = taxon_name,
-                                                        pattern = strings_to_remove)) |>
-  dplyr::mutate("search_name" = stringr::str_remove_all(string = search_name,
-                                                        pattern = "\\svar.*$")) |>
-  dplyr::mutate("search_name" = stringr::str_remove_all(string = search_name,
-                                                        pattern = "\\ssubsp.*$"))
+  dplyr::mutate("search_name" = stringr::str_remove_all(string = taxon_name, pattern = strings_to_remove))
 
 
 taxa_phylo <- mnnpc_phylo_taxa_lookup |>
