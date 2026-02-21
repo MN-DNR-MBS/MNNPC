@@ -1,3 +1,7 @@
+# MNNPC 1.1.2 (21-02-2026)
+
+* Re-calculating `MNNPC::mnnpc_diversity_metrics`, ensuring that all strata are correctly removed and all cover values are less than 100.
+
 # MNNPC 1.1.1 (21-02-2026)
 
 * Re-calculating `MNNPC::mnnpc_fidelity_metrics` and `MNNPC::mnnpc_diversity_metrics`.

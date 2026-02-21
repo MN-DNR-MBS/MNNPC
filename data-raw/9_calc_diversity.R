@@ -2,8 +2,11 @@
 
 base_fp <- file.path("C:", "Users", "zekmar", "OneDrive - UKCEH", "Projects", "MNNPC")
 mnnpc_dd_fp <- file.path(base_fp, "floristic_table_development_data_2026-02-21.csv")
+input_path <- file.path("data-raw", "data-out-ak")
 
-higher_taxa <- MNNPC::mnnpc_taxonomic_backbone |>
+load(file.path(input_path, "mnnpc_taxonomic_backbone.rds"))
+
+higher_taxa <- mnnpc_taxonomic_backbone |>
   tibble::as_tibble() |>
   dplyr::select(taxon_name,
                 "Kingdom" = "kingdom",
@@ -14,9 +17,27 @@ higher_taxa <- MNNPC::mnnpc_taxonomic_backbone |>
                 "Genus" = "genus") |>
   dplyr::distinct()
 
+strings_to_remove <- paste(x = c(" canopy",
+                                 " subcanopy",
+                                 " sub-canopy",
+                                 " understory"), 
+                           collapse = "|", sep = "")
+
 mnnpc_dd <- read.csv(file = mnnpc_dd_fp) |>
   tibble::as_tibble() |>
-  dplyr::select(npc_class, npc_type, npc_subtype, ecs_section, Quadrat, Species, Cover)
+  dplyr::select(npc_class, npc_type, npc_subtype, ecs_section, Quadrat, Species, Cover)|>
+  dplyr::mutate("Species" = stringr::str_remove_all(string = Species, pattern = strings_to_remove)) |>
+  dplyr::summarise("Cover" = sum(Cover), .by = c("npc_class", "npc_type", "npc_subtype", "ecs_section", "Quadrat", "Species")) |>
+  dplyr::mutate("Cover" = ifelse(Cover > 100, 100, Cover))
+
+# Check for duplicates
+mnnpc_dd |>
+  dplyr::group_by(npc_class, npc_type, npc_subtype, ecs_section, Quadrat, Species) |>
+  dplyr::filter(dplyr::n() > 1) |>
+  dplyr::ungroup()
+
+# Check no cover values are above 100
+summary(mnnpc_dd)
 
 ecs_sections <- sort(setdiff(unique(mnnpc_dd$ecs_section), NA))
 
@@ -127,12 +148,6 @@ calc_mnnpc_div <- function(data, ecs_sections, output_name){
     suppressMessages() |>
     dplyr::mutate("ecs_section" = output_name,
                   "rank" = "quadrat")
-  
-  # write.csv(x = plot_data_class_results, file = file.path(base_fp, paste0("mnnpc_diversity_class_results_", output_name, ".csv")), row.names = FALSE)
-  # write.csv(x = plot_data_type_results, file = file.path(base_fp, paste0("mnnpc_diversity_type_results_", output_name, ".csv")), row.names = FALSE)
-  # write.csv(x = plot_data_subtype_results, file = file.path(base_fp, paste0("mnnpc_diversity_subtype_results_", output_name, ".csv")), row.names = FALSE)
-  # write.csv(x = plot_data_quadrat_results, file = file.path(base_fp, paste0("mnnpc_diversity_quadrat_results_", output_name, ".csv")), row.names = FALSE)
-  
   
   mnnpc_diversity_results <- dplyr::bind_rows(plot_data_class_results,
                                               plot_data_type_results,
