@@ -1,7 +1,7 @@
 # renv::install(file.path("..", "RMAVIS_1.2.0.tar.gz"), repos = NULL, type = "source")
 
 base_fp <- file.path("C:", "Users", "zekmar", "OneDrive - UKCEH", "Projects", "MNNPC")
-mnnpc_dd_fp <- file.path(base_fp, "floristic_table_development_data_20251224.csv")
+mnnpc_dd_fp <- file.path(base_fp, "floristic_table_development_data_2026-02-21.csv")
 
 higher_taxa <- MNNPC::mnnpc_taxonomic_backbone |>
   tibble::as_tibble() |>
@@ -128,10 +128,10 @@ calc_mnnpc_div <- function(data, ecs_sections, output_name){
     dplyr::mutate("ecs_section" = output_name,
                   "rank" = "quadrat")
   
-  write.csv(x = plot_data_class_results, file = file.path(base_fp, paste0("mnnpc_diversity_class_results_", output_name, ".csv")), row.names = FALSE)
-  write.csv(x = plot_data_type_results, file = file.path(base_fp, paste0("mnnpc_diversity_type_results_", output_name, ".csv")), row.names = FALSE)
-  write.csv(x = plot_data_subtype_results, file = file.path(base_fp, paste0("mnnpc_diversity_subtype_results_", output_name, ".csv")), row.names = FALSE)
-  write.csv(x = plot_data_quadrat_results, file = file.path(base_fp, paste0("mnnpc_diversity_quadrat_results_", output_name, ".csv")), row.names = FALSE)
+  # write.csv(x = plot_data_class_results, file = file.path(base_fp, paste0("mnnpc_diversity_class_results_", output_name, ".csv")), row.names = FALSE)
+  # write.csv(x = plot_data_type_results, file = file.path(base_fp, paste0("mnnpc_diversity_type_results_", output_name, ".csv")), row.names = FALSE)
+  # write.csv(x = plot_data_subtype_results, file = file.path(base_fp, paste0("mnnpc_diversity_subtype_results_", output_name, ".csv")), row.names = FALSE)
+  # write.csv(x = plot_data_quadrat_results, file = file.path(base_fp, paste0("mnnpc_diversity_quadrat_results_", output_name, ".csv")), row.names = FALSE)
   
   
   mnnpc_diversity_results <- dplyr::bind_rows(plot_data_class_results,
@@ -159,6 +159,5 @@ mnnpc_diversity_metrics <- mnnpc_diversity_results_all |>
                 measure, "metric" = "dat_id", partition_level, q, diversity)
 
 write.csv(x = mnnpc_diversity_metrics, file = file.path(base_fp, paste0("mnnpc_diversity_metrics", ".csv")), row.names = FALSE)
-# mnnpc_diversity_metrics <- read.csv(file = file.path(base_fp, paste0("mnnpc_diversity_metrics", ".csv")))
 
 usethis::use_data(mnnpc_diversity_metrics, internal = FALSE, overwrite = TRUE, compress = "xz")

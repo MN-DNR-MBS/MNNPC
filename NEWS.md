@@ -1,3 +1,7 @@
+# MNNPC 1.1.1 (21-02-2026)
+
+* Re-calculating `MNNPC::mnnpc_fidelity_metrics` and `MNNPC::mnnpc_diversity_metrics`.
+
 # MNNPC 1.1.0 (20-02-2026)
 
 * Adding `MNNPC::mnnpc_development_data` object which contains the releves used to define the MN NPC communities.

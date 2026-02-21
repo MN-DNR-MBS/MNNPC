@@ -5,7 +5,7 @@
 \alias{mnnpc_fidelity_metrics}
 \title{Fidelity measures}
 \format{
-A list of 9 data frames with 733026 rows and  columns, the definitions of which are:
+A list of 9 data frames with 662172 rows and  columns, the definitions of which are:
 \describe{
 \item{ecs_section}{The abbreviation of the ECS Section in which the plots occurred, one of: Lake Agassiz, Aspen Parklands (LAP), Minnesota & NE Iowa Morainal (MIM), N. Minnesota & Ontario Peatlands(MOP), N. Minnesota Drift & Lake Plains (MDL), North Central Glaciated Plains (CGP), Northern Superior Uplands (NSU), Paleozoic Plateau (PPL), Red River Valley (RRV), Southern Superior Upland (SSU), Western Superior Uplands (WSU), or Statewide (statewide).}
 \item{system}{The MNNPC unit system code.}

@@ -1,0 +1,24 @@
+---
+title: "Documentation snippets for RMAVIS"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+## Analysis
+
+### Options
+
+**VC Types**
+For MNNPC analysis, the default VC type is "statewide". The user can also select VC types that have been described using vegetation plots from a specific Ecological Classification System (ECS) Section. These geographic units within the state of Minnesota were developed by the MN DNR and are defined by origin of glacial deposits, regional elevation, distribution of plants, and regional climate. For more information, please visit the [Ecological Classification System website](https://www.dnr.state.mn.us/ecs/index.html) The acronym for selected ECS Sections will be appended to the MN NPC code in analysis results.
+
+```{r ecsMap, echo = FALSE, fig.cap = "Map of the Ecological Classification Systems Sections, as defined by the MN DNR, which can be used to constrain MN NPC Analysis to a specific geographic region.", out.width = '100%', fig.align='center'}
+knitr::include_graphics("./screenshots/ecs_map.png", rel_path = FALSE)
+```
+
+
+## VC Assignment
+
+### Options
+
+**Restrict Habitat**
+For MN NPC analysis, habitat can be restricted to the NPC system or NPC system + floristic region. 

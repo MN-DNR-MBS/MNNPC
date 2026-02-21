@@ -10,7 +10,7 @@ version 2.0.
 <!-- badges: start -->
 
 [![Generic
-badge](https://img.shields.io/badge/Version-1.1.0-green.svg)]()
+badge](https://img.shields.io/badge/Version-1.1.1-green.svg)]()
 <!-- badges: end -->
 
 ## Overview
