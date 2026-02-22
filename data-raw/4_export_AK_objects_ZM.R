@@ -165,9 +165,27 @@ usethis::use_data(mnnpc_development_data, internal = FALSE, overwrite = TRUE, co
 
 
 # prepare
-mnnpc_releves_statewide <- mnnpc_floristic_table_data |>
+mnnpc_releves_statewide_class <- mnnpc_floristic_table_data |>
   dplyr::mutate(ecs_section = "statewide") |>
-  dplyr::select(npc_code, "releve" = "Quadrat", "taxon_name" = "Species")
+  dplyr::select("npc_code" = "npc_class", "releve" = "Quadrat", "taxon_name" = "Species") |>
+  dplyr::filter(!is.na(npc_code)) |>
+  dplyr::mutate("releve" = paste0(npc_code, "_", releve))
+
+mnnpc_releves_statewide_type <- mnnpc_floristic_table_data |>
+  dplyr::mutate(ecs_section = "statewide") |>
+  dplyr::select("npc_code" = "npc_type", "releve" = "Quadrat", "taxon_name" = "Species") |>
+  dplyr::filter(!is.na(npc_code)) |>
+  dplyr::mutate("releve" = paste0(npc_code, "_", releve))
+
+mnnpc_releves_statewide_subtype <- mnnpc_floristic_table_data |>
+  dplyr::mutate(ecs_section = "statewide") |>
+  dplyr::select("npc_code" = "npc_subtype", "releve" = "Quadrat", "taxon_name" = "Species") |>
+  dplyr::filter(!is.na(npc_code)) |>
+  dplyr::mutate("releve" = paste0(npc_code, "_", releve))
+
+mnnpc_releves_statewide <- dplyr::bind_rows(mnnpc_releves_statewide_class,
+                                            mnnpc_releves_statewide_type,
+                                            mnnpc_releves_statewide_subtype)
 
 ecs_sections <- mnnpc_floristic_table_data$ecs_section |> unique()
 ecs_sections <- ecs_sections[!is.na(ecs_sections)]
@@ -176,14 +194,43 @@ mnnpc_releves <- mnnpc_releves_statewide
 
 for(section in ecs_sections){
   # section <- "MDL"
-  mnnpc_development_data_section <- mnnpc_floristic_table_data |>
+  
+  mnnpc_releves_statewide_class_section <- mnnpc_floristic_table_data |>
     dplyr::filter(ecs_section == section) |>
-    dplyr::mutate("npc_code" = paste0(npc_code, "_", section)) |>
-    dplyr::select(npc_code, "releve" = "Quadrat", "taxon_name" = "Species")
+    dplyr::select("npc_code" = "npc_class", "releve" = "Quadrat", "taxon_name" = "Species") |>
+    dplyr::filter(!is.na(npc_code)) |>
+    dplyr::mutate("releve" = paste0(npc_code, "_", releve, "_", section)) |>
+    dplyr::mutate("npc_code" = paste0(npc_code, "_", section))
+  
+  mnnpc_releves_statewide_type_section <- mnnpc_floristic_table_data |>
+    dplyr::filter(ecs_section == section) |>
+    dplyr::select("npc_code" = "npc_type", "releve" = "Quadrat", "taxon_name" = "Species") |>
+    dplyr::filter(!is.na(npc_code)) |>
+    dplyr::mutate("releve" = paste0(npc_code, "_", releve, "_", section)) |>
+    dplyr::mutate("npc_code" = paste0(npc_code, "_", section))
+  
+  mnnpc_releves_statewide_subtype_section <- mnnpc_floristic_table_data |>
+    dplyr::filter(ecs_section == section) |>
+    dplyr::select("npc_code" = "npc_subtype", "releve" = "Quadrat", "taxon_name" = "Species") |>
+    dplyr::filter(!is.na(npc_code)) |>
+    dplyr::mutate("releve" = paste0(npc_code, "_", releve, "_", section)) |>
+    dplyr::mutate("npc_code" = paste0(npc_code, "_", section))
+  
+  mnnpc_releves_section <- dplyr::bind_rows(mnnpc_releves_statewide_class_section,
+                                            mnnpc_releves_statewide_type_section,
+                                            mnnpc_releves_statewide_subtype_section)
   
   mnnpc_releves <- mnnpc_releves |>
-    dplyr::bind_rows(mnnpc_development_data_section)
+    dplyr::bind_rows(mnnpc_releves_section)
+  
 }
+
+mnnpc_releves <- mnnpc_releves |>
+  dplyr::select(npc_code, releve, taxon_name)
+
+# check
+all(unique(mnnpc_floristic_tables$npc_code) %in% unique(mnnpc_releves$npc_code))
+table(mnnpc_releves$npc_code)
 
 # save
 usethis::use_data(mnnpc_releves, internal = FALSE, overwrite = TRUE, compress = "xz")

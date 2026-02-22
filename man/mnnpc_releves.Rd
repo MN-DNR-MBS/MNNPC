@@ -5,7 +5,7 @@
 \alias{mnnpc_releves}
 \title{MN NPC Releves}
 \format{
-A data frame with 406374 rows and 3 columns, the definitions of which are:
+A data frame with 847564 rows and 3 columns, the definitions of which are:
 \describe{
 \item{npc_code}{The code for the MN NPC unit.}
 \item{releve}{An anonymised ID for each releve.}

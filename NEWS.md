@@ -1,3 +1,7 @@
+# MNNPC 1.1.3 (22-02-2026)
+
+* Re-exporting `MNNPC::mnnpc_releves` ensuring that all classes, types, and subtypes for all sections and statewide are included.
+
 # MNNPC 1.1.2 (21-02-2026)
 
 * Re-calculating `MNNPC::mnnpc_diversity_metrics`, ensuring that all strata are correctly removed and all cover values are less than 100.
