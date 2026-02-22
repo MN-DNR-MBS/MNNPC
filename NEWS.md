@@ -1,3 +1,7 @@
+# MNNPC 1.1.4 (22-02-2026)
+
+* Re-exporting `MNNPC::mnnpc_releves` with section names in between unit codes and releve numbers.
+
 # MNNPC 1.1.3 (22-02-2026)
 
 * Re-exporting `MNNPC::mnnpc_releves` ensuring that all classes, types, and subtypes for all sections and statewide are included.

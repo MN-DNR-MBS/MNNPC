@@ -199,21 +199,21 @@ for(section in ecs_sections){
     dplyr::filter(ecs_section == section) |>
     dplyr::select("npc_code" = "npc_class", "releve" = "Quadrat", "taxon_name" = "Species") |>
     dplyr::filter(!is.na(npc_code)) |>
-    dplyr::mutate("releve" = paste0(npc_code, "_", releve, "_", section)) |>
+    dplyr::mutate("releve" = paste0(npc_code, "_", section, "_", releve)) |>
     dplyr::mutate("npc_code" = paste0(npc_code, "_", section))
   
   mnnpc_releves_statewide_type_section <- mnnpc_floristic_table_data |>
     dplyr::filter(ecs_section == section) |>
     dplyr::select("npc_code" = "npc_type", "releve" = "Quadrat", "taxon_name" = "Species") |>
     dplyr::filter(!is.na(npc_code)) |>
-    dplyr::mutate("releve" = paste0(npc_code, "_", releve, "_", section)) |>
+    dplyr::mutate("releve" = paste0(npc_code, "_", section, "_", releve)) |>
     dplyr::mutate("npc_code" = paste0(npc_code, "_", section))
   
   mnnpc_releves_statewide_subtype_section <- mnnpc_floristic_table_data |>
     dplyr::filter(ecs_section == section) |>
     dplyr::select("npc_code" = "npc_subtype", "releve" = "Quadrat", "taxon_name" = "Species") |>
     dplyr::filter(!is.na(npc_code)) |>
-    dplyr::mutate("releve" = paste0(npc_code, "_", releve, "_", section)) |>
+    dplyr::mutate("releve" = paste0(npc_code, "_", section, "_", releve)) |>
     dplyr::mutate("npc_code" = paste0(npc_code, "_", section))
   
   mnnpc_releves_section <- dplyr::bind_rows(mnnpc_releves_statewide_class_section,
