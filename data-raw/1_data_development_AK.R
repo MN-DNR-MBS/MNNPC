@@ -885,6 +885,7 @@ mnnpc_floristic_table_data <- spec_grp %>%
 
 # save
 save(mnnpc_floristic_table_data, file = "data-raw/data-out-ak/mnnpc_floristic_table_data.rds")
+load("data-raw/data-out-ak/mnnpc_floristic_table_data.rds")
 
 
 #### section map ####

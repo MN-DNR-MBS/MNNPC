@@ -6,8 +6,9 @@
 #' @param releve_data See `MNNPC::mnnpc_example_releve`.
 #' @param strip_suffixes Specify whether to strip suffixes (e.g. s.l., s.s., and s.a.) from taxon names, a boolean (TRUE/FALSE).
 #' @param match_to_accepted Specify whether to convert raw taxon names to accepted (recommended_taxon_name in `MNNPC::mnnpc_taxa_lookup`), a boolean (TRUE/FALSE).
-#' @param aggregate_into_assigned Specify whether to aggregate taxa into accepted groups (recommended_assignment in `MNNPC::mnnpc_taxa_lookup`), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).
+#' @param aggregate_into_assigned Specify whether to aggregate taxa into accepted groups (recommended_assignment in `MNNPC::mnnpc_taxa_lookup`), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE). Ignored when aggregate_into_analysis_groups is TRUE.
 #' @param aggregate_into_analysis_groups Specify whether to aggregate taxa into analysis groups (analysis_group in `MNNPC::mnnpc_taxa_lookup`), a boolean (TRUE/FALSE).
+#' @param include_strata Specify whether to stratify tree taxa into understory, subcanopy, and canopy based on height values, a boolean (TRUE/FALSE). Can be combined with match_to_accepted, aggregate_into_assigned, or aggregate_into_analysis_groups output.
 #' @param cover_scale Specify the scale of species cover values, one of: "percentage", "proportional", "domin", "braunBlanquet", or "none".
 #'
 #' @returns A data frame containing the releve data with five columns: "Year", "Group", "Quadrat", "Species", "Cover"
@@ -20,6 +21,7 @@ process_dnr_releves <- function(releve_data,
                                 match_to_accepted = TRUE,
                                 aggregate_into_assigned = FALSE,
                                 aggregate_into_analysis_groups = TRUE,
+                                include_strata = TRUE,
                                 cover_scale = "percentage") {
   #### check for processed releve ####
   
@@ -93,6 +95,41 @@ process_dnr_releves <- function(releve_data,
     
   }
   
+  #### misordered heights ####
+  
+  if(all(c("minht", "maxht") %in% names(releve_data))){
+    
+    # convert to numeric if not already
+    releve_data <- releve_data |>
+      dplyr::mutate(minht = as.numeric(minht), maxht = as.numeric(maxht))
+    
+    # check that min and max heights are in order
+    n_misordered_heights <- releve_data |>
+      dplyr::filter(maxht < minht) |>
+      nrow()
+    
+    # warn and flip min and max heights if out of order
+    if (n_misordered_heights > 0) {
+      warning(
+        paste(
+          "There are",
+          n_misordered_heights,
+          "rows with maxht < minht. These rows will be corrected by swapping minht and maxht values."
+        )
+      )
+      
+      releve_data <- releve_data |>
+        dplyr::mutate(
+          minht_orig = minht,
+          maxht_orig = maxht,
+          minht = ifelse(maxht_orig < minht_orig, maxht_orig, minht_orig),
+          maxht = ifelse(maxht_orig < minht_orig, minht_orig, maxht_orig)
+        ) |>
+        dplyr::select(-c(minht_orig, maxht_orig))
+      
+    }
+    
+  }
   
   #### return with suffixes ####
   
@@ -101,6 +138,28 @@ process_dnr_releves <- function(releve_data,
   
   # stop if suffixes present and removing not selected
   if (suffixes_present > 0 & strip_suffixes == F) {
+    # convert outside-of-plot cover to "r" unless it's a canopy tree (based on user input)
+    # no physcodes/strata info -> convert to "r"
+    if (all(c("outside_of_plot", "physcode", "maxht") %in% names(releve_data))) {
+      releve_data <- releve_data |>
+        dplyr::mutate(scov = ifelse(
+          outside_of_plot %in% c(1, "t", "T", TRUE) &
+            !(physcode %in% c("D", "E") &
+                maxht >= 5),
+          min(MNNPC::mnnpc_bb_conv$scov_mid, na.rm = T),
+          scov
+        ))
+      
+    } else if("outside_of_plot" %in% names(releve_data)){
+      releve_data <- releve_data |>
+        dplyr::mutate(scov = ifelse(
+          outside_of_plot %in% c(1, "t", "T", TRUE),
+          min(MNNPC::mnnpc_bb_conv$scov_mid, na.rm = T),
+          scov
+        ))
+      
+    }
+    
     # sum cover for each taxon (over strata, outside of plot, etc.)
     dat_out_suff <- releve_data |>
       dplyr::group_by(year, group, relnumb, taxon) |>
@@ -139,6 +198,28 @@ process_dnr_releves <- function(releve_data,
   
   # stop if taxa aren't matched to accepted names
   if (match_to_accepted == F) {
+    # convert outside-of-plot cover to "r" unless it's a canopy tree (based on user input)
+    # no physcodes/strata info -> conver to "r"
+    if (all(c("outside_of_plot", "physcode", "maxht") %in% names(releve_data))) {
+      releve_data <- releve_data |>
+        dplyr::mutate(scov = ifelse(
+          outside_of_plot %in% c(1, "t", "T", TRUE) &
+            !(physcode %in% c("D", "E") &
+                maxht >= 5),
+          min(MNNPC::mnnpc_bb_conv$scov_mid, na.rm = T),
+          scov
+        ))
+      
+    } else if("outside_of_plot" %in% names(releve_data)){
+      releve_data <- releve_data |>
+        dplyr::mutate(scov = ifelse(
+          outside_of_plot %in% c(1, "t", "T", TRUE),
+          min(MNNPC::mnnpc_bb_conv$scov_mid, na.rm = T),
+          scov
+        ))
+      
+    }
+    
     # sum cover for each taxon (over strata, outside of plot, etc.)
     dat_out_no_match <- releve_data |>
       dplyr::group_by(year, group, relnumb, taxon) |>
@@ -197,6 +278,57 @@ process_dnr_releves <- function(releve_data,
       physcode
     ))
   
+  #### missing height values ####
+  
+  # add NA columns if missing
+  if(!("minht" %in% names(releve_data))){
+    releve_data$minht <- NA_real_
+  }
+  if(!("maxht" %in% names(releve_data))){
+    releve_data$maxht <- NA_real_
+  }
+  
+  # trees that don't have strata
+  strata_missing <- releve_data |>
+    dplyr::filter(stringr::str_detect(physcode, "D|E") &
+                    is.na(stratacode) &
+                    (is.na(minht) | is.na(maxht))) |>
+    dplyr::pull(taxon_name) |>
+    unique() |>
+    sort()
+  
+  # warn user that trees will be stratified across levels
+  if (length(strata_missing) > 0 & include_strata == T) {
+    warning(
+      paste0(
+        "The following taxa are missing height values and will be stratified across understory, subcanopy, and canopy: ",
+        paste(strata_missing, collapse = ", ")
+      )
+    )
+    
+  }
+  
+  # replace any missing with lowest and highest possible
+  releve_data <- releve_data |>
+    dplyr::mutate(
+      minht = tidyr::replace_na(minht, 1),
+      maxht = tidyr::replace_na(maxht, 8)
+    )
+  
+  #### outside-of-plot ####
+  
+  # convert outside-of-plot cover to "r" unless it's a canopy tree
+  if ("outside_of_plot" %in% names(releve_data)) {
+    releve_data <- releve_data |>
+      dplyr::mutate(scov = ifelse(
+        outside_of_plot %in% c(1, "t", "T", TRUE) &
+          !(physcode %in% c("D", "E") &
+              maxht >= 5),
+        min(MNNPC::mnnpc_bb_conv$scov_mid, na.rm = T),
+        scov
+      ))
+    
+  }
   
   #### output matched taxa ####
   
@@ -224,23 +356,34 @@ process_dnr_releves <- function(releve_data,
       
     }
     
-    # sum cover for each taxon (over strata, outside of plot, etc.)
-    dat_out_match <- releve_data |>
-      dplyr::filter(!is.na(recommended_taxon_name)) |>
-      dplyr::group_by(year, group, relnumb, recommended_taxon_name) |>
-      dplyr::summarize(Cover = sum(scov, na.rm = T), .groups = "drop") |>
-      dplyr::rename(
-        Year = year,
-        Group = group,
-        Quadrat = relnumb,
-        Species = recommended_taxon_name
-      )
+    if (include_strata == F) {
+      # sum cover for each taxon (over strata, outside of plot, etc.)
+      dat_out_match <- releve_data |>
+        dplyr::filter(!is.na(recommended_taxon_name)) |>
+        dplyr::group_by(year, group, relnumb, recommended_taxon_name) |>
+        dplyr::summarize(Cover = sum(scov, na.rm = T), .groups = "drop") |>
+        dplyr::rename(
+          Year = year,
+          Group = group,
+          Quadrat = relnumb,
+          Species = recommended_taxon_name
+        )
+      
+      # return
+      return(dat_out_match)
+      
+      # exit
+      stop()
+      
+    }
     
-    # return
-    return(dat_out_match)
+    # if include_strata == T, fall through to height formatting and stratification below
+    # filter to accepted names before stratification
+    releve_data <- releve_data |>
+      dplyr::filter(!is.na(recommended_taxon_name))
     
-    # exit
-    stop()
+    # set species_col for stratification output
+    species_col <- "recommended_taxon_name"
     
   }
   
@@ -269,143 +412,101 @@ process_dnr_releves <- function(releve_data,
       
     }
     
-    # sum cover for each accepted name (over strata, outside of plot, etc.)
-    dat_out_acc <- releve_data |>
-      dplyr::filter(!is.na(recommended_assignment)) |>
-      dplyr::group_by(year, group, relnumb, recommended_assignment) |>
-      dplyr::summarize(scov = sum(scov, na.rm = T), .groups = "drop") |>
-      dplyr::rename(
-        Year = year,
-        Group = group,
-        Quadrat = relnumb,
-        Species = recommended_assignment,
-        Cover = scov
-      )
+    if (include_strata == F) {
+      # sum cover for each accepted name (over strata, outside of plot, etc.)
+      dat_out_acc <- releve_data |>
+        dplyr::filter(!is.na(recommended_assignment)) |>
+        dplyr::group_by(year, group, relnumb, recommended_assignment) |>
+        dplyr::summarize(scov = sum(scov, na.rm = T), .groups = "drop") |>
+        dplyr::rename(
+          Year = year,
+          Group = group,
+          Quadrat = relnumb,
+          Species = recommended_assignment,
+          Cover = scov
+        )
+      
+      # return
+      return(dat_out_acc)
+      
+      # exit
+      stop()
+      
+    }
     
-    # return
-    return(dat_out_acc)
-    
-    # exit
-    stop()
-    
-  }
-  
-  #### missing height values ####
-  
-  # convert heights to numbers if they aren't already
-  # this will cause a warning if there's "X" in these columns
-  releve_data <- releve_data |>
-    dplyr::mutate(minht = as.numeric(minht), maxht = as.numeric(maxht))
-  
-  # trees that don't have strata
-  strata_missing <- releve_data |>
-    dplyr::filter(stringr::str_detect(physcode, "D|E") &
-                    is.na(stratacode) &
-                    (is.na(minht) | is.na(maxht))) |>
-    dplyr::pull(taxon_name) |>
-    unique() |>
-    sort()
-  
-  # warn user that trees will be stratified across levels
-  if (length(strata_missing) > 0) {
-    warning(
-      paste0(
-        "The following taxa are missing height values and will be stratified across understory, subcanopy, and canopy: ",
-        paste(strata_missing, collapse = ", ")
-      )
-    )
-    
-  }
-  
-  # replace any missing with lowest and highest possible
-  releve_data <- releve_data |>
-    dplyr::mutate(
-      minht = tidyr::replace_na(minht, 1),
-      maxht = tidyr::replace_na(maxht, 8)
-    )
-  
-  
-  #### mis-ordered heights ####
-  
-  # check that min and max heights are in order
-  n_misordered_heights <- releve_data |>
-    dplyr::filter(maxht < minht) |>
-    nrow()
-  
-  # warn and flip min and max heights if out of order
-  if (n_misordered_heights > 0) {
-    warning(
-      paste(
-        "There are",
-        n_misordered_heights,
-        "rows with maxht < minht. These rows will be corrected by swapping minht and maxht values."
-      )
-    )
-    
+    # if include_strata == T, fall through to height formatting and stratification below
+    # filter to assigned taxa before stratification
     releve_data <- releve_data |>
-      dplyr::mutate(
-        minht_orig = minht,
-        maxht_orig = maxht,
-        minht = ifelse(maxht_orig < minht_orig, maxht_orig, minht_orig),
-        maxht = ifelse(maxht_orig < minht_orig, minht_orig, maxht_orig)
-      ) |>
-      dplyr::select(-c(minht_orig, maxht_orig))
+      dplyr::filter(!is.na(recommended_assignment))
+    
+    # set species_col for stratification output
+    species_col <- "recommended_assignment"
     
   }
   
-  #### outside-of-plot ####
   
-  # convert outside-of-plot cover to "r" unless it's a canopy tree
-  # add outside of plot if missing
-  if ("outside_of_plot" %in% names(releve_data)) {
-    releve_data <- releve_data |>
-      dplyr::mutate(scov = ifelse(
-        outside_of_plot %in% c(1, "t", "T", TRUE) &
-          !(physcode %in% c("D", "E") &
-              maxht >= 5),
-        min(MNNPC::mnnpc_bb_conv$scov_mid, na.rm = T),
-        scov
-      ))
+  #### output analysis groups ####
+  
+  if (aggregate_into_analysis_groups == T) {
+    # physcodes to include
+    physcode_include <- c("B", "C", "D", "E", "F", "G", "H", "K", "S", "X")
+    phys_pattern <- paste0("\\b(", paste(physcode_include, collapse = "|"), ")\\b")
     
-  } else {
-    releve_data$outside_of_plot <- 0
+    # taxa that don't have analysis groups or physcodes not included in analyses
+    taxa_removed <- releve_data |>
+      dplyr::filter(is.na(analysis_group) |
+                      stringr::str_detect(physcode, phys_pattern) == F) |>
+      dplyr::pull(taxon_name) |>
+      unique() |>
+      sort()
     
-  }
-  
-  #### taxa removed from analysis groups ####
-  
-  # physcodes to include
-  physcode_include <- c("B", "C", "D", "E", "F", "G", "H", "K", "S", "X")
-  phys_pattern <- paste0("\\b(", paste(physcode_include, collapse = "|"), ")\\b")
-  
-  # taxa that don't have analysis groups
-  taxa_removed <- releve_data |>
-    dplyr::filter(is.na(analysis_group) |
-                    stringr::str_detect(physcode, phys_pattern) == F) |>
-    dplyr::pull(taxon_name) |>
-    unique() |>
-    sort()
-  
-  # warn user about taxa being removed
-  if (length(taxa_removed) > 0) {
-    warning(
-      paste0(
-        "The following taxa were removed because they don't belong to analysis groups or have included physiognomy codes: ",
-        paste(taxa_removed, collapse = ", "),
-        ". See taxa lookup table for details."
+    # warn user about taxa being removed
+    if (length(taxa_removed) > 0) {
+      warning(
+        paste0(
+          "The following taxa were removed because they don't belong to analysis groups or have included physiognomy codes: ",
+          paste(taxa_removed, collapse = ", "),
+          ". See taxa lookup table for details."
+        )
       )
-    )
+      
+    }
+    
+    if(include_strata == F){
+      # sum cover for each analysis group (over strata, outside of plot, etc.)
+      dat_out_ag <- releve_data |>
+        dplyr::filter(!is.na(analysis_group) &
+                        stringr::str_detect(physcode, phys_pattern)) |>
+        dplyr::group_by(year, group, relnumb, analysis_group) |>
+        dplyr::summarize(Cover = sum(scov, na.rm = T), .groups = "drop") |>
+        dplyr::rename(
+          Year = year,
+          Group = group,
+          Quadrat = relnumb,
+          Species = analysis_group
+        )
+      
+      # return
+      return(dat_out_ag)
+      
+      # exit
+      stop() 
+      
+    }
+    
+    # if include_strata == T, fall through to height formatting and stratification below
+    # filter to assigned taxa before stratification
+    releve_data <- releve_data |>
+      dplyr::filter(!is.na(analysis_group) &
+                      stringr::str_detect(physcode, phys_pattern))
+    
+    # set species_col for stratification output
+    species_col <- "analysis_group"
     
   }
-  
+
   
   #### stratification ####
-  
-  # remove taxa that don't have analysis groups
-  # select taxa with appropriate physcodes
-  releve_data <- releve_data |>
-    dplyr::filter(!is.na(analysis_group) &
-                    stringr::str_detect(physcode, phys_pattern))
   
   # code combinations
   dat_codes <- releve_data |>
@@ -433,7 +534,7 @@ process_dnr_releves <- function(releve_data,
   # expand rows, one for each height level
   # select height levels within strata
   # calculate scov for that height level
-  # sum across the same analysis codes and height levels within stratum
+  # sum across the same species column and height levels within stratum
   # add strata to tree names
   # rename columns
   releve_data <- releve_data |>
@@ -466,7 +567,7 @@ process_dnr_releves <- function(releve_data,
     dplyr::group_by(year,
                     group,
                     relnumb,
-                    analysis_group,
+                    .data[[species_col]],
                     strata_lower,
                     strata_upper) |>
     dplyr::summarize(scov = sum(scov_ht, na.rm = T), .groups = "drop") |>
@@ -481,19 +582,19 @@ process_dnr_releves <- function(releve_data,
         strata_lower == 6 &
           strata_upper == 8 ~ "canopy"
       ),
-      analysis_group_strata =  ifelse(
+      species_strata = ifelse(
         !is.na(strata),
-        paste(analysis_group, strata),
-        analysis_group
+        paste(.data[[species_col]], strata),
+        .data[[species_col]]
       )
     ) |>
-    dplyr::select(year, group, relnumb, analysis_group_strata, scov) |>
-    dplyr::arrange(year, group, relnumb, analysis_group_strata) |>
+    dplyr::select(year, group, relnumb, species_strata, scov) |>
+    dplyr::arrange(year, group, relnumb, species_strata) |>
     dplyr::rename(
       Year = year,
       Group = group,
       Quadrat = relnumb,
-      Species = analysis_group_strata,
+      Species = species_strata,
       Cover = scov
     ) |>
     as.data.frame()
