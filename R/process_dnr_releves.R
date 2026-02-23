@@ -196,6 +196,16 @@ process_dnr_releves <- function(releve_data,
     
   }
   
+  #### crosswalk hybrid names ####
+  
+  # join hybrid crosswalk and replace names
+  releve_data <- releve_data |>
+    dplyr::left_join(MNNPC::mnnpc_hybrid_crosswalk) |>
+    dplyr::mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) |>
+    dplyr::select(-taxon_rep)
+  
+  #### output unmatched taxa ####
+  
   # stop if taxa aren't matched to accepted names
   if (match_to_accepted == F) {
     # convert outside-of-plot cover to "r" unless it's a canopy tree (based on user input)
@@ -263,13 +273,9 @@ process_dnr_releves <- function(releve_data,
   # remove columns that are in lookup
   releve_data <- releve_data[, !names(releve_data) %in% names(lookup)]
   
-  # crosswalk hybrids
   # add match names and analysis group by taxon name
   # replace physcode with standardized physcode
   releve_data <- releve_data |>
-    dplyr::left_join(MNNPC::mnnpc_hybrid_crosswalk) |>
-    dplyr::mutate(taxon = ifelse(!is.na(taxon_rep), taxon_rep, taxon)) |>
-    dplyr::select(-taxon_rep) |>
     dplyr::rename(taxon_name = taxon) |>
     dplyr::left_join(lookup) |>
     dplyr::mutate(physcode = dplyr::if_else(
@@ -553,10 +559,12 @@ process_dnr_releves <- function(releve_data,
                        dplyr::rename(maxht = ht) |>
                        dplyr::select(maxht, ht_max_m)) |>
     dplyr::mutate(max_min_range = ht_max_m - ht_min_m,
-                  scov_per_m = scov / max_min_range) |>
+                  scov_per_m = scov / max_min_range,
+                  .row_id = dplyr::row_number()) |>
     dplyr::select(-c(ht_max_m, ht_min_m, max_min_range, scov)) |>
-    dplyr::rowwise()|>
+    dplyr::group_by(across(everything())) |>
     dplyr::reframe(ht = seq(minht, maxht)) |>
+    dplyr::select(-.row_id) |>
     dplyr::filter(ht >= strata_lower & ht <= strata_upper) |>
     dplyr::left_join(
       MNNPC::mnnpc_ht_conv |>
