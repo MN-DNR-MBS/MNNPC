@@ -555,7 +555,7 @@ process_dnr_releves <- function(releve_data,
     dplyr::mutate(max_min_range = ht_max_m - ht_min_m,
                   scov_per_m = scov / max_min_range) |>
     dplyr::select(-c(ht_max_m, ht_min_m, max_min_range, scov)) |>
-    dplyr::group_by(across(everything())) |>
+    dplyr::rowwise()|>
     dplyr::reframe(ht = seq(minht, maxht)) |>
     dplyr::filter(ht >= strata_lower & ht <= strata_upper) |>
     dplyr::left_join(
