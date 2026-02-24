@@ -362,6 +362,15 @@ testthat::test_that("process_dnr_releves stops on invalid cover_scale", {
   
 })
 
+testthat::test_that("process_dnr_releves gives 0 cover if incorrect scale used", {
+  
+  actual <- MNNPC::process_dnr_releves(releve_data = test_data,
+                                       cover_scale = "percentage")
+  
+  testthat::expect_true(sum(actual$Cover) == 0)
+  
+})
+
 # ---- warning tests ----
 
 testthat::test_that("process_dnr_releves gives warning if suffixes aren't stripped", {
@@ -413,3 +422,4 @@ testthat::test_that("process_dnr_releves adds pseudo-columns when year, group, r
   testthat::expect_true(all(actual$Quadrat == "1"))
   
 })
+

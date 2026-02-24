@@ -75,17 +75,30 @@ process_dnr_releves <- function(releve_data,
   ))) {
     stop("Please specify a valid cover scale.")
     
+  } else if (cover_scale == "percentage" & 
+             is.numeric(releve_data$scov) == F) {
+      releve_data$scov <- NA_real_
+
   } else if (cover_scale == "proportional") {
-    releve_data$scov <- releve_data$scov * 100
+    
+    if(is.numeric(releve_data$scov) == F){
+      releve_data$scov <- NA_real_
+      
+    } else {
+      releve_data$scov <- releve_data$scov * 100
+      
+    }
     
   } else if (cover_scale == "domin") {
     releve_data <- releve_data |>
+      dplyr::mutate(scov = as.character(scov)) |>
       dplyr::inner_join(MNNPC::mnnpc_dom_conv, by = "scov") |>
       dplyr::select(-scov) |>
       dplyr::rename(scov = scov_mid)
     
   } else if (cover_scale == "braunBlanquet") {
     releve_data <- releve_data |>
+      dplyr::mutate(scov = as.character(scov)) |>
       dplyr::inner_join(MNNPC::mnnpc_bb_conv, by = "scov") |>
       dplyr::select(-scov) |>
       dplyr::rename(scov = scov_mid)
