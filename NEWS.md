@@ -1,3 +1,7 @@
+# MNNPC 1.1.6 (24-02-2026)
+
+* Ensuring `MNNPC::process_dnr_releves` runs when an incorrect cover scale is provided, throwing a warning, but not triggering an error.
+
 # MNNPC 1.1.5 (24-02-2026)
 
 * Adding the 'include_strata' argument to `MNNPC::process_dnr_releves` which controls whether taxa are aggregated into strata or not.
