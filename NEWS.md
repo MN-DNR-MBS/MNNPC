@@ -1,3 +1,7 @@
+# MNNPC 1.1.5 (24-02-2026)
+
+* Adding the 'include_strata' argument to `MNNPC::process_dnr_releves` which controls whether taxa are aggregated into strata or not.
+
 # MNNPC 1.1.4 (22-02-2026)
 
 * Re-exporting `MNNPC::mnnpc_releves` with section names in between unit codes and releve numbers.

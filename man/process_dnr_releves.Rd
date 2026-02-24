@@ -10,6 +10,7 @@ process_dnr_releves(
   match_to_accepted = TRUE,
   aggregate_into_assigned = FALSE,
   aggregate_into_analysis_groups = TRUE,
+  include_strata = TRUE,
   cover_scale = "percentage"
 )
 }
@@ -20,9 +21,11 @@ process_dnr_releves(
 
 \item{match_to_accepted}{Specify whether to convert raw taxon names to accepted (recommended_taxon_name in \code{MNNPC::mnnpc_taxa_lookup}), a boolean (TRUE/FALSE).}
 
-\item{aggregate_into_assigned}{Specify whether to aggregate taxa into accepted groups (recommended_assignment in \code{MNNPC::mnnpc_taxa_lookup}), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE).}
+\item{aggregate_into_assigned}{Specify whether to aggregate taxa into accepted groups (recommended_assignment in \code{MNNPC::mnnpc_taxa_lookup}), which are equivalent taxa due to taxonomic changes, a boolean (TRUE/FALSE). Ignored when aggregate_into_analysis_groups is TRUE.}
 
 \item{aggregate_into_analysis_groups}{Specify whether to aggregate taxa into analysis groups (analysis_group in \code{MNNPC::mnnpc_taxa_lookup}), a boolean (TRUE/FALSE).}
+
+\item{include_strata}{Specify whether to stratify tree taxa into understory, subcanopy, and canopy based on height values, a boolean (TRUE/FALSE). Can be combined with match_to_accepted, aggregate_into_assigned, or aggregate_into_analysis_groups output.}
 
 \item{cover_scale}{Specify the scale of species cover values, one of: "percentage", "proportional", "domin", "braunBlanquet", or "none".}
 }

@@ -15,7 +15,7 @@ testthat::test_that("process_dnr_releves works with default arguments", {
 testthat::test_that("process_dnr_releves works on malformed data", {
   
   test_data_malformed <- test_data |>
-    dplyr::filter(relnumb == first(relnumb) & year == first(year))
+    dplyr::filter(relnumb == dplyr::first(relnumb) & year == dplyr::first(year))
   
   test_data_malformed[1, 8] <- NA
   test_data_malformed[2, 7] <- NA
@@ -147,9 +147,10 @@ testthat::test_that("process_dnr_releves species names are correct for each aggr
   
   # unmatched species should only differ from lookup by "Unknown" taxa
   testthat::expect_true(
-    all(grepl("Unknown", setdiff(actual_no_match$Species,
-                                 MNNPC::mnnpc_taxa_lookup$taxon_name)))
-  )
+    setequal(c("Unknown", "Non-sphagnum moss", "Unknown moss", "Unknown bryophytes"), 
+             setdiff(actual_no_match$Species, MNNPC::mnnpc_taxa_lookup$taxon_name)
+             )
+    )
   
   # matched species should all be in the recommended taxon list
   testthat::expect_true(
